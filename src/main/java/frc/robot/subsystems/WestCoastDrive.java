@@ -105,6 +105,7 @@ public class WestCoastDrive extends Module {
         public static final double kPulsesPerRotation = 256.0;
         public static final double kCurrentLimitAmps = 60.0;
         public static final double kTrackWidthFeet = 20.875 / 12;
+        public static final double kRpmToMpsFactor = (ABC.feet_to_meters(kWheelCircumferenceFeet)/kGearboxRatio) * 1/60;
         public static final int kMaxLimelightFOV = 22;
 
         // ========================================
@@ -272,22 +273,18 @@ public class WestCoastDrive extends Module {
 
         public ChassisSpeeds getCurrentSpeeds() {
                 // Create a kinematics object with a track width of 0.7 meters
-                DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.7);
+                DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(kTrackWidthFeet);
 
                 // Get the current left and right wheel speeds from the encoders
-                double leftSpeed = leftEncoder.getRate();
-                double rightSpeed = rightEncoder.getRate();
+                double leftSpeed = mLeftEncoder.getVelocity();
+                double rightSpeed = mRightEncoder.getVelocity();
 
                 // Create a wheel speeds object with the encoder values
-                DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(leftSpeed, rightSpeed);
+                DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(leftSpeed * kRpmToMpsFactor, rightSpeed * kRpmToMpsFactor);
 
                 // Convert the wheel speeds to chassis speeds
                 ChassisSpeeds chassisSpeeds = kinematics.toChassisSpeeds(wheelSpeeds);
-
-                // Get the robot-relative linear and angular velocities
-                double vx = chassisSpeeds.vxMetersPerSecond; // forward velocity in meters per second
-                double omega = chassisSpeeds.omegaRadiansPerSecond; // angular velocity in radians per second
-
+                return chassisSpeeds;
         }
 
         public Pose2d getPose() {
