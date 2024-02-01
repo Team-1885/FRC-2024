@@ -4,14 +4,54 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.CANSparkMax;
+
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.hardware.REVLibCAN;
+
+//remember to import into RobotContainer
+
+
+//using drivetrain motors because we don't have any others declared yet
+//new version of wpilib isn't working too great
 
 public class PeytonCANLauncher extends SubsystemBase {
-  /** Creates a new PeytonCANLauncher. */
-  public PeytonCANLauncher() {}
+  // Creates a new PeytonCANLauncher
+  CANSparkMax REV_0xM1;
+
+  public PeytonCANLauncher() {
+    REV_0xM1 = new CANSparkMax(REVLibCAN.L_MASTER_ID, REVLibCAN.MOTOR_TYPE); //launch wheel
+
+    REV_0xM1.setSmartCurrentLimit(80); //value found in kitbot constants, launch wheel
+
+  }
+
+  public Command getIntakeCommand() {
+    return this.startEnd(
+      () -> {
+        setLaunchWheel(-1); //value found in kitbot constants, launch wheel
+      },
+      // When the command stops, stop the wheels
+      () -> {
+        stop();
+      });
+  }
+
+  public void setLaunchWheel(double speed) {
+    REV_0xM1.set(speed);
+  }
+
+  public void stop() {
+    REV_0xM1.set(0);
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    // does it still need to call even with nothing in it?
   }
 }
+  
+
+

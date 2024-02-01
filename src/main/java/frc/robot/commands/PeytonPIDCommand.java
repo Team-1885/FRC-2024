@@ -4,29 +4,96 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import java.util.function.DoubleConsumer;
+import java.util.function.DoubleSupplier;
 
-public class PeytonPIDCommand extends CommandBase {
-  /** Creates a new PeytonPIDCommand. */
-  public PeytonPIDCommand() {
-    // Use addRequirements() here to declare subsystem dependencies.
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.ADAM;
+import frc.robot.RobotContainer;
+import frc.robot.subsystems.PeytonPID;
+import lombok.Getter;
+
+//remember to import into RobotContainer
+
+@SuppressWarnings("PMD.CommentSize")
+public class PeytonPIDCommand extends PIDCommand {
+
+  private @Getter ADAM adam = new ADAM(null);
+
+  private final @Getter PeytonPID peytonPID;
+
+  public PeytonCommand(final PeytonPID peytonPID, PIDController controller, DoubleSupplier measurementSource, DoubleSupplier setpointSource,
+  DoubleConsumer useOutput, Subsystem... requirements) {
+    super(new PIDController(0, 0, 0), setpointSource, 0, useOutput, requirements);
+    getController();
+    this.peytonPID = peytonPID;
+    addRequirements(peytonPID);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    super.initialize();
+    System.out.println("==== STARTING PEYTONPIDCOMMAND ====");
+    runTest(() -> {
 
-  // Called every time the scheduler runs while the command is scheduled.
+    });
+  }
+
   @Override
-  public void execute() {}
+  public void execute() {
+    super.execute();
+    runTest(() -> {
+      
+      double forwardSpeed = RobotContainer.logitech.getRawAxis(1) * 1;
+      double turnSpeed = RobotContainer.logitech.getZ() * 1; 
 
-  // Called once the command ends or is interrupted.
+      forwardSpeed = applyDeadzone(forwardSpeed, 0.05);
+      turnSpeed = applyDeadzone(turnSpeed, 0.05);
+
+      double leftSpeed = forwardSpeed + turnSpeed;
+      double rightSpeed = forwardSpeed - turnSpeed;
+
+      peytonDriveTrain.setMotorSpeed(leftSpeed, rightSpeed);
+    });
+  }
+
+  private double applyDeadzone(double value, double deadzone) {
+    if (Math.abs(value) < deadzone) {
+      return 0.0;
+    } else {
+      return value;
+    }
+  }
+
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    super.end(interrupted);
+    runTest(() -> {
 
-  // Returns true when the command should end.
+    });
+  }
+
   @Override
   public boolean isFinished() {
+    super.isFinished();
     return false;
   }
+
+  public void debugCommand() {
+    runTest(() -> initialize());
+    runTest(() -> execute());
+    runTest(() -> end(false));
+  }
+
+  public void runTest(final Runnable code) {
+    try {
+      code.run();
+    } catch (Exception e) {
+      adam.uncaughtException(Thread.currentThread(), e);
+    }
+  }
 }
+
