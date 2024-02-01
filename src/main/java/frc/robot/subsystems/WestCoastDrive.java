@@ -105,7 +105,8 @@ public class WestCoastDrive extends Module {
         public static final double kPulsesPerRotation = 256.0;
         public static final double kCurrentLimitAmps = 60.0;
         public static final double kTrackWidthFeet = 20.875 / 12;
-        public static final double kRpmToMpsFactor = (ABC.feet_to_meters(kWheelCircumferenceFeet)/kGearboxRatio) * 1/60;
+        public static final double kRpmToMpsFactor = (ABC.feet_to_meters(kWheelCircumferenceFeet) / kGearboxRatio) * 1
+                        / 60;
         public static final int kMaxLimelightFOV = 22;
 
         // ========================================
@@ -262,26 +263,31 @@ public class WestCoastDrive extends Module {
                 });
         }
 
-        public void drive(ChassisSpeeds pFieldRelativeSpeeds) {
-                ChassisSpeeds robotRelative = ChassisSpeeds.fromFieldRelativeSpeeds(pFieldRelativeSpeeds,
-                                mGyro.getRotation2d());
-                DifferentialDriveKinematics mKinematics = new DifferentialDriveKinematics(kTrackWidthFeet);
-                DifferentialDriveWheelSpeeds wheelSpeeds = mKinematics.toWheelSpeeds(robotRelative);
-                setMotorSpeed(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond);
+        public void drive(ChassisSpeeds pRobotRelativeSpeeds) {
+                // Creating my kinematics object: track width of around 1.7 feet
+                DifferentialDriveKinematics mKinematics = new DifferentialDriveKinematics(ABC.feet_to_meters(kTrackWidthFeet));
 
+                // Convert to wheel speeds
+                DifferentialDriveWheelSpeeds mWheelSpeeds = mKinematics.toWheelSpeeds(pRobotRelativeSpeeds);
+
+                // Left velocity
+                double mLeftVelocity = mWheelSpeeds.leftMetersPerSecond;
+
+                // Right velocity
+                double mRightVelocity = mWheelSpeeds.rightMetersPerSecond;
+
+                setMotorSpeed(mLeftVelocity, mRightVelocity);
         }
 
         public ChassisSpeeds getCurrentSpeeds() {
-                // Create a kinematics object with a track width of 0.7 meters
-                DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(kTrackWidthFeet);
-
+                // Create a kinematics object with a track width of around 1.7 feet
+                DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(ABC.feet_to_meters(kTrackWidthFeet));
                 // Get the current left and right wheel speeds from the encoders
                 double leftSpeed = mLeftEncoder.getVelocity();
                 double rightSpeed = mRightEncoder.getVelocity();
-
                 // Create a wheel speeds object with the encoder values
-                DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(leftSpeed * kRpmToMpsFactor, rightSpeed * kRpmToMpsFactor);
-
+                DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(leftSpeed * kRpmToMpsFactor,
+                                rightSpeed * kRpmToMpsFactor);
                 // Convert the wheel speeds to chassis speeds
                 ChassisSpeeds chassisSpeeds = kinematics.toChassisSpeeds(wheelSpeeds);
                 return chassisSpeeds;
