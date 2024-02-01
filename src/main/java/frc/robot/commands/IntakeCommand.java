@@ -8,9 +8,14 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.common.types.input.ELogitech310;
 import frc.robot.ADAM;
+import frc.robot.InputMap;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.controller.AbstractController;
 import frc.robot.subsystems.IntakeSubsystem;
 import lombok.Getter;
+
+import frc.robot.hardware.vendors.firstparties.Data;
 
 import com.flybotix.hfr.codex.CodexOf;
 import com.flybotix.hfr.codex.RobotCodex;
@@ -26,7 +31,6 @@ public class IntakeCommand extends CommandBase {
 
 
   private @Getter ADAM adam = new ADAM(null);
-  
 
   private final @Getter IntakeSubsystem intakeSubsystem;
 
@@ -52,19 +56,19 @@ public class IntakeCommand extends CommandBase {
     runTest(() -> {
       double feedSpeed = 0;
       double rotateSpeed = 0;
-
       //input from buttons
-      if(ELogitech310.A_BTN.isButton())
+      if(Robot.DATA.driverinput.isSet(ELogitech310.A_BTN))
       {
         feedSpeed = 0.5;
       }
       
       //rotate up
-      if(ELogitech310.L_BTN.isButton())
+      if(Robot.DATA.driverinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS))
       {
         rotateSpeed = 0.5;
       }
-      else if(ELogitech310.LEFT_TRIGGER_AXIS.isAxis())
+      //rotate down
+      if(Robot.DATA.driverinput.isSet(ELogitech310.L_BTN))
       {
         rotateSpeed = -0.5;
       }

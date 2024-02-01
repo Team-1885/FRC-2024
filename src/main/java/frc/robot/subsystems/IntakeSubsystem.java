@@ -76,7 +76,7 @@ public class IntakeSubsystem extends SubsystemBase {
         }
 
         /**
-         * Executes a custom method, running it within a testing environment.
+         * Executes a custom method, running =it within a testing environment.
          *
          * @see #runTest(Runnable)
          */

@@ -25,6 +25,8 @@ import frc.robot.subsystems.WestCoastDrive;
 import frc.robot.subsystems.IntakeSubsystem;
 import lombok.Getter;
 
+import frc.common.types.input.ELogitech310;
+
 /** 
  * This class is where the bulk of the robot should be declared. 
  * Since Command-based is a "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot} periodic methods (other than the scheduler calls). 
@@ -37,6 +39,10 @@ import lombok.Getter;
   private @Getter final DriveCommand driveCommand = new DriveCommand(westCoastDrive);
   private @Getter final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
   private @Getter final ExampleCommand exampleCommand = new ExampleCommand(exampleSubsystem);
+  
+  private @Getter final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private @Getter final IntakeCommand intakeCommand = new IntakeCommand(intakeSubsystem);
+
   //private @Getter final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   //private @Getter final IntakeCommand intakeCommand = new IntakeCommand(intakeSubsystem);
   private @Getter final XboxController xboxController = new XboxController(RobotMap.DriverConstants.D_XBOX_PORT);
@@ -51,6 +57,9 @@ import lombok.Getter;
     SmartDashboard.putData("Auto Chooser", autoChooser);
     westCoastDrive.setDefaultCommand(driveCommand);
     NamedCommands.registerCommand("DriveCommand", driveCommand);
+
+    intakeSubsystem.setDefaultCommand(intakeCommand);
+    NamedCommands.registerCommand("IntakeCommand", intakeCommand);
     // Configure the trigger bindings
     configureBindings();
   }
