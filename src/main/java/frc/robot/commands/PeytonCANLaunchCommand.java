@@ -8,14 +8,8 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.PeytonCANLauncher;
 import lombok.Getter;
 
-//remember to import into RobotContainer
 
 public class PeytonCANLaunchCommand extends CommandBase {
-
-  //the equivalent of LaunchNote.java for the KitBot
-  //which is for 2 motors
-  //if we end up using only one, I will switch over to PrepareLaunch.java
-  //which is only for 1 motor to launch the note into the speaker
 
 private final @Getter PeytonCANLauncher peytonCANLauncher;
 

@@ -20,8 +20,6 @@ import frc.robot.ADAM;
 import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
 import lombok.Getter;
 
-//remember to import into RobotContainer
-
 //added some PID stuff, don't know yet what is relevant and what isn't
 
 @SuppressWarnings("PMD.CommentSize")

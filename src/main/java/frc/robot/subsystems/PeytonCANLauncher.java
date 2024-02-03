@@ -10,11 +10,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.REVLibCAN;
 
-//remember to import into RobotContainer
-
-
 //using drivetrain motors because we don't have any others declared yet
-//new version of wpilib isn't working too great
+//new version of wpilib isn't showing errors
 
 public class PeytonCANLauncher extends SubsystemBase {
   // Creates a new PeytonCANLauncher
@@ -23,14 +20,14 @@ public class PeytonCANLauncher extends SubsystemBase {
   public PeytonCANLauncher() {
     REV_0xM1 = new CANSparkMax(REVLibCAN.L_MASTER_ID, REVLibCAN.MOTOR_TYPE); //launch wheel
 
-    REV_0xM1.setSmartCurrentLimit(80); //value found in kitbot constants, launch wheel
+    REV_0xM1.setSmartCurrentLimit(80); //value found in kitbot constants
 
   }
 
   public Command getIntakeCommand() {
     return this.startEnd(
       () -> {
-        setLaunchWheel(-1); //value found in kitbot constants, launch wheel
+        setLaunchWheel(-1); //value found in kitbot constants
       },
       // When the command stops, stop the wheels
       () -> {
@@ -52,6 +49,5 @@ public class PeytonCANLauncher extends SubsystemBase {
     // does it still need to call even with nothing in it?
   }
 }
-  
-
-
+ 
+//testing... for some reason gitkraken isnt showing an option to commit a change to code...

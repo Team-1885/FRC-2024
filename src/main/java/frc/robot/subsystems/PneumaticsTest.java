@@ -10,8 +10,6 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-//remember to import into RobotContainer
-
 public class PneumaticsTest extends SubsystemBase {
 
 // Solenoid corresponds to a single solenoid.

@@ -9,8 +9,6 @@ import frc.robot.ADAM;
 import frc.robot.subsystems.PneumaticsTest;
 import lombok.Getter;
 
-//remember to import into RobotContainer
-
 public class PneumaticsCommand extends CommandBase {
   /** Creates a new PneumaticsCommand. */
   private @Getter ADAM adam = new ADAM(null);

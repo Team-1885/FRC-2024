@@ -23,6 +23,12 @@ import frc.robot.commands.IntakeCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.WestCoastDrive;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.PeytonCANLauncher;
+import frc.robot.commands.PeytonCANLaunchCommand;
+import frc.robot.subsystems.PeytonPID;
+import frc.robot.commands.PeytonPIDCommand;
+//import frc.robot.subsystems.PneumaticsTest;
+//import frc.robot.commands.PneumaticsCommand;
 import lombok.Getter;
 
 /** 
@@ -37,6 +43,13 @@ import lombok.Getter;
   private @Getter final DriveCommand driveCommand = new DriveCommand(westCoastDrive);
   private @Getter final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
   private @Getter final ExampleCommand exampleCommand = new ExampleCommand(exampleSubsystem);
+  private @Getter final PeytonCANLauncher peytonCANLauncher  = new PeytonCANLauncher();
+  private @Getter final PeytonCANLaunchCommand peytonCANLaunchCommand = new peytonCANLaunchCommand(peytonCANLauncher);
+  private @Getter final PeytonPID peytonPID = new PeytonPID ();
+  private @Getter final PeytonPIDCommand peytonPIDCommand = new PeytonPIDCommand(peytonPID);
+  // private @Getter final PneumaticsTest pneumaticsTest = new PneumaticsTest();
+  // private @Getter final PneumaticsCommand pneumaticsCommand = new PneumaticsCommand(pneumaticsTest);
+
   //private @Getter final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   //private @Getter final IntakeCommand intakeCommand = new IntakeCommand(intakeSubsystem);
   private @Getter final XboxController xboxController = new XboxController(RobotMap.DriverConstants.D_XBOX_PORT);
