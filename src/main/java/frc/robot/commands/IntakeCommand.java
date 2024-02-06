@@ -4,22 +4,18 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.Command;
+
 import frc.common.types.input.ELogitech310;
 import frc.robot.ADAM;
-import frc.robot.InputMap;
+
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.controller.AbstractController;
+
 import frc.robot.subsystems.IntakeSubsystem;
 import lombok.Getter;
 
-import frc.robot.hardware.vendors.firstparties.Data;
 
-import com.flybotix.hfr.codex.CodexOf;
-import com.flybotix.hfr.codex.RobotCodex;
-import edu.wpi.first.wpilibj.Joystick;
 
 
 /**
@@ -27,7 +23,7 @@ import edu.wpi.first.wpilibj.Joystick;
  */
 
 @SuppressWarnings("PMD.CommentSize")
-public class IntakeCommand extends CommandBase {
+public class IntakeCommand extends Command {
 
 
   private @Getter ADAM adam = new ADAM(null);
@@ -62,7 +58,7 @@ public class IntakeCommand extends CommandBase {
         feedSpeed = 0.5;
       }
       
-      //rotate up
+      /*//rotate up
       if(Robot.DATA.driverinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS))
       {
         rotateSpeed = 0.5;
@@ -71,13 +67,33 @@ public class IntakeCommand extends CommandBase {
       if(Robot.DATA.driverinput.isSet(ELogitech310.L_BTN))
       {
         rotateSpeed = -0.5;
-      }
+      }*/
+
+      rotateSpeed = RobotContainer.logitech.getRawAxis(1) * 1;
+      //double turnSpeed = RobotContainer.logitech.getZ() * 0.7; // Get X-axis value of left stick //AVI DID THIS
+
+      // You may want to add deadzones to prevent small joystick values from causing
+      // unintended movement
+
+
+      /*FIX ME */
+      rotateSpeed = applyDeadzone(rotateSpeed, 0.05);
+      //turnSpeed = applyDeadzone(turnSpeed, 0.05);
 
       // Set motor speeds in the IntakeSubsystem
       intakeSubsystem.setFeederSpeed(feedSpeed);
       intakeSubsystem.setRotaterSpeed(rotateSpeed);
     });
   }
+
+    // Helper method to apply a deadzone to joystick values
+    private double applyDeadzone(double value, double deadzone) {
+      if (Math.abs(value) < deadzone) {
+        return 0.0;
+      } else {
+        return value;
+      }
+    }
 
   // Called once the command ends or is interrupted.
   @Override
