@@ -7,14 +7,18 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.PeytonCANLauncher;
 import lombok.Getter;
+//don't have any imports, idk what I need to import because no errors are showing
 
-
+@SuppressWarnings("PMD.CommentSize")
 public class PeytonCANLaunchCommand extends CommandBase {
+
+private @Getter ADAM adam = new ADAM(null);
 
 private final @Getter PeytonCANLauncher peytonCANLauncher;
 
   // Creates a new PeytonCANLaunchCommand.
   public PeytonCANLaunchCommand(final PeytonCANLauncher peytonCANLauncher) {
+    super();
     // Use addRequirements() here to declare subsystem dependencies.
     this.peytonCANLauncher = peytonCANLauncher;
     addRequirements(peytonCANLauncher);
@@ -23,24 +27,53 @@ private final @Getter PeytonCANLauncher peytonCANLauncher;
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    peytonCANLauncher.setLaunchWheel(1.0); //value found in kit bot constants
+    System.out.println("========== STARTING LAUNCHER COMMAND ==========");
+    runTest(() -> {
+
+    });
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //Do I still need to keep the method if there is nothing in it?
+    runTest(() -> {
+      double launchSpeed = 0;
+
+      //input from buttons
+      if(ELogitech310.A_BTN.isButton())
+      {
+        launchSpeed = 0.5;
+      }
+
+      launcherSubsystem.setLauncherSpeed(launchSpeed);
+    });
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    peytonCANLauncher.stop();
+    runTest(() -> {
+
+    });
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     return false;
+  }
+
+  public void debugCommand() {
+    runTest(() -> initialize());
+    runTest(() -> execute());
+    runTest(() -> end(false));
+  }
+
+  public void runTest(final Runnable code) {
+    try {
+      code.run();
+    } catch (Exception e) {
+      adam.uncaughtException(Thread.currentThread(), e);
+    }
   }
 }

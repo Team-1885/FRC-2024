@@ -23,8 +23,8 @@ import frc.robot.commands.IntakeCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.WestCoastDrive;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.PeytonCANLauncher;
-import frc.robot.commands.PeytonCANLaunchCommand;
+//import frc.robot.subsystems.PeytonCANLauncher;
+//import frc.robot.commands.PeytonCANLaunchCommand;
 import frc.robot.subsystems.PeytonPID;
 import frc.robot.commands.PeytonPIDCommand;
 //import frc.robot.subsystems.PneumaticsTest;
@@ -43,8 +43,8 @@ import lombok.Getter;
   private @Getter final DriveCommand driveCommand = new DriveCommand(westCoastDrive);
   private @Getter final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
   private @Getter final ExampleCommand exampleCommand = new ExampleCommand(exampleSubsystem);
-  private @Getter final PeytonCANLauncher peytonCANLauncher  = new PeytonCANLauncher();
-  private @Getter final PeytonCANLaunchCommand peytonCANLaunchCommand = new peytonCANLaunchCommand(peytonCANLauncher);
+  //private @Getter final PeytonCANLauncher peytonCANLauncher  = new PeytonCANLauncher();
+  //private @Getter final PeytonCANLaunchCommand peytonCANLaunchCommand = new peytonCANLaunchCommand(peytonCANLauncher);
   private @Getter final PeytonPID peytonPID = new PeytonPID ();
   private @Getter final PeytonPIDCommand peytonPIDCommand = new PeytonPIDCommand(peytonPID);
   // private @Getter final PneumaticsTest pneumaticsTest = new PneumaticsTest();
@@ -52,8 +52,10 @@ import lombok.Getter;
 
   //private @Getter final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   //private @Getter final IntakeCommand intakeCommand = new IntakeCommand(intakeSubsystem);
-  private @Getter final XboxController xboxController = new XboxController(RobotMap.DriverConstants.D_XBOX_PORT);
-  public @Getter final static Joystick logitech = new Joystick(RobotMap.DriverConstants.D_LOGITECH_PORT);
+  private @Getter final XboxController xboxController1 = new XboxController1(RobotMap.DriverConstants.D_XBOX_PORT);
+  private @Getter final XboxController xboxController2 = new XboxController2(RobotMap.DriverConstants.D_XBOX_PORT);
+  public @Getter final static Joystick logitech1 = new Joystick(RobotMap.DriverConstants.D_LOGITECH_PORT);
+  public @Getter final static Joystick logitech2 = new Joystick(RobotMap.DriverConstants.D_LOGITECH_PORT);
   private final SendableChooser<Command> autoChooser;
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

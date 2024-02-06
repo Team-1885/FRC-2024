@@ -9,45 +9,64 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.REVLibCAN;
+//don't have any imports, idk what I need to import because no errors are showing
 
-//using drivetrain motors because we don't have any others declared yet
-//new version of wpilib isn't showing errors
 
 public class PeytonCANLauncher extends SubsystemBase {
   // Creates a new PeytonCANLauncher
-  CANSparkMax REV_0xM1;
+  private @Getter final ADAM adam = new ADAM(null);
+
+  private static CANSparkMax REV_LAUNCHER_MOTOR = new CANSparkMax(REVLibCAN.SHOOTER_FEEDER_ID, REVLibCAN.MOTOR_TYPE);
+
+  private @Getter RelativeEncoder shooterEncoder;
+
+  private ShuffleboardTab tab = Shuffleboard.getTab("===== SHOOTER SUBSYSTEM =====");
+  private GenericEntry testEntry1 = tab.add("===== SET SHOOTER SPEED =====", 0).getEntry();
 
   public PeytonCANLauncher() {
-    REV_0xM1 = new CANSparkMax(REVLibCAN.L_MASTER_ID, REVLibCAN.MOTOR_TYPE); //launch wheel
 
-    REV_0xM1.setSmartCurrentLimit(80); //value found in kitbot constants
+    super();
+    Stream.of(REV_LAUNCHER_MOTOR).forEach(CANSparkMax::restoreFactoryDefaults);
 
-  }
-
-  public Command getIntakeCommand() {
-    return this.startEnd(
-      () -> {
-        setLaunchWheel(-1); //value found in kitbot constants
-      },
-      // When the command stops, stop the wheels
-      () -> {
-        stop();
-      });
-  }
-
-  public void setLaunchWheel(double speed) {
-    REV_0xM1.set(speed);
-  }
-
-  public void stop() {
-    REV_0xM1.set(0);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // does it still need to call even with nothing in it?
+    runTest(() -> {
+      testEntry1.setDouble(REV_INTAKE_FEEDER.get());
+      REVLibCAN.logFaults(Stream.of(REV_LAUNCHER_MOTOR));
+      // ... Other periodic tasks
+});
+  }
+
+  public void reset() {
+    runTest(() -> {
+            // Resets
+            Stream.of(shooterEncoder).forEach(encoder -> encoder.setPosition(0));
+            Stream.of(REV_LAUNCHER_MOTOR).forEach(motor -> motor.stopMotor());
+    });
+  }
+
+  public void setLaunchWheelSpeed(double speed) {
+    REV_LAUNCHER_MOTOR.set(launchSpeed);
+  }
+
+  public double getLaunchWheelSpeed() {
+    return REV_LAUNCHER_MOTOR.get();
+  }
+
+    public void debugSubsystem() {
+      runTest(() -> periodic());
+      runTest(() -> reset());
+}
+
+public void runTest(final Runnable code) {
+  try {
+          code.run();
+  } catch (Exception e) {
+          adam.uncaughtException(Thread.currentThread(), e);
   }
 }
- 
-//testing... for some reason gitkraken isnt showing an option to commit a change to code...
+}
+

@@ -28,7 +28,7 @@ import lombok.Getter;
 public class IntakeSubsystem extends SubsystemBase {
         private @Getter final ADAM adam = new ADAM(null);
 
-        // Creates a CANSparkMax motor, inheriting physical constants from the {@link#REVLibCAN} helper class.
+        // Creates a CANSparkMax motor, inheriting physical constants from the {@link#REVLibCAN} helper class.               
         private static CANSparkMax REV_INTAKE_FEEDER = new CANSparkMax(REVLibCAN.INTAKE_FEEDER_ID, REVLibCAN.MOTOR_TYPE);
 
         // Creates a CANSparkMax motor, inheriting physical constants from the {@link#REVLibCAN} helper class.
