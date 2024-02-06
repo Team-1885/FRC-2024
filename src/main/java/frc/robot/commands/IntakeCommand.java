@@ -75,8 +75,6 @@ public class IntakeCommand extends Command {
       // You may want to add deadzones to prevent small joystick values from causing
       // unintended movement
 
-
-      /*FIX ME */
       rotateSpeed = applyDeadzone(rotateSpeed, 0.05);
       //turnSpeed = applyDeadzone(turnSpeed, 0.05);
 
