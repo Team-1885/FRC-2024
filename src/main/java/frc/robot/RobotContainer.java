@@ -17,9 +17,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.RetractClimbCommand;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.WestCoastDrive;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -37,6 +40,12 @@ import lombok.Getter;
   private @Getter final DriveCommand driveCommand = new DriveCommand(westCoastDrive);
   private @Getter final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
   private @Getter final ExampleCommand exampleCommand = new ExampleCommand(exampleSubsystem);
+
+  private @Getter final Climber climber = new Climber();
+  private @Getter final ClimbCommand climbCommand = new ClimbCommand(climber);
+  private @Getter final RetractClimbCommand retractCommand = new RetractClimbCommand(climber);
+
+
   //private @Getter final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   //private @Getter final IntakeCommand intakeCommand = new IntakeCommand(intakeSubsystem);
   private @Getter final XboxController xboxController = new XboxController(RobotMap.DriverConstants.D_XBOX_PORT);
@@ -51,6 +60,10 @@ import lombok.Getter;
     SmartDashboard.putData("Auto Chooser", autoChooser);
     westCoastDrive.setDefaultCommand(driveCommand);
     NamedCommands.registerCommand("DriveCommand", driveCommand);
+
+    SmartDashboard.putData("Open Claw", new RetractClimbCommand(climber));
+    SmartDashboard.putData("Close Claw", new ClimbCommand(climber));
+
     // Configure the trigger bindings
     configureBindings();
   }

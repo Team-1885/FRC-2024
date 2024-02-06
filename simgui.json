@@ -1,7 +1,12 @@
 {
   "HALProvider": {
     "Other Devices": {
-      "SPARK MAX [4]": {
+      "SPARK MAX [20]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [21]": {
         "header": {
           "open": true
         }
@@ -12,14 +17,9 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Auto Chooser": "String Chooser",
-      "/SmartDashboard/Field": "Field2d"
-    },
-    "windows": {
-      "/SmartDashboard/Field": {
-        "window": {
-          "visible": true
-        }
-      }
+      "/SmartDashboard/Close Claw": "Command",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Open Claw": "Command"
     }
   },
   "NetworkTables": {
@@ -34,6 +34,9 @@
     "transitory": {
       "Shuffleboard": {
         "===== WEST COAST DRIVE =====": {
+          "open": true
+        },
+        "Climber": {
           "open": true
         },
         "West Coast Drive": {

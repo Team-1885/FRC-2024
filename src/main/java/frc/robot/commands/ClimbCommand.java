@@ -4,76 +4,51 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.common.types.input.ELogitech310;
 import frc.robot.ADAM;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.WestCoastDrive;
 import lombok.Getter;
 
-import com.flybotix.hfr.codex.CodexOf;
-import com.flybotix.hfr.codex.RobotCodex;
-import edu.wpi.first.wpilibj.Joystick;
 
-
-/**
- * An example command for use as a template.
- */
 
 @SuppressWarnings("PMD.CommentSize")
-public class IntakeCommand extends Command {
-
-
+public class ClimbCommand extends Command{
+  //New Climber made
   private @Getter ADAM adam = new ADAM(null);
-  
+  private final @Getter Climber climber;
 
-  private final @Getter IntakeSubsystem intakeSubsystem;
 
-  /** Creates a new ExampleCommand. */
-  public IntakeCommand(final IntakeSubsystem intakeSubsystem) {
+
+  public ClimbCommand(final Climber climber) {
     super();
-    // Use addRequirements() here to declare subsystem dependencies.
-    this.intakeSubsystem = intakeSubsystem;
-    addRequirements(intakeSubsystem);
+    this.climber = climber;
+    addRequirements(climber);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.println("========== STARTING INTAKE COMMAND ==========");
+    System.out.println("========== STARTING ClIMBCOMMAND ==========");
     runTest(() -> {
 
     });
   }
 
+  //
   // Called every time the scheduler runs while the command is scheduled.
+  @Override
   public void execute() {
     runTest(() -> {
-      double feedSpeed = 0;
-      double rotateSpeed = 0;
-
-      //input from buttons
-      if(ELogitech310.A_BTN.isButton())
-      {
-        feedSpeed = 0.5;
-      }
+      climber.setMotorSpeed();
       
-      //rotate up
-      if(ELogitech310.L_BTN.isButton())
-      {
-        rotateSpeed = 0.5;
-      }
-      else if(ELogitech310.LEFT_TRIGGER_AXIS.isAxis())
-      {
-        rotateSpeed = -0.5;
-      }
-
-      // Set motor speeds in the IntakeSubsystem
-      intakeSubsystem.setFeederSpeed(feedSpeed);
-      intakeSubsystem.setRotaterSpeed(rotateSpeed);
     });
   }
+
 
   // Called once the command ends or is interrupted.
   @Override
@@ -118,3 +93,5 @@ public class IntakeCommand extends Command {
     }
   }
 }
+
+
