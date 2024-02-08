@@ -7,27 +7,32 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.ADAM;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.WestCoastDrive;
+//import frc.robot.subsystems.WestCoastDrive;
 import lombok.Getter;
 
 /**
  * An example command for use as a template.
  */
 
+ /*
 @SuppressWarnings("PMD.CommentSize")
 public class DriveCommand extends Command {
 
   /**
    * Lorem Ipsum.
    */
+
+   /*
   private @Getter ADAM adam = new ADAM(null);
 
   /**
    * Lorem Ipsum.
    */
-  private final @Getter WestCoastDrive westCoastDrive;
+  /*private final @Getter WestCoastDrive westCoastDrive;
 
   /** Creates a new ExampleCommand. */
+
+  /*
   public DriveCommand(final WestCoastDrive westCoastDrive) {
     super();
     // Use addRequirements() here to declare subsystem dependencies.
@@ -98,6 +103,8 @@ public class DriveCommand extends Command {
    * @see #execute()
    * @see #end(boolean)
    */
+
+   /*
   public void debugCommand() {
     runTest(() -> initialize());
     runTest(() -> execute());
@@ -111,6 +118,8 @@ public class DriveCommand extends Command {
    *
    * @param code The runnable task to be executed.
    */
+
+   /*
   public void runTest(final Runnable code) {
     try {
       code.run();
@@ -118,4 +127,4 @@ public class DriveCommand extends Command {
       adam.uncaughtException(Thread.currentThread(), e);
     }
   }
-}
+}*/

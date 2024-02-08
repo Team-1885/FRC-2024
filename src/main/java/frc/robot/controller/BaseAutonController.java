@@ -20,7 +20,7 @@ import frc.robot.Enums;
 import frc.robot.InputMap.EDriveData;
 import frc.robot.hardware.vendors.firstparties.ABC;
 import frc.robot.hardware.vendors.firstparties.Settings;
-import frc.robot.subsystems.WestCoastDrive;
+//import frc.robot.subsystems.WestCoastDrive;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -34,7 +34,7 @@ import java.util.UUID;
  * robot along said Trajectory. This is an autonmous routine that can
  * accepty and Trajectory, so long as it is feasible (mathematically and
  * realistically).
- */
+ *
 public class BaseAutonController extends AbstractController {
 
     /**
@@ -42,8 +42,8 @@ public class BaseAutonController extends AbstractController {
      * robot and usually doesn't represent real time. This is only intended to be
      * used for temporal offsets.
      */
-    public final Timer mTimer;
-    public final Timer mFirstLeg;
+    //public final Timer mTimer;
+    //public final Timer mFirstLeg;
     /**
      * The {@link RamseteController} that is used to follow a {@link Trajectory}.
      * This
@@ -52,51 +52,51 @@ public class BaseAutonController extends AbstractController {
      * at a given time. It will also look up where the robot should be along the
      * trajectory
      */
-    public final RamseteController mFollower;
+    //public final RamseteController mFollower;
     /**
      * The module responsible for calculating how much volatage to send to the
      * motors based on the
      * desired velocity.
      */
-    public final SimpleMotorFeedforward mFeedforward;
+    //public final SimpleMotorFeedforward mFeedforward;
     /**
      * The kinematics of the motors based on the distance between the wheels (left
      * and right).
      */
-    public final DifferentialDriveKinematics mDriveKinematics;
+    //public final DifferentialDriveKinematics mDriveKinematics;
 
-    public final PIDController mMotorPidController;
+    //public final PIDController mMotorPidController;
     /**
      * The trajectory to execute. At this time this class reaches out and gets the
      * trajectory. Since
      * the trajectory needs to be restarted every time, this is not final and is
      * reloaded in the init method.
-     */
+     *
     public Trajectory mTrajectory;
     /**
      * A history of the speeds of the wheels this module has calculated for the
      * trajectory
-     */
+     *
     private DifferentialDriveWheelSpeeds mPrevTargetWheelSpeeds;
     /**
      * A history of the speeds of the actual speeds the robot moved
-     */
+     *
     public DifferentialDriveWheelSpeeds mPrevActualSpeed;
     /**
      * The time, in seconds. This may not reflect realtime.
-     */
+     *
     public double mPrevTime;
 
     /**
      * Unique identifier for this object. This should get reinitialized on each
      * initialize call
      *
-     */
+     *
     private UUID mID;
     public Trajectory.State initialState;
     public int mCycleCount = 0;
 
-    protected final TrajectoryConfig mTrajectoryConfig;
+    //protected final TrajectoryConfig mTrajectoryConfig;
 
     /**
      * Default constructor. This will instantiate the variables that are not
@@ -104,6 +104,8 @@ public class BaseAutonController extends AbstractController {
      * state of autonomous. For those components, those will be initialized in the
      * initialized method
      */
+
+     /*
     public BaseAutonController() {
         mFollower = new RamseteController(Settings.kRamseteB, Settings.kRamseteZeta);
         mFeedforward = new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA);
@@ -124,8 +126,9 @@ public class BaseAutonController extends AbstractController {
         mTrajectoryConfig.addConstraint(new DifferentialDriveKinematicsConstraint(k, 1.0));
         mTrajectoryConfig.setStartVelocity(0.0);
         mTrajectoryConfig.setEndVelocity(0.0);
-    }
+    } */
 
+    /*
     public void initialize() {
         initialize(null);
     }
@@ -137,9 +140,11 @@ public class BaseAutonController extends AbstractController {
      * (Something that only really happens
      * at home).
      */
+
+     /*
     public void initialize(Trajectory pTrajectory) {
         mID = UUID.randomUUID();
-        mTimer.reset();
+    /*    mTimer.reset();
         mTimer.start();
         mFirstLeg.reset();
         mFirstLeg.start();
@@ -157,6 +162,7 @@ public class BaseAutonController extends AbstractController {
         mPrevActualSpeed = new DifferentialDriveWheelSpeeds(0, 0);
     }
 
+    /*
     @Override
     protected void updateImpl() {
 
@@ -178,8 +184,10 @@ public class BaseAutonController extends AbstractController {
      * called multiple times until the robot traverses the entire Trajectory or
      * until autonmous runs out of time.
      */
+
+     /*
     public void execute() {
-        double curTime = mTimer.get() - startTime;
+/*        double curTime = mTimer.get() - startTime;
         double dT = curTime - mPrevTime;
 
         if (mPrevTime < 0) {
@@ -216,7 +224,7 @@ public class BaseAutonController extends AbstractController {
         data.add(instActualAccelRight);
 
         ramseteFollow(curTime, dT, actualSpeeds, targetWheelSpeeds, data);
-    }
+        }
 
     protected void ramseteFollow(double curTime, double dT, DifferentialDriveWheelSpeeds actualSpeeds,
             DifferentialDriveWheelSpeeds targetWheelSpeeds, List<Object> data) {
@@ -229,10 +237,10 @@ public class BaseAutonController extends AbstractController {
         double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevTargetWheelSpeeds.leftMetersPerSecond, dT);
         double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevTargetWheelSpeeds.rightMetersPerSecond, dT);
 
-        output.left = calculateOutputFromFeedForward(leftFeedforward, mMotorPidController,
-                actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond, data);
-        output.right = calculateOutputFromFeedForward(rightFeedforward, mMotorPidController,
-                actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond, data);
+      //  output.left = calculateOutputFromFeedForward(leftFeedforward, mMotorPidController,
+          //      actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond, data);
+        //output.right = calculateOutputFromFeedForward(rightFeedforward, mMotorPidController,
+            //    actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond, data);
         if (data != null) {
             data.add(leftSetpoint);
             data.add(rightSetpoint);
@@ -258,10 +266,11 @@ public class BaseAutonController extends AbstractController {
      *                                last execution
      * @return The feeds forward from the gains and setpoint
      */
-    private double calculateFeedsForward(double pSpeedSetpoint, double pPrevSpeedsMetersPerSec, double pDt) {
+    /*private double calculateFeedsForward(double pSpeedSetpoint, double pPrevSpeedsMetersPerSec, double pDt) {
         return mFeedforward.calculate(
                 pSpeedSetpoint, (pSpeedSetpoint - pPrevSpeedsMetersPerSec) / pDt);
-    }
+                
+    }*/
 
     /**
      * Method to calculate the feed foward plus the pid output from actual speed and
@@ -279,6 +288,7 @@ public class BaseAutonController extends AbstractController {
      *         The feed forward + the output from the pid controller given the
      *         actual speed and setpoints
      */
+    /*
     private double calculateOutputFromFeedForward(double pFeedForward, PIDController pPidController,
             double pActualSpeeds, double pSetPoint, List<Object> data) {
         double pidCalc = pPidController.calculate(pActualSpeeds, pSetPoint);
@@ -294,7 +304,7 @@ public class BaseAutonController extends AbstractController {
      * 
      * @return
      *         Return the {@link DifferentialDriveWheelSpeeds}
-     */
+     *
     private DifferentialDriveWheelSpeeds calculateActualSpeeds() {
         double actualLeftSpeedMeters = ABC.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s));
         double actualRightSpeedMeters = ABC.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s));
@@ -310,7 +320,7 @@ public class BaseAutonController extends AbstractController {
      *                         The current robot pose
      * @return
      *         The robot wheel speeds
-     */
+     *
     private DifferentialDriveWheelSpeeds getTargetWheelSpeeds(Trajectory.State trajectorySample, Pose2d pRobotPose,
             List<Object> data) {
         ChassisSpeeds calculate = mFollower.calculate(pRobotPose, trajectorySample);
@@ -329,7 +339,7 @@ public class BaseAutonController extends AbstractController {
      * 
      * @return
      *         The robot pose represented as {@link Pose2d}
-     */
+     *
     private Pose2d getRobotPose() {
         double absX = initialState.poseMeters.getX() + db.drivetrain.get(EDriveData.GET_X_OFFSET_METERS);
         double absY = initialState.poseMeters.getY() + db.drivetrain.get(EDriveData.GET_Y_OFFSET_METERS);
@@ -343,7 +353,7 @@ public class BaseAutonController extends AbstractController {
      * 
      * @param pOutput
      *                The voltage values to set the motors
-     */
+     *
     private void updateDriveTrain(Pair<Double, Double> pOutput) {
         double leftFeet = ABC.meters_to_feet(pOutput.getLeft());
         double rightFeet = ABC.meters_to_feet(pOutput.getRight());
@@ -357,7 +367,7 @@ public class BaseAutonController extends AbstractController {
      * 
      * @return
      *         true if the trajectory traversal is complete, false otherwise
-     */
+     *
     public boolean isFinished() {
         return mTimer.hasElapsed(mTrajectory.getTotalTimeSeconds());
     }
@@ -386,4 +396,4 @@ public class BaseAutonController extends AbstractController {
         SmartDashboard.putNumber("Actual Speed Left: ", actualSpeeds.leftMetersPerSecond);
         SmartDashboard.putNumber("Actual Speed Right", actualSpeeds.rightMetersPerSecond);
     }
-}
+}*/
