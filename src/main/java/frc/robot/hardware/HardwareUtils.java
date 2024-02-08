@@ -1,14 +1,14 @@
 package frc.robot.hardware;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+/*import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
-import frc.common.lib.control.ProfileGains;
+import frc.common.lib.control.ProfileGains;*/
 
 public class HardwareUtils {
 
-  public static void setGains(SparkMaxPIDController pNEO, ProfileGains pGains) {
+  /*public static void setGains(SparkMaxPIDController pNEO, ProfileGains pGains) {
     pNEO.setP(pGains.P, pGains.PROFILE_SLOT);
     pNEO.setI(pGains.I, pGains.PROFILE_SLOT);
     pNEO.setD(pGains.D, pGains.PROFILE_SLOT);
@@ -28,8 +28,9 @@ public class HardwareUtils {
     pTalon.config_kP(pGains.PROFILE_SLOT, pGains.P);
     pTalon.config_kI(pGains.PROFILE_SLOT, pGains.I);
     pTalon.config_kD(pGains.PROFILE_SLOT, pGains.D);
-  }
+  } */
 
   private HardwareUtils() {
+    
   }
 }

@@ -47,13 +47,15 @@ import frc.common.types.input.ELogitech310;
   //private @Getter final IntakeCommand intakeCommand = new IntakeCommand(intakeSubsystem);
   private @Getter final XboxController xboxController = new XboxController(RobotMap.DriverConstants.D_XBOX_PORT);
   public @Getter final static Joystick logitech = new Joystick(RobotMap.DriverConstants.D_LOGITECH_PORT);
+  public @Getter final static Joystick logitech2 = new Joystick(RobotMap.DriverConstants.D_LOGITECH2_PORT);
+
   private final SendableChooser<Command> autoChooser;
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Build an auto chooser. This will use Commands.none() as the default option.
     autoChooser = AutoBuilder.buildAutoChooser();
 
-    // Another option that allows you to specify the default auto by its name
+    // Another option that allows you to specify the default auto by its names
     SmartDashboard.putData("Auto Chooser", autoChooser);
     westCoastDrive.setDefaultCommand(driveCommand);
     NamedCommands.registerCommand("DriveCommand", driveCommand);
