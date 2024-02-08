@@ -199,10 +199,10 @@ public class WestCoastDrive extends Module {
                 // mTargetLockPID.setOutputRange(Settings.kTargetAngleLockMinPower,
                 // Settings.kTargetAngleLockMaxPower);
 
-                HardwareUtils.setGains(mLeftCtrl, kVelocityGains);
+                /*HardwareUtils.setGains(mLeftCtrl, kVelocityGains);
                 HardwareUtils.setGains(mRightCtrl, kVelocityGains);
                 HardwareUtils.setGains(mLeftCtrl, kSmartMotionGains);
-                HardwareUtils.setGains(mRightCtrl, kSmartMotionGains);
+                HardwareUtils.setGains(mRightCtrl, kSmartMotionGains);*/
 
                 Stream.of(mLeftMaster, mLeftFollower, mRightMaster, mRightFollower)
                                 .forEach(CANSparkMax::burnFlash);
