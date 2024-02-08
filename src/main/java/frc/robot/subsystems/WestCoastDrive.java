@@ -244,7 +244,7 @@ public class WestCoastDrive extends Module {
         }
 
         public void drive(ChassisSpeeds pRobotRelativeSpeeds) {
-                // Creating my kinematics object: track width of around 1.7 feet
+                // Creating my kinematics object
                 DifferentialDriveKinematics mKinematics = new DifferentialDriveKinematics(ABC.feet_to_meters(kTrackWidthFeet));
 
                 // Convert to wheel speeds
