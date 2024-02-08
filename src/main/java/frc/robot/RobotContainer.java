@@ -17,11 +17,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-//import frc.robot.commands.DriveCommand;
+import frc.robot.commands.DriveCommand;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.subsystems.ExampleSubsystem;
-//import frc.robot.subsystems.WestCoastDrive;
+import frc.robot.subsystems.WestCoastDrive;
 import frc.robot.subsystems.IntakeSubsystem;
 import lombok.Getter;
 
@@ -35,8 +35,8 @@ import frc.common.types.input.ELogitech310;
 @SuppressWarnings("PMD.CommentSize") public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
- // private @Getter final WestCoastDrive westCoastDrive = WestCoastDrive.getInstance();
-  //private @Getter final DriveCommand driveCommand = new DriveCommand(westCoastDrive);
+  private @Getter final WestCoastDrive westCoastDrive = WestCoastDrive.getInstance();
+  private @Getter final DriveCommand driveCommand = new DriveCommand(westCoastDrive);
   private @Getter final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
   private @Getter final ExampleCommand exampleCommand = new ExampleCommand(exampleSubsystem);
   
@@ -57,8 +57,8 @@ import frc.common.types.input.ELogitech310;
 
     // Another option that allows you to specify the default auto by its names
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    //westCoastDrive.setDefaultCommand(driveCommand);
-    //NamedCommands.registerCommand("DriveCommand", driveCommand);
+    westCoastDrive.setDefaultCommand(driveCommand);
+    NamedCommands.registerCommand("DriveCommand", driveCommand);
 
     intakeSubsystem.setDefaultCommand(intakeCommand);
     NamedCommands.registerCommand("IntakeCommand", intakeCommand);

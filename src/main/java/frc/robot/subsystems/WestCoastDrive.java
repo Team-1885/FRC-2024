@@ -54,8 +54,6 @@ import lombok.Getter;
 /**
  * WestCoastDrive Subsystem.
  */
-
- /*
 @SuppressWarnings("PMD.CommentSize")
 public class WestCoastDrive extends Module {
         private @Getter final ADAM adam = new ADAM(null);
@@ -154,8 +152,6 @@ public class WestCoastDrive extends Module {
         public double mCurrentDeg;
 
         /** Constructor for the Subsystem */
-
-        /*
         public WestCoastDrive() {
                 super();
                 mTable = NetworkTableInstance.getDefault().getTable("drive");
@@ -207,9 +203,7 @@ public class WestCoastDrive extends Module {
                 HardwareUtils.setGains(mRightCtrl, kVelocityGains);
                 HardwareUtils.setGains(mLeftCtrl, kSmartMotionGains);
                 HardwareUtils.setGains(mRightCtrl, kSmartMotionGains);*/
-                
 
-                /*
                 Stream.of(mLeftMaster, mLeftFollower, mRightMaster, mRightFollower)
                                 .forEach(CANSparkMax::burnFlash);
                 SmartDashboard.putData("Field", mField);
@@ -337,8 +331,6 @@ public class WestCoastDrive extends Module {
          *
          * @see #runTest(Runnable)
          */
-
-         /*
         public void reset() {
                 runTest(() -> {
                         Stream.of(mLeftEncoder, mRightEncoder)
@@ -467,8 +459,6 @@ public class WestCoastDrive extends Module {
          *
          * @see #runTest(Runnable)
          */
-
-         /*
         public void debugSubsystem() {
                 runTest(() -> periodic());
                 runTest(() -> reset());
@@ -480,8 +470,6 @@ public class WestCoastDrive extends Module {
          *
          * @param code The runnable task to be executed.
          */
-
-         /*
         public void runTest(final Runnable code) {
                 try {
                         code.run();
@@ -489,6 +477,5 @@ public class WestCoastDrive extends Module {
                         adam.uncaughtException(Thread.currentThread(), e);
                 }
         }
-        
 
-}*/
+}

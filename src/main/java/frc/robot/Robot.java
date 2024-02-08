@@ -21,13 +21,13 @@ import frc.common.types.EMatchMode;
 import frc.common.types.MatchMetadata;
 import frc.logging.CSVLogger;
 import frc.logging.Log;
-//import frc.robot.controller.BaseAutonController;
+import frc.robot.controller.BaseAutonController;
 import frc.robot.hardware.vendors.firstparties.Clock;
 import frc.robot.hardware.vendors.firstparties.Data;
 import frc.robot.hardware.vendors.firstparties.Settings;
 import frc.robot.network.EForwardableConnections;
 import frc.robot.subsystems.ModuleList;
-//import frc.robot.subsystems.WestCoastDrive;
+import frc.robot.subsystems.WestCoastDrive;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -60,10 +60,10 @@ public class Robot extends TimedRobot {
   private CSVLogger mCSVLogger;
   private Timer initTimer = new Timer();
 
-  //private WestCoastDrive mWestCoastDrive;
+  private WestCoastDrive mWestCoastDrive;
   // private AutonSelection mAutonSelection;
   private ClimbModeSelection mClimberSelector;
-  //private BaseAutonController mBaseAutonController;
+  private BaseAutonController mBaseAutonController;
   private InputMap mOI;
   private MatchMetadata mMatchMeta = null;
   private @Getter Command autonomousCommand;
@@ -95,7 +95,7 @@ public class Robot extends TimedRobot {
     CLOCK.update();
     Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::portForwarding);
     // mAutonSelection = new AutonSelection();
-    //mBaseAutonController = new BaseAutonController();
+    mBaseAutonController = new BaseAutonController();
     // mShootMoveController = new ShootMoveController();
     // mThreeBallAuton = new ThreeBallTrajectoryController();
     // mFourBallAuton = new FourBallTrajectoryAuton();
@@ -104,7 +104,7 @@ public class Robot extends TimedRobot {
     mOI = new InputMap();
     // mLEDControl = new LEDModule();
     // mAddressableLEDs = new AddressableLEDs();
-    //mWestCoastDrive = WestCoastDrive.getInstance();
+    mWestCoastDrive = WestCoastDrive.getInstance();
     // mLimelight = new Limelight();
     if (IS_SIMULATED) {
       // mSimulation = new SimulationModule();
@@ -193,9 +193,9 @@ public class Robot extends TimedRobot {
     MODE = EMatchMode.AUTONOMOUS;
     //Robot.DATA.registerAllWithShuffleboard();
     mRunningModules.clearModules();
-    //mRunningModules.addModule(mWestCoastDrive);
+    mRunningModules.addModule(mWestCoastDrive);
     mRunningModules.modeInit(EMatchMode.AUTONOMOUS);
-    //mWestCoastDrive.readInputs();
+    mWestCoastDrive.readInputs();
     // if (mAutonSelection.getSelectedAutonController() != null) {
     //    mAutonSelection.getSelectedAutonController().schedule();
     // }
@@ -222,7 +222,7 @@ public class Robot extends TimedRobot {
     }
     mRunningModules.clearModules();
     // mRunningModules.addModule(mOI);
-    //mRunningModules.addModule(mWestCoastDrive);
+    mRunningModules.addModule(mWestCoastDrive);
     MODE = EMatchMode.TELEOPERATED;
     // mActiveController = mTeleopController;
     // mActiveController.setEnabled(true);
