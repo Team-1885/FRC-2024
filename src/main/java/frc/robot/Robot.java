@@ -194,8 +194,8 @@ public class Robot extends TimedRobot {
     //Robot.DATA.registerAllWithShuffleboard();
     mRunningModules.clearModules();
     mRunningModules.addModule(mWestCoastDrive);
-    mRunningModules.modeInit(EMatchMode.AUTONOMOUS);
-    mWestCoastDrive.readInputs();
+    // mRunningModules.modeInit(EMatchMode.AUTONOMOUS);
+    // mWestCoastDrive.readInputs();
     // if (mAutonSelection.getSelectedAutonController() != null) {
     //    mAutonSelection.getSelectedAutonController().schedule();
     // }
