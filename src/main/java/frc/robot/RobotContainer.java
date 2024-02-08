@@ -47,7 +47,7 @@ import frc.common.types.input.ELogitech310;
   //private @Getter final IntakeCommand intakeCommand = new IntakeCommand(intakeSubsystem);
   private @Getter final XboxController xboxController = new XboxController(RobotMap.DriverConstants.D_XBOX_PORT);
   public @Getter final static Joystick logitech = new Joystick(RobotMap.DriverConstants.D_LOGITECH_PORT);
-  public @Getter final static Joystick logitech2 = new Joystick(RobotMap.DriverConstants.D_LOGITECH2_PORT);
+  //public @Getter final static Joystick logitech2 = new Joystick(RobotMap.DriverConstants.D_LOGITECH2_PORT); <temp commented out
 
   private final SendableChooser<Command> autoChooser;
   /** The container for the robot. Contains subsystems, OI devices, and commands. */

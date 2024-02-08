@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj.XboxController;
      * ...
      */
     public static final int D_LOGITECH_PORT = 0;
+
+    //public static final int D_LOGITECH2_PORT = 0; <temp commented out
   }
 
   /**
@@ -48,6 +50,8 @@ import edu.wpi.first.wpilibj.XboxController;
      * ...
      */
     public static final int O_LOGITECH_PORT = 0;
+
+    //public static final int O_LOGITECH2_PORT = 0; <temp commented out
   }
 
   /**
