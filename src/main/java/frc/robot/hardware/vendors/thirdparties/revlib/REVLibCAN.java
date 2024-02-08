@@ -34,8 +34,8 @@ public class REVLibCAN {
   public static @Getter final double CURRENT_LIMIT_AMPS = 60.0;
   public static @Getter final int L_MASTER_ID = 11; //was 10
   public static @Getter final int L_FOLLOWER_ID = 12; //was 9
-  public static @Getter final int R_MASTER_ID = 4;
-  public static @Getter final int R_FOLLOWER_ID = 2;
+  public static @Getter final int R_MASTER_ID = 13; //was 4
+  public static @Getter final int R_FOLLOWER_ID = 14; //was 2
 
   public static @Getter final int INTAKE_FEEDER_ID = 10;
   public static @Getter final int INTAKE_ROTATER_ID = 9;
