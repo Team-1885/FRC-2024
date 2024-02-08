@@ -6,7 +6,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj.Joystick;
@@ -14,15 +13,12 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.ExampleCommand;
-import frc.robot.commands.IntakeCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.WestCoastDrive;
-import frc.robot.subsystems.IntakeSubsystem;
 import lombok.Getter;
 
 /** 
@@ -40,7 +36,8 @@ import lombok.Getter;
   //private @Getter final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   //private @Getter final IntakeCommand intakeCommand = new IntakeCommand(intakeSubsystem);
   private @Getter final XboxController xboxController = new XboxController(RobotMap.DriverConstants.D_XBOX_PORT);
-  public @Getter final static Joystick logitech = new Joystick(RobotMap.DriverConstants.D_LOGITECH_PORT);
+  public @Getter final static Joystick logitech1 = new Joystick(RobotMap.DriverConstants.D_LOGITECH_PORT);
+  public @Getter final static Joystick logitech2 = new Joystick(RobotMap.DriverConstants.D_LOGITECH_PORT_2);
   private final SendableChooser<Command> autoChooser;
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -68,8 +65,10 @@ import lombok.Getter;
     // Trigger driveTriggerY = new Trigger(() -> logitech.getRawAxis(1) > 0.01); // Replace 1 with the axis number for the Y axis
     // driveTriggerY.whileTrue(driveCommand);
 
-    logitech.getRawAxis(0); // X
-    logitech.getRawAxis(1); // Y
+    logitech1.getRawAxis(0); // X
+    logitech1.getRawAxis(1); // Y
+    logitech2.getRawAxis(0); // X
+    logitech2.getRawAxis(1); // Y
   }
 
   /**

@@ -275,8 +275,8 @@ public class WestCoastDrive extends Module {
                 DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.7);
 
                 // Get the current left and right wheel speeds from the encoders
-                double leftSpeed = leftEncoder.getRate();
-                double rightSpeed = rightEncoder.getRate();
+                double leftSpeed = mLeftEncoder.getVelocity();
+                double rightSpeed = mRightEncoder.getVelocity();
 
                 // Create a wheel speeds object with the encoder values
                 DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(leftSpeed, rightSpeed);
@@ -284,9 +284,8 @@ public class WestCoastDrive extends Module {
                 // Convert the wheel speeds to chassis speeds
                 ChassisSpeeds chassisSpeeds = kinematics.toChassisSpeeds(wheelSpeeds);
 
-                // Get the robot-relative linear and angular velocities
-                double vx = chassisSpeeds.vxMetersPerSecond; // forward velocity in meters per second
-                double omega = chassisSpeeds.omegaRadiansPerSecond; // angular velocity in radians per second
+                
+                return chassisSpeeds;
 
         }
 
@@ -405,7 +404,7 @@ public class WestCoastDrive extends Module {
                 double turn = db.drivetrain.safeGet(EDriveData.DESIRED_TURN_PCT, 0.0);
                 double left = throttle + turn;
                 double right = throttle - turn;
-                ECommonNeutralMode neutralMode = db.drivetrain.get(EDriveData.NEUTRAL_MODE, ECommonNeutralMode.class);
+                //ECommonNeutralMode neutralMode = db.drivetrain.get(EDriveData.NEUTRAL_MODE, ECommonNeutralMode.class);
                 if (state == null)
                         return;
                 switch (state) {

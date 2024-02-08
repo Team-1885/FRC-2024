@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.XboxController;
      * ...
      */
     public static final int D_LOGITECH_PORT = 0;
+    public static final int D_LOGITECH_PORT_2 = 0;
   }
 
   /**

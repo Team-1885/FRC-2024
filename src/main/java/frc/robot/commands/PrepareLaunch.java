@@ -4,22 +4,24 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.Command;
+
 //import static frc.robot.hardware.KitBotCONSTANT.LauncherConstants.*;
 
 //import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+
 //import frc.robot.subsystems.PWMLauncher;
 
 // import frc.robot.subsystems.CANLauncher;
 
-public class PrepareLaunch extends CommandBase {
+public class Intake extends Command {
   private static final Object kLauncherSpeed = null;
-  frc.robot.commands.PWMLauncher m_launcher;
+  frc.robot.commands.Intake m_launcher;
 
   // CANLauncher m_launcher;
 
   /** Creates a new PrepareLaunch. */
-  public PrepareLaunch(PWMLauncher launcher) {
+  public Intake(Intake launcher) {
     // save the launcher system internally
     m_launcher = launcher;
 
@@ -27,7 +29,7 @@ public class PrepareLaunch extends CommandBase {
     addRequirements(m_launcher);
   }
 
-  private void addRequirements(PWMLauncher m_launcher2) {
+  private void addRequirements(Intake m_launcher2) {
     //auto made method:
     throw new UnsupportedOperationException("Unimplemented method 'addRequirements'");
   }
@@ -37,6 +39,11 @@ public class PrepareLaunch extends CommandBase {
   public void initialize() {
     // Set launch wheel to speed, keep feed wheel at 0 to let launch wheel spin up.
     m_launcher.setLaunchWheel(kLauncherSpeed);
+  }
+
+  private void setLaunchWheel(Object klauncherspeed2) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'setLaunchWheel'");
   }
 
   // Called every time the scheduler runs while the command is scheduled.
