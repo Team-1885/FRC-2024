@@ -50,8 +50,8 @@ public class DriveCommand extends Command {
   public void execute() {
     runTest(() -> {
       
-      double forwardSpeed = RobotContainer.logitech.getRawAxis(1) * 1;
-      double turnSpeed = RobotContainer.logitech.getZ() * 0.7; // Get X-axis value of left stick //AVI DID THIS
+      double forwardSpeed = RobotContainer.logitech1.getRawAxis(1) * 1;
+      double turnSpeed = RobotContainer.logitech1.getZ() * 0.7; // Get X-axis value of left stick //AVI DID THIS
 
       // You may want to add deadzones to prevent small joystick values from causing
       // unintended movement

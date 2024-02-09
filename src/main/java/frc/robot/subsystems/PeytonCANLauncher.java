@@ -4,12 +4,19 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
+import java.util.stream.Stream;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.hardware.REVLibCAN;
-//don't have any imports, idk what I need to import because no errors are showing
+import frc.robot.ADAM;
+import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
+import lombok.Getter;
 
 
 public class PeytonCANLauncher extends SubsystemBase {
@@ -34,7 +41,7 @@ public class PeytonCANLauncher extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     runTest(() -> {
-      testEntry1.setDouble(REV_INTAKE_FEEDER.get());
+      testEntry1.setDouble(REV_LAUNCHER_MOTOR.get());
       REVLibCAN.logFaults(Stream.of(REV_LAUNCHER_MOTOR));
       // ... Other periodic tasks
 });
@@ -49,7 +56,7 @@ public class PeytonCANLauncher extends SubsystemBase {
   }
 
   public void setLaunchWheelSpeed(double speed) {
-    REV_LAUNCHER_MOTOR.set(launchSpeed);
+    REV_LAUNCHER_MOTOR.set(speed);
   }
 
   public double getLaunchWheelSpeed() {

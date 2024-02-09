@@ -57,6 +57,7 @@ public class REVLibCAN {
 
   private @Getter static ADAM adam = new ADAM(null);
   private static final Logger logger = Logger.getLogger(REVLibCAN.class.getName());
+public static final int SHOOTER_FEEDER_ID = 0;
 
   public static void logFaults(Stream<CANSparkMax> REVLibCAN) {
     runTest(() -> {

@@ -52,10 +52,8 @@ import lombok.Getter;
 
   //private @Getter final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   //private @Getter final IntakeCommand intakeCommand = new IntakeCommand(intakeSubsystem);
-  private @Getter final XboxController xboxController1 = new XboxController1(RobotMap.DriverConstants.D_XBOX_PORT);
-  private @Getter final XboxController xboxController2 = new XboxController2(RobotMap.DriverConstants.D_XBOX_PORT);
+  private @Getter final XboxController xboxController = new XboxController(RobotMap.DriverConstants.D_XBOX_PORT);
   public @Getter final static Joystick logitech1 = new Joystick(RobotMap.DriverConstants.D_LOGITECH_PORT);
-  public @Getter final static Joystick logitech2 = new Joystick(RobotMap.DriverConstants.D_LOGITECH_PORT);
   private final SendableChooser<Command> autoChooser;
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -83,8 +81,8 @@ import lombok.Getter;
     // Trigger driveTriggerY = new Trigger(() -> logitech.getRawAxis(1) > 0.01); // Replace 1 with the axis number for the Y axis
     // driveTriggerY.whileTrue(driveCommand);
 
-    logitech.getRawAxis(0); // X
-    logitech.getRawAxis(1); // Y
+    logitech1.getRawAxis(0); // X
+    logitech1.getRawAxis(1); // Y
   }
 
   /**

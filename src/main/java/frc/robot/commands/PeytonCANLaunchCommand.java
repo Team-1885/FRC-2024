@@ -4,13 +4,15 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.common.types.input.ELogitech310;
+import frc.robot.ADAM;
 import frc.robot.subsystems.PeytonCANLauncher;
 import lombok.Getter;
 //don't have any imports, idk what I need to import because no errors are showing
 
 @SuppressWarnings("PMD.CommentSize")
-public class PeytonCANLaunchCommand extends CommandBase {
+public class PeytonCANLaunchCommand extends Command {
 
 private @Getter ADAM adam = new ADAM(null);
 
@@ -45,7 +47,7 @@ private final @Getter PeytonCANLauncher peytonCANLauncher;
         launchSpeed = 0.5;
       }
 
-      launcherSubsystem.setLauncherSpeed(launchSpeed);
+      peytonCANLauncher.setLaunchWheelSpeed(launchSpeed);
     });
   }
 

@@ -23,7 +23,11 @@ public class PeytonPIDCommand extends PIDCommand {
 
   private final @Getter PeytonPID peytonPID;
 
-  public PeytonCommand(final PeytonPID peytonPID, PIDController controller, DoubleSupplier measurementSource, DoubleSupplier setpointSource,
+  public PeytonPIDCommand(PeytonPID peytonPID2) {
+    //TODO Auto-generated constructor stub
+  }
+
+  public void PeytonCommand(final PeytonPID peytonPID, PIDController controller, DoubleSupplier measurementSource, DoubleSupplier setpointSource,
   DoubleConsumer useOutput, Subsystem... requirements) {
     super(new PIDController(0, 0, 0), setpointSource, 0, useOutput, requirements);
     getController();
@@ -46,8 +50,8 @@ public class PeytonPIDCommand extends PIDCommand {
     super.execute();
     runTest(() -> {
       
-      double forwardSpeed = RobotContainer.logitech.getRawAxis(1) * 1;
-      double turnSpeed = RobotContainer.logitech.getZ() * 1; 
+      double forwardSpeed = RobotContainer.logitech1.getRawAxis(1) * 1;
+      double turnSpeed = RobotContainer.logitech1.getZ() * 1; 
 
       forwardSpeed = applyDeadzone(forwardSpeed, 0.05);
       turnSpeed = applyDeadzone(turnSpeed, 0.05);
