@@ -12,8 +12,12 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.EncoderType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.SparkRelativeEncoder;
+import com.revrobotics.SparkRelativeEncoder.Type;
+
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.hardware.vendors.firstparties.ABC;
@@ -42,22 +46,21 @@ import lombok.Getter;
 public class WestCoastDrive extends Module {
         private @Getter final ADAM adam = new ADAM(null);
 
-        // Creates two CANSparkMax motors, inheriting physical constants from the
-        // {@link#REVLibCAN} helper class.
+        // Creates two CANSparkMax motors, inheriting physical constants from the {@link#REVLibCAN} helper class.
         private static CANSparkMax mLeftMaster = new CANSparkMax(REVLibCAN.L_MASTER_ID, REVLibCAN.MOTOR_TYPE),
                         mLeftFollower = new CANSparkMax(REVLibCAN.L_FOLLOWER_ID, REVLibCAN.MOTOR_TYPE);
 
-        // Creates two CANSparkMax motors, inheriting physical constants from the
-        // {@link#REVLibCAN} helper class.
+        // Creates two CANSparkMax motors, inheriting physical constants from the {@link#REVLibCAN} helper class.
         private static CANSparkMax mRightMaster = new CANSparkMax(REVLibCAN.R_MASTER_ID, REVLibCAN.MOTOR_TYPE),
                         mRightFollower = new CANSparkMax(REVLibCAN.R_FOLLOWER_ID, REVLibCAN.MOTOR_TYPE);
 
         private @Getter RelativeEncoder mLeftEncoder = mLeftMaster.getEncoder();
-        private @Getter RelativeEncoder mRightEncoder = mRightMaster.getEncoder();
+        private @Getter RelativeEncoder mRightEncoder = mRightMaster.getEncoder(SparkMaxRelativeEncoder.Type.kQuadrature, 0);
+
+        private ADXRS450_Gyro mGyro = new ADXRS450_Gyro();
 
         private SparkPIDController mLeftCtrl, mRightCtrl;
         // private PIDController mTurnToDegreePID, mLeftPositionPID, mRightPositionPID, mTargetLockPID;
-        private ADXRS450_Gyro mGyro = new ADXRS450_Gyro();
 
         private NetworkTable mTable;
         private final Field2d mField = new Field2d();
@@ -76,11 +79,12 @@ public class WestCoastDrive extends Module {
         // DO NOT MODIFY THESE PHYSICAL CONSTANTS
         // ========================================
         public static final double kGearboxRatio = 8.46; // rotated 8.46 times, rotates gear that spins the wheel once
-        public static final double kReductionRatio = 0.01;
-        public static final double kWheelDiameterFeet = 0.5;
         public static final double kWheelDiameterInches = 6;
+        public static final double kWheelDiameterFeet = 0.5;
         public static final double kWheelCircumferenceInches = kWheelDiameterInches * Math.PI;
         public static final double kWheelCircumferenceFeet = kWheelDiameterFeet * Math.PI;
+        
+        public static final double kReductionRatio = 0.01;
         public static final double kConversionFactor = kWheelCircumferenceInches * kReductionRatio;
         public static final double kDriveNEOPositionFactor = kGearboxRatio * kWheelCircumferenceFeet;
         public static final double kDriveNEOVelocityFactor = kDriveNEOPositionFactor / 60.0;
