@@ -53,10 +53,10 @@ public class IntakeCommand extends Command {
       double feedSpeed = 0;
       double rotateSpeed = 0;
       //input from buttons
-      if(Robot.DATA.driverinput.isSet(ELogitech310.A_BTN))
+      /*if(Robot.DATA.driverinput.isSet(ELogitech310.A_BTN))
       {
         feedSpeed = 0.5;
-      }
+      }*/
       
       /*//rotate up
       if(Robot.DATA.driverinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS))
@@ -70,12 +70,14 @@ public class IntakeCommand extends Command {
       }*/
 
       rotateSpeed = RobotContainer.logitech.getRawAxis(1) * 1;
+      feedSpeed = RobotContainer.logitech.getRawAxis(2) * 1;
       //double turnSpeed = RobotContainer.logitech.getZ() * 0.7; // Get X-axis value of left stick //AVI DID THIS
 
       // You may want to add deadzones to prevent small joystick values from causing
       // unintended movement
 
       rotateSpeed = applyDeadzone(rotateSpeed, 0.05);
+      feedSpeed = applyDeadzone(feedSpeed, 0.05);
       //turnSpeed = applyDeadzone(turnSpeed, 0.05);
 
       // Set motor speeds in the IntakeSubsystem
