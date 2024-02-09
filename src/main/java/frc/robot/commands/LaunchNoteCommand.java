@@ -8,9 +8,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.common.types.input.ELogitech310;
 import frc.robot.Robot;
 
-public class TheresaLaunchNote extends Command {
-  /** Creates a new TheresaLaunchNote. */
-  public TheresaLaunchNote() {
+public class LaunchNoteCommand extends Command {
+  /** Creates a new LaunchNoteSubsystem. */
+  public LaunchNoteCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -32,7 +32,7 @@ public class TheresaLaunchNote extends Command {
       
 
       // Set motor speeds in the IntakeSubsystem
-      TheresaLaunchNote.setLaunchMotorSpeed(launchSpeed);
+      LaunchNoteCommand.setLaunchMotorSpeed(launchSpeed);
       
     });
   

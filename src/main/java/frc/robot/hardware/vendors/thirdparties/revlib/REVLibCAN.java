@@ -40,6 +40,9 @@ public class REVLibCAN {
   public static @Getter final int INTAKE_FEEDER_ID = 5;
   public static @Getter final int INTAKE_ROTATER_ID = 6;
 
+  public static @Getter final int LAUNCH_ID = 1;
+  public static @Getter final int LAUNCH2_ID = 3;
+
   // =======================================
   // DO NOT EDIT THESE CONFIGURATION OPTIONS
   // =======================================

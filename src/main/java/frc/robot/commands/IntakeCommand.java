@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.common.types.input.ELogitech310;
@@ -22,7 +23,7 @@ import edu.wpi.first.wpilibj.Joystick;
  */
 
 @SuppressWarnings("PMD.CommentSize")
-public class IntakeCommand extends CommandBase {
+public class IntakeCommand extends Command {
 
 
   private @Getter ADAM adam = new ADAM(null);
