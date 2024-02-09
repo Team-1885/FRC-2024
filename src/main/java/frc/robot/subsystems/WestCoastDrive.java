@@ -54,11 +54,9 @@ public class WestCoastDrive extends Module {
 
         private @Getter RelativeEncoder mLeftEncoder = mLeftMaster.getEncoder();
         private @Getter RelativeEncoder mRightEncoder = mRightMaster.getEncoder();
-        private 
 
         private SparkPIDController mLeftCtrl, mRightCtrl;
-        // private PIDController mTurnToDegreePID, mLeftPositionPID, mRightPositionPID,
-        // mTargetLockPID;
+        // private PIDController mTurnToDegreePID, mLeftPositionPID, mRightPositionPID, mTargetLockPID;
         private ADXRS450_Gyro mGyro = new ADXRS450_Gyro();
 
         private NetworkTable mTable;
