@@ -1,5 +1,7 @@
 package frc.robot.controller;
 
+import lombok.Getter;
+
 import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.Timer;
 import frc.common.lib.util.XorLatch;
@@ -8,7 +10,7 @@ import frc.robot.Enums;
 import frc.robot.Robot;
 import frc.robot.Enums.EDriveState;
 import frc.robot.Enums.LEDState;
-import frc.robot.Enums.ELauncherData;
+import frc.common.types.ELauncherData;
 import frc.robot.InputMap.EDriveData;
 import frc.robot.hardware.vendors.firstparties.Clock;
 import frc.robot.hardware.vendors.firstparties.Data;

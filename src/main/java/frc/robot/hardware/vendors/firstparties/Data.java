@@ -50,7 +50,7 @@ public class Data {
   public final RobotCodex<ERawLimelightData> rawLimelight = new RobotCodex(NULL_CODEX_VALUE, ERawLimelightData.class);
   public final RobotCodex<EClimberData> climber = new RobotCodex(NULL_CODEX_VALUE, EClimberData.class);
   public final RobotCodex<EDriveData> drivetrain = new RobotCodex(NULL_CODEX_VALUE, EDriveData.class);
-  public final RobotCodex<ELauncherData>  launcher = new RobotCodex(NULL_CODEX_VALUE, ELauncher.class);
+  public final RobotCodex<ELauncherData>  launcher = new RobotCodex(NULL_CODEX_VALUE, ELauncherData.class);
   public final RobotCodex<ELimelightData> limelight = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
   public final RobotCodex<ELEDControlData> ledcontrol = new RobotCodex(NULL_CODEX_VALUE, ELEDControlData.class);
   public final RobotCodex[] mAllCodexes = new RobotCodex[] {
