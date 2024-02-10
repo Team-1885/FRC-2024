@@ -30,9 +30,9 @@ import frc.robot.subsystems.ModuleList;
 import frc.robot.subsystems.WestCoastDrive;
 import frc.robot.subsystems.LauncherSubsystem;
 
-import frc.robot.controller.
-
 import frc.robot.controller.LauncherController;
+
+import lombok.Getter;
 
 import java.util.Arrays;
 

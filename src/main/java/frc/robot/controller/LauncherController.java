@@ -3,10 +3,12 @@ package frc.robot.controller;
 import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.Timer;
 import frc.common.lib.util.XorLatch;
+import frc.common.types.input.ELogitech310;
 import frc.robot.Enums;
 import frc.robot.Robot;
 import frc.robot.Enums.EDriveState;
 import frc.robot.Enums.LEDState;
+import frc.robot.Enums.ELauncherData;
 import frc.robot.InputMap.EDriveData;
 import frc.robot.hardware.vendors.firstparties.Clock;
 import frc.robot.hardware.vendors.firstparties.Data;
@@ -48,10 +50,6 @@ public class LauncherController extends AbstractController{
    * 
    * @param pEnabled TRUE if enabled
    */
-  public final void setEnabled(boolean pEnabled) {
-    mCycleCount = 0;
-    mEnabled = pEnabled;
-  }
 
   public void stopDrivetrain() {
     db.drivetrain.set(EDriveData.STATE, EDriveState.PERCENT_OUTPUT);
@@ -67,11 +65,11 @@ public class LauncherController extends AbstractController{
 private void updateLauncherSubsystem(){
     if(Robot.DATA.driverinput.isSet(ELogitech310.A_BTN))
     {
-
+        
     }
 }
 
-  protected void setLED(Enums.LEDColorMode pColor, Enums.LEDState pState) {
+  /*protected void setLED(Enums.LEDColorMode pColor, Enums.LEDState pState) {
     // pState is in seconds
     db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, pColor);
     db.ledcontrol.set(ELEDControlData.LED_STATE, pState);
@@ -85,7 +83,7 @@ private void updateLauncherSubsystem(){
     db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, pColor);
     db.ledcontrol.set(ELEDControlData.LED_STATE, LEDState.BLINKING);
     db.ledcontrol.set(ELEDControlData.BLINK_SPEED, pBlinkRate);
-  }
+  }*/
 
   /**
    * Provides a way to report on what is used in our codex vs not used. This
