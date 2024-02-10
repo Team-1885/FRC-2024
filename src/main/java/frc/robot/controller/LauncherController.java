@@ -67,7 +67,8 @@ public class LauncherController extends AbstractController{
 private void updateLauncherSubsystem(){
     if(Robot.DATA.driverinput.isSet(ELogitech310.A_BTN))
     {
-        
+        //move? or update button pressed status?
+
     }
 }
 
