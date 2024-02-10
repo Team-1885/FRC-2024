@@ -40,14 +40,17 @@ private final @Getter PeytonCANLauncher peytonCANLauncher;
   public void execute() {
     runTest(() -> {
       double launchSpeed = 0;
+      double launch2Speed = 0;
 
       //input from buttons
       if(ELogitech310.A_BTN.isButton())
       {
         launchSpeed = 0.5;
+        launch2Speed = 0.5;
       }
 
-      peytonCANLauncher.setLaunchWheelSpeed(launchSpeed);
+      peytonCANLauncher.setLaunchSpeed(launchSpeed);
+      peytonCANLauncher.setLaunch2Speed(launch2Speed);
     });
   }
 

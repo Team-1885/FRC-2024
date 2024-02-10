@@ -40,6 +40,9 @@ public class REVLibCAN {
   public static @Getter final int INTAKE_FEEDER_ID = 5;
   public static @Getter final int INTAKE_ROTATER_ID = 6;
 
+  public static @Getter final int SHOOTER_1_ID = 0;
+  public static @Getter final int SHOOTER_2_ID = 0;
+
   // =======================================
   // DO NOT EDIT THESE CONFIGURATION OPTIONS
   // =======================================
@@ -57,7 +60,6 @@ public class REVLibCAN {
 
   private @Getter static ADAM adam = new ADAM(null);
   private static final Logger logger = Logger.getLogger(REVLibCAN.class.getName());
-public static final int SHOOTER_FEEDER_ID = 0;
 
   public static void logFaults(Stream<CANSparkMax> REVLibCAN) {
     runTest(() -> {

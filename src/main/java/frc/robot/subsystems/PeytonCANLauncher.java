@@ -12,7 +12,6 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.ADAM;
 import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
@@ -23,18 +22,22 @@ public class PeytonCANLauncher extends SubsystemBase {
   // Creates a new PeytonCANLauncher
   private @Getter final ADAM adam = new ADAM(null);
 
-  private static CANSparkMax REV_LAUNCHER_MOTOR = new CANSparkMax(REVLibCAN.SHOOTER_FEEDER_ID, REVLibCAN.MOTOR_TYPE);
+  private static CANSparkMax REV_LAUNCHER_MOTOR = new CANSparkMax(REVLibCAN.SHOOTER_1_ID, REVLibCAN.MOTOR_TYPE);
+  private static CANSparkMax REV_LAUNCHER_MOTOR2 = new CANSparkMax(REVLibCAN.SHOOTER_2_ID, REVLibCAN.MOTOR_TYPE);
 
-  private @Getter RelativeEncoder shooterEncoder;
+  private @Getter RelativeEncoder launcherEncoder, launcher2Encoder;
 
   private ShuffleboardTab tab = Shuffleboard.getTab("===== SHOOTER SUBSYSTEM =====");
-  private GenericEntry testEntry1 = tab.add("===== SET SHOOTER SPEED =====", 0).getEntry();
+  private GenericEntry testEntry1 = tab.add("===== SET SHOOTER1 SPEED =====", 0).getEntry();
+  private GenericEntry testEntry2 = tab.add("===== SET SHOOTER2 SPEED =====", 0).getEntry();
 
   public PeytonCANLauncher() {
 
     super();
-    Stream.of(REV_LAUNCHER_MOTOR).forEach(CANSparkMax::restoreFactoryDefaults);
-
+    Stream.of(REV_LAUNCHER_MOTOR, REV_LAUNCHER_MOTOR2).forEach(CANSparkMax::restoreFactoryDefaults);
+    Stream.of(REV_LAUNCHER_MOTOR, REV_LAUNCHER_MOTOR2).forEach(motor -> motor.setSmartCurrentLimit(30, 35, 100));
+    launcherEncoder = REV_LAUNCHER_MOTOR.getEncoder();                                                                                                          
+    launcher2Encoder = REV_LAUNCHER_MOTOR2.getEncoder();
   }
 
   @Override
@@ -42,7 +45,8 @@ public class PeytonCANLauncher extends SubsystemBase {
     // This method will be called once per scheduler run
     runTest(() -> {
       testEntry1.setDouble(REV_LAUNCHER_MOTOR.get());
-      REVLibCAN.logFaults(Stream.of(REV_LAUNCHER_MOTOR));
+      testEntry2.setDouble(REV_LAUNCHER_MOTOR2.get());
+      REVLibCAN.logFaults(Stream.of(REV_LAUNCHER_MOTOR, REV_LAUNCHER_MOTOR2));
       // ... Other periodic tasks
 });
   }
@@ -50,17 +54,25 @@ public class PeytonCANLauncher extends SubsystemBase {
   public void reset() {
     runTest(() -> {
             // Resets
-            Stream.of(shooterEncoder).forEach(encoder -> encoder.setPosition(0));
-            Stream.of(REV_LAUNCHER_MOTOR).forEach(motor -> motor.stopMotor());
+            Stream.of(launcherEncoder, launcher2Encoder).forEach(encoder -> encoder.setPosition(0));
+            Stream.of(REV_LAUNCHER_MOTOR, REV_LAUNCHER_MOTOR2).forEach(motor -> motor.stopMotor());
     });
   }
 
-  public void setLaunchWheelSpeed(double speed) {
-    REV_LAUNCHER_MOTOR.set(speed);
+  public void setLaunchSpeed(final double launchSpeed) {
+    REV_LAUNCHER_MOTOR.set(launchSpeed);
   }
 
-  public double getLaunchWheelSpeed() {
+  public void setLaunch2Speed(final double launch2Speed){
+    REV_LAUNCHER_MOTOR2.set(launch2Speed);
+  }
+
+  public double getLaunchSpeed() {
     return REV_LAUNCHER_MOTOR.get();
+  }
+
+  public double getLaunch2Speed(){
+    return REV_LAUNCHER_MOTOR2.get();
   }
 
     public void debugSubsystem() {
