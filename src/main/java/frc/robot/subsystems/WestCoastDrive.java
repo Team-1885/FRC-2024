@@ -23,7 +23,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.hardware.vendors.firstparties.ABC;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -55,8 +57,8 @@ public class WestCoastDrive extends Module {
                         mRightFollower = new CANSparkMax(REVLibCAN.R_FOLLOWER_ID, REVLibCAN.MOTOR_TYPE);
 
         private @Getter RelativeEncoder mLeftEncoder = mLeftMaster.getEncoder();
-        private @Getter RelativeEncoder mRightEncoder = mRightMaster.getEncoder(SparkMaxRelativeEncoder.Type.kQuadrature, 0);
-
+       // private @Getter RelativeEncoder mRightEncoder = mRightMaster.getEncoder(SparkMaxRelativeEncoder.Type.kQuadrature, 0);
+        private @Getter RelativeEncoder mRightEncoder = mRightMaster.getEncoder();
         private ADXRS450_Gyro mGyro = new ADXRS450_Gyro();
 
         private SparkPIDController mLeftCtrl, mRightCtrl;
@@ -256,11 +258,42 @@ public class WestCoastDrive extends Module {
         }
 
         public void drive(ChassisSpeeds pRobotRelativeSpeeds) {
+                // Creating my kinematics object: track width of around 1.7 feet
+                DifferentialDriveKinematics mKinematics = new DifferentialDriveKinematics(ABC.feet_to_meters(kTrackWidthFeet));
 
+                // Convert to wheel speeds
+                //if this does not work make it turn into field relative and then convert
+                DifferentialDriveWheelSpeeds mWheelSpeeds = mKinematics.toWheelSpeeds(pRobotRelativeSpeeds);
+
+                // Left velocity
+                double mLeftVelocity = mWheelSpeeds.leftMetersPerSecond;
+
+                // Right velocity
+                double mRightVelocity = mWheelSpeeds.rightMetersPerSecond;
+
+                // these values must be under the max velocity set in pathplanner
+                System.out.println("Left velocity: in MPS " + mLeftVelocity + "right velocity: in MPS" + mRightVelocity);
+                System.out.println("Left velocity: in decimal " + mLeftVelocity/ kMaxMpsVelocity + "right velocity: in decimal" + mRightVelocity/ kMaxMpsVelocity );
+                setMotorSpeed(mLeftVelocity/ kMaxMpsVelocity, mRightVelocity/ kMaxMpsVelocity);
         }
 
         public ChassisSpeeds getCurrentSpeeds() {
+                 // Create a kinematics object with a track width of around 1.7 feet
+                DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(ABC.feet_to_meters(kTrackWidthFeet));
+                // Get the current left and right wheel speeds from the encoders
+                double leftSpeed = mLeftEncoder.getVelocity();
+                double rightSpeed = mRightEncoder.getVelocity();
+                // Create a wheel speeds object with the encoder values
+                DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(leftSpeed * kRpmToMpsFactor,
+                                rightSpeed * kRpmToMpsFactor);
+                // Convert the wheel speeds to chassis speeds
+                ChassisSpeeds chassisSpeeds = kinematics.toChassisSpeeds(wheelSpeeds);
+                // Assuming mLeftEncoder and mRightEncoder are your encoder objects
+                double leftEncoderValue = mLeftEncoder.getPosition();
+                double rightEncoderValue = mRightEncoder.getPosition();
+                System.out.println("Left Encoder: " + leftEncoderValue + ", Right Encoder: " + rightEncoderValue);
 
+                return chassisSpeeds;
         }
 
         public Pose2d getPose() {
