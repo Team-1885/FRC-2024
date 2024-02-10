@@ -19,10 +19,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.ExampleCommand;
-import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.LauncherCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.WestCoastDrive;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LauncherSubsystem;
 import lombok.Getter;
 
 import frc.common.types.input.ELogitech310;
@@ -40,8 +40,8 @@ import frc.common.types.input.ELogitech310;
   private @Getter final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
   private @Getter final ExampleCommand exampleCommand = new ExampleCommand(exampleSubsystem);
   
-  private @Getter final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-  private @Getter final IntakeCommand intakeCommand = new IntakeCommand(intakeSubsystem);
+  private @Getter final LauncherSubsystem launcherSubsystem = new LauncherSubsystem();
+  private @Getter final LauncherCommand launcherCommand = new LauncherCommand(launcherSubsystem);
 
   //private @Getter final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   //private @Getter final IntakeCommand intakeCommand = new IntakeCommand(intakeSubsystem);
@@ -60,8 +60,8 @@ import frc.common.types.input.ELogitech310;
     westCoastDrive.setDefaultCommand(driveCommand);
     NamedCommands.registerCommand("DriveCommand", driveCommand);
 
-    intakeSubsystem.setDefaultCommand(intakeCommand);
-    NamedCommands.registerCommand("IntakeCommand", intakeCommand);
+    launcherSubsystem.setDefaultCommand(launcherCommand);
+    NamedCommands.registerCommand("LauncherCommand", launcherCommand);
     // Configure the trigger bindings
     configureBindings();
   }

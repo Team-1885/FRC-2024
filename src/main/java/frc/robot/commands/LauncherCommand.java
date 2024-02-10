@@ -12,7 +12,7 @@ import frc.robot.ADAM;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LauncherSubsystem;
 import lombok.Getter;
 
 
@@ -23,25 +23,25 @@ import lombok.Getter;
  */
 
 @SuppressWarnings("PMD.CommentSize")
-public class IntakeCommand extends Command {
+public class LauncherCommand extends Command {
 
 
   private @Getter ADAM adam = new ADAM(null);
 
-  private final @Getter IntakeSubsystem intakeSubsystem;
+  private final @Getter LauncherSubsystem launcherSubsystem;
 
   /** Creates a new ExampleCommand. */
-  public IntakeCommand(final IntakeSubsystem intakeSubsystem) {
+  public LauncherCommand(final LauncherSubsystem launcherSubsystem) {
     super();
     // Use addRequirements() here to declare subsystem dependencies.
-    this.intakeSubsystem = intakeSubsystem;
-    addRequirements(intakeSubsystem);
+    this.launcherSubsystem = launcherSubsystem;
+    addRequirements(launcherSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.println("========== STARTING INTAKE COMMAND ==========");
+    System.out.println("========== STARTING LAUNCHER COMMAND ==========");
     runTest(() -> {
 
     });
@@ -50,50 +50,19 @@ public class IntakeCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   public void execute() {
     runTest(() -> {
-      double feedSpeed = 0;
-      double rotateSpeed = 0;
+      double launcherSpeed = 0;
       //input from buttons
-      /*if(Robot.DATA.driverinput.isSet(ELogitech310.A_BTN))
+
+      if(Robot.DATA.driverinput.isSet(ELogitech310.A_BTN))
       {
-        feedSpeed = 0.5;
-      }*/
-      
-      /*//rotate up
-      if(Robot.DATA.driverinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS))
-      {
-        rotateSpeed = 0.5;
+        launcherSpeed = 0.5;
       }
-      //rotate down
-      if(Robot.DATA.driverinput.isSet(ELogitech310.L_BTN))
-      {
-        rotateSpeed = -0.5;
-      }*/
-
-      rotateSpeed = RobotContainer.logitech.getRawAxis(1) * 1;
-      feedSpeed = RobotContainer.logitech.getRawAxis(2) * 1;
-      //double turnSpeed = RobotContainer.logitech.getZ() * 0.7; // Get X-axis value of left stick //AVI DID THIS
-
-      // You may want to add deadzones to prevent small joystick values from causing
-      // unintended movement
-
-      rotateSpeed = applyDeadzone(rotateSpeed, 0.05);
-      feedSpeed = applyDeadzone(feedSpeed, 0.05);
-      //turnSpeed = applyDeadzone(turnSpeed, 0.05);
 
       // Set motor speeds in the IntakeSubsystem
-      intakeSubsystem.setFeederSpeed(feedSpeed);
-      intakeSubsystem.setRotaterSpeed(rotateSpeed);
+      launcherSubsystem.setLaunchSpeed(launcherSpeed);
     });
   }
 
-    // Helper method to apply a deadzone to joystick values
-    private double applyDeadzone(double value, double deadzone) {
-      if (Math.abs(value) < deadzone) {
-        return 0.0;
-      } else {
-        return value;
-      }
-    }
 
   // Called once the command ends or is interrupted.
   @Override

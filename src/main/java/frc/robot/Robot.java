@@ -28,6 +28,8 @@ import frc.robot.hardware.vendors.firstparties.Settings;
 import frc.robot.network.EForwardableConnections;
 import frc.robot.subsystems.ModuleList;
 import frc.robot.subsystems.WestCoastDrive;
+import frc.robot.subsystems.LauncherSubsystem;
+
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -61,6 +63,8 @@ public class Robot extends TimedRobot {
   private Timer initTimer = new Timer();
 
   private WestCoastDrive mWestCoastDrive;
+  private LauncherSubsystem mLauncherSubsystem;
+
   // private AutonSelection mAutonSelection;
   private ClimbModeSelection mClimberSelector;
   private BaseAutonController mBaseAutonController;
@@ -105,6 +109,7 @@ public class Robot extends TimedRobot {
     // mLEDControl = new LEDModule();
     // mAddressableLEDs = new AddressableLEDs();
     mWestCoastDrive = WestCoastDrive.getInstance();
+    mLauncherSubsystem = LauncherSubsystem.getInstance();
     // mLimelight = new Limelight();
     if (IS_SIMULATED) {
       // mSimulation = new SimulationModule();

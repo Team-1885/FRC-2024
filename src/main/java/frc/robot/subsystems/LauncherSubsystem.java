@@ -26,52 +26,52 @@ import lombok.Getter;
  * Intake Subsystem.
  */
 @SuppressWarnings("PMD.CommentSize")
-public class IntakeSubsystem extends SubsystemBase {
+public class LauncherSubsystem extends SubsystemBase {
         private @Getter final ADAM adam = new ADAM(null);
 
         // Creates a CANSparkMax motor, inheriting physical constants from the {@link#REVLibCAN} helper class.
-        private static CANSparkMax REV_INTAKE_FEEDER = new CANSparkMax(REVLibCAN.INTAKE_FEEDER_ID, REVLibCAN.MOTOR_TYPE);
+        private static CANSparkMax REV_LAUNCH1 = new CANSparkMax(REVLibCAN.INTAKE_FEEDER_ID, REVLibCAN.MOTOR_TYPE);
 
         // Creates a CANSparkMax motor, inheriting physical constants from the {@link#REVLibCAN} helper class.
-        private static CANSparkMax REV_INTAKE_ROTATER = new CANSparkMax(REVLibCAN.INTAKE_ROTATER_ID, REVLibCAN.MOTOR_TYPE);
+        private static CANSparkMax REV_LAUNCH2 = new CANSparkMax(REVLibCAN.INTAKE_ROTATER_ID, REVLibCAN.MOTOR_TYPE);
         /**
          * Lorem Ipsum.
          */
-        private @Getter RelativeEncoder feederEncoder, rotateEncoder;
+        private @Getter RelativeEncoder launch1Encoder, launch2Encoder;
 
         private ShuffleboardTab tab = Shuffleboard.getTab("===== INTAKE SUBSYSTEM =====");
         private GenericEntry testEntry1 = tab.add("===== SET FEEDER SPEED =====", 0).getEntry();
         private GenericEntry testEntry2 = tab.add("===== SET ROTATION SPEED =====", 0).getEntry();
 
         /** Constructor for the Subsystem */
-        public IntakeSubsystem() {
+        public LauncherSubsystem() {
                 /**
                  * Low-level configurations for the hardware objects
                  */
                 super();
-                Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER).forEach(CANSparkMax::restoreFactoryDefaults);
+                Stream.of(REV_LAUNCH1, REV_LAUNCH2).forEach(CANSparkMax::restoreFactoryDefaults);
                 /*Stream.of(REV_0xM1, REV_0xF1)
                                 .forEach(motor -> motor.setInverted(false));
                 Stream.of(REV_0xM2, REV_0xF2)
                                 .forEach(motor -> motor.setInverted(true));
                 Stream.of(REV_0xM1, REV_0xF1, REV_0xM2, REV_0xF2)
                                 .forEach(motor -> motor.setIdleMode(CANSparkMax.IdleMode.kCoast)); */
-                Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER).forEach(motor -> motor.setSmartCurrentLimit(30, 35, 100));
-                feederEncoder = REV_INTAKE_FEEDER.getEncoder();
-                rotateEncoder = REV_INTAKE_ROTATER.getEncoder();
-                Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER).forEach(motor -> motor.setClosedLoopRampRate(0.5));
-                Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER).forEach(motor -> motor.setOpenLoopRampRate(0.5));
-                Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER).forEach(motor -> motor.setControlFramePeriodMs(1));
-                Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER).forEach(CANSparkMax::burnFlash);
+                Stream.of(REV_LAUNCH1, REV_LAUNCH2).forEach(motor -> motor.setSmartCurrentLimit(30, 35, 100));
+                launch1Encoder = REV_LAUNCH1.getEncoder();
+                launch2Encoder = REV_LAUNCH2.getEncoder();
+                Stream.of(REV_LAUNCH1, REV_LAUNCH2).forEach(motor -> motor.setClosedLoopRampRate(0.5));
+                Stream.of(REV_LAUNCH1, REV_LAUNCH2).forEach(motor -> motor.setOpenLoopRampRate(0.5));
+                Stream.of(REV_LAUNCH1, REV_LAUNCH2).forEach(motor -> motor.setControlFramePeriodMs(1));
+                Stream.of(REV_LAUNCH1, REV_LAUNCH2).forEach(CANSparkMax::burnFlash);
 
         }
 
         @Override
         public void periodic() { // This method will be called once per scheduler run (usually, once every 20 ms),
                 runTest(() -> {
-                        testEntry1.setDouble(REV_INTAKE_FEEDER.get());
-                        testEntry2.setDouble(REV_INTAKE_ROTATER.get());
-                        REVLibCAN.logFaults(Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER));
+                        testEntry1.setDouble(REV_LAUNCH1.get());
+                        testEntry2.setDouble(REV_LAUNCH2.get());
+                        REVLibCAN.logFaults(Stream.of(REV_LAUNCH1, REV_LAUNCH2));
                         // ... Other periodic tasks
                 });
         }
@@ -84,30 +84,29 @@ public class IntakeSubsystem extends SubsystemBase {
         public void reset() {
                 runTest(() -> {
                         // Resets
-                        Stream.of(feederEncoder, rotateEncoder).forEach(encoder -> encoder.setPosition(0));
-                        Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER).forEach(motor -> motor.stopMotor());
+                        Stream.of(launch1Encoder, launch2Encoder).forEach(encoder -> encoder.setPosition(0));
+                        Stream.of(REV_LAUNCH1, REV_LAUNCH2).forEach(motor -> motor.stopMotor());
                 });
         }
 
-        public void setFeederSpeed(final double feedSpeed) {
+        public void setLaunchSpeed(final double launch1Speed) {
                 // Setting motor speed using the ".set()" method from the CANSparkMax class
-                REV_INTAKE_FEEDER.set(feedSpeed);
-        }
-
-        public void setRotaterSpeed(final double rotateSpeed) {
+                REV_LAUNCH1.set(launch1Speed);
+        
                 // Setting motor speed using the ".set()" method from the CANSparkMax class
-                REV_INTAKE_ROTATER.set(rotateSpeed);
+                REV_LAUNCH2.set(launch1Speed);
         }
 
-        public double getFeederSpeed() {
+        public double getLaunchSpeed() {
                 // Getting motor speed using the ".get()" method from the CANSparkMax class
-                return REV_INTAKE_FEEDER.get();
+                return REV_LAUNCH1.get();
         }
 
-        public double getRotaterSpeed() {
-                // Getting motor speed using the ".get()" method from the CANSparkMax class
-                return REV_INTAKE_ROTATER.get();
-                }
+        private static final LauncherSubsystem instance = new LauncherSubsystem();
+
+        public static LauncherSubsystem getInstance() {
+                return instance;
+        }
 
         /**
          * Executes custom testing and validation methods in a controlled environment.
