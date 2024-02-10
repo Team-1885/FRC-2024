@@ -5,25 +5,32 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.common.types.input.ELogitech310;
 import frc.robot.ADAM;
-import frc.robot.subsystems.PeytonCANLauncher;
+import frc.robot.RobotContainer;
+import frc.robot.commands.PeytonLaunchCommand;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.PeytonLauncher;
 import lombok.Getter;
 //don't have any imports, idk what I need to import because no errors are showing
 
 @SuppressWarnings("PMD.CommentSize")
-public class PeytonCANLaunchCommand extends Command {
+public class PeytonLaunchCommand extends Command {
 
 private @Getter ADAM adam = new ADAM(null);
 
-private final @Getter PeytonCANLauncher peytonCANLauncher;
+private final @Getter PeytonLauncher peytonLauncher;
+
+private final @Getter PeytonLaunchCommand peytonCANLauncher;
 
   // Creates a new PeytonCANLaunchCommand.
-  public PeytonCANLaunchCommand(final PeytonCANLauncher peytonCANLauncher) {
+  public PeytonLaunchCommand(final PeytonLauncher peytonLauncher) {
     super();
     // Use addRequirements() here to declare subsystem dependencies.
-    this.peytonCANLauncher = peytonCANLauncher;
-    addRequirements(peytonCANLauncher);
+    this.peytonLauncher = peytonLauncher;
+    this.peytonCANLauncher = null;
+    addRequirements(peytonLauncher);
   }
 
   // Called when the command is initially scheduled.
@@ -49,8 +56,8 @@ private final @Getter PeytonCANLauncher peytonCANLauncher;
         launch2Speed = 0.5;
       }
 
-      peytonCANLauncher.setLaunchSpeed(launchSpeed);
-      peytonCANLauncher.setLaunch2Speed(launch2Speed);
+      peytonLauncher.setLaunchSpeed(launchSpeed);
+      peytonLauncher.setLaunch2Speed(launch2Speed);
     });
   }
 
