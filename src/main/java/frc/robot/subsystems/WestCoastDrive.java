@@ -270,11 +270,12 @@ public class WestCoastDrive extends Module {
 
                 // Right velocity
                 double mRightVelocity = mWheelSpeeds.rightMetersPerSecond;
-
+                double leftSppeed = mLeftVelocity/kMaxMpsVelocity;
+                double rightSppeed = mRightVelocity/kMaxMpsVelocity;
                 // these values must be under the max velocity set in pathplanner
                 System.out.println("Left velocity: in MPS " + mLeftVelocity + "right velocity: in MPS" + mRightVelocity);
-                System.out.println("Left velocity: in decimal " + mLeftVelocity/ kMaxMpsVelocity + "right velocity: in decimal" + mRightVelocity/ kMaxMpsVelocity );
-                setMotorSpeed(mLeftVelocity/ kMaxMpsVelocity, mRightVelocity/ kMaxMpsVelocity);
+                System.out.println("Left velocity: in decimal " + leftSppeed + "right velocity: in decimal" + rightSppeed );
+                setMotorSpeed(leftSppeed, rightSppeed);
         }
 
         public ChassisSpeeds getCurrentSpeeds() {
@@ -297,6 +298,8 @@ public class WestCoastDrive extends Module {
         }
 
         public Pose2d getPose() {
+                System.out.println("the pose x meters is " + mOdometry.getPoseMeters().getX());
+                System.out.println("the pose y meters is " + mOdometry.getPoseMeters().getY());
                 return mOdometry.getPoseMeters();
         }
 
@@ -307,8 +310,8 @@ public class WestCoastDrive extends Module {
         }
 
         public void setMotorSpeed(final double leftSpeed, final double rightSpeed) {
-                mLeftMaster.set(leftSpeed);
-                mRightMaster.set(rightSpeed);
+                mLeftMaster.set(leftSpeed*.5);
+                mRightMaster.set(rightSpeed*.5);
         }
 
         public double getMotorSpeed() {
