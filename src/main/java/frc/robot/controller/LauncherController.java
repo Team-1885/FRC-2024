@@ -67,8 +67,9 @@ public class LauncherController extends AbstractController{
 private void updateLauncherSubsystem(){
     if(Robot.DATA.driverinput.isSet(ELogitech310.A_BTN))
     {
-        //move? or update button pressed status?
-
+       //change enum state to true/1
+      //ELauncherData.SHOOTER_STATE = true;
+      db.launcher.set(ELauncherData.SHOOTER_STATE, true);
     }
 }
 
