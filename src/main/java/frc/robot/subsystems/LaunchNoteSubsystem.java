@@ -12,7 +12,6 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.ADAM;
 import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
@@ -24,8 +23,8 @@ public class LaunchNoteSubsystem extends SubsystemBase {
   // Creates a new PeytonCANLauncher
   private @Getter final ADAM adam = new ADAM(null);
 
-  private static CANSparkMax REV_LAUNCHER_MOTOR = new CANSparkMax(REVLibCAN.LAUNCH_ID, REVLibCAN.MOTOR_TYPE);
-  ///////////GO BACK TO!!! private static CANSparkMax REV_LAUNCHER2_MOTOR = new CANSparkMax(REVLibCAN.LAUNCH2_ID, REVLibCAN.MOTOR_TYPE);
+  private @Getter static CANSparkMax REV_LAUNCHER_MOTOR = new CANSparkMax(REVLibCAN.LAUNCH_ID, REVLibCAN.MOTOR_TYPE);
+  private @Getter static CANSparkMax REV_LAUNCHER2_MOTOR = new CANSparkMax(REVLibCAN.LAUNCH2_ID, REVLibCAN.MOTOR_TYPE);
 
   private @Getter RelativeEncoder shooterEncoder;
 
@@ -38,6 +37,7 @@ private double launchSpeed;
 
     super();
     Stream.of(REV_LAUNCHER_MOTOR).forEach(CANSparkMax::restoreFactoryDefaults);
+    Stream.of(REV_LAUNCHER2_MOTOR).forEach(CANSparkMax::restoreFactoryDefaults);
 
   }
 
@@ -48,6 +48,8 @@ private double launchSpeed;
       testEntry1.setDouble(REV_LAUNCHER_MOTOR.get());
       REVLibCAN.logFaults(Stream.of(REV_LAUNCHER_MOTOR));
       // ... Other periodic tasks
+      testEntry1.setDouble(REV_LAUNCHER2_MOTOR.get());
+      REVLibCAN.logFaults(Stream.of(REV_LAUNCHER2_MOTOR));
 });
   }
 
@@ -56,15 +58,21 @@ private double launchSpeed;
             // Resets
             Stream.of(shooterEncoder).forEach(encoder -> encoder.setPosition(0));
             Stream.of(REV_LAUNCHER_MOTOR).forEach(motor -> motor.stopMotor());
+            Stream.of(REV_LAUNCHER2_MOTOR).forEach(motor -> motor.stopMotor());
     });
   }
 
   public void setLaunchWheelSpeed(double speed) {
     REV_LAUNCHER_MOTOR.set(launchSpeed);
+    REV_LAUNCHER2_MOTOR.set(launchSpeed);
   }
 
-  public double getLaunchWheelSpeed() {
+  public double getLaunchWheelSpeed1() {
     return REV_LAUNCHER_MOTOR.get();
+  }
+
+  public double getLaunchWheelSpeed2() {
+    return REV_LAUNCHER2_MOTOR.get();
   }
 
     public void debugSubsystem() {
