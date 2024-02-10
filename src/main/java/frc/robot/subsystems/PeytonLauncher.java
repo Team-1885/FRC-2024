@@ -18,7 +18,7 @@ import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
 import lombok.Getter;
 
 
-public class PeytonCANLauncher extends SubsystemBase {
+public class PeytonLauncher extends SubsystemBase {
   // Creates a new PeytonCANLauncher
   private @Getter final ADAM adam = new ADAM(null);
 
@@ -31,7 +31,7 @@ public class PeytonCANLauncher extends SubsystemBase {
   private GenericEntry testEntry1 = tab.add("===== SET SHOOTER1 SPEED =====", 0).getEntry();
   private GenericEntry testEntry2 = tab.add("===== SET SHOOTER2 SPEED =====", 0).getEntry();
 
-  public PeytonCANLauncher() {
+  public PeytonLauncher() {
 
     super();
     Stream.of(REV_LAUNCHER_MOTOR, REV_LAUNCHER_MOTOR2).forEach(CANSparkMax::restoreFactoryDefaults);
