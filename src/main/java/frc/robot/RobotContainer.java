@@ -20,11 +20,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.PeytonCANLaunchCommand;
+import frc.robot.commands.PeytonLaunchCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.WestCoastDrive;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.PeytonCANLauncher;
+import frc.robot.subsystems.PeytonLauncher;
 //import frc.robot.subsystems.PneumaticsTest;
 //import frc.robot.commands.PneumaticsCommand;
 import lombok.Getter;
@@ -36,13 +36,14 @@ import lombok.Getter;
  */
 @SuppressWarnings("PMD.CommentSize") public class RobotContainer {
 
-  // The robot's subsystems and commands are defined here...
+  
+// The robot's subsystems and commands are defined here...
   private @Getter final WestCoastDrive westCoastDrive = WestCoastDrive.getInstance();
   private @Getter final DriveCommand driveCommand = new DriveCommand(westCoastDrive);
   private @Getter final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
   private @Getter final ExampleCommand exampleCommand = new ExampleCommand(exampleSubsystem);
-  private @Getter final PeytonCANLauncher peytonCANLauncher  = new PeytonCANLauncher();
-  private @Getter final PeytonCANLaunchCommand peytonCANLaunchCommand = new PeytonCANLaunchCommand(peytonCANLauncher);
+  private @Getter final PeytonLauncher peytonCANLauncher  = new PeytonLauncher();
+  private @Getter final PeytonLaunchCommand peytonCANLaunchCommand = new PeytonLaunchCommand(peytonCANLauncher);
   // private @Getter final PneumaticsTest pneumaticsTest = new PneumaticsTest();
   // private @Getter final PneumaticsCommand pneumaticsCommand = new PneumaticsCommand(pneumaticsTest);
 
@@ -50,6 +51,7 @@ import lombok.Getter;
   //private @Getter final IntakeCommand intakeCommand = new IntakeCommand(intakeSubsystem);
   private @Getter final XboxController xboxController = new XboxController(RobotMap.DriverConstants.D_XBOX_PORT);
   public @Getter final static Joystick logitech1 = new Joystick(RobotMap.DriverConstants.D_LOGITECH_PORT);
+  
   private final SendableChooser<Command> autoChooser;
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -76,7 +78,7 @@ import lombok.Getter;
 
     // Trigger driveTriggerY = new Trigger(() -> logitech.getRawAxis(1) > 0.01); // Replace 1 with the axis number for the Y axis
     // driveTriggerY.whileTrue(driveCommand);
-
+   
     logitech1.getRawAxis(0); // X
     logitech1.getRawAxis(1); // Y
   }

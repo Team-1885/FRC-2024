@@ -242,6 +242,10 @@ public class WestCoastDrive extends Module {
         private DifferentialDriveOdometry mOdometry = new DifferentialDriveOdometry(mGyro.getRotation2d(),
                         leftDistanceTraveled, rightDistanceTraveled);
 
+        private ADXRS450_Gyro leftEncoder;
+
+        private ADXRS450_Gyro rightEncoder;
+
         @Override
         public void periodic() { // This method will be called once per scheduler run (usually, once every 20
                                  // ms),
@@ -287,6 +291,7 @@ public class WestCoastDrive extends Module {
                 // Get the robot-relative linear and angular velocities
                 double vx = chassisSpeeds.vxMetersPerSecond; // forward velocity in meters per second
                 double omega = chassisSpeeds.omegaRadiansPerSecond; // angular velocity in radians per second
+                return chassisSpeeds;
 
         }
 
