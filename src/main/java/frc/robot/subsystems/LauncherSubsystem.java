@@ -40,15 +40,16 @@ public class LauncherSubsystem extends SubsystemBase {
         private @Getter RelativeEncoder launch1Encoder, launch2Encoder;
 
         private ShuffleboardTab tab = Shuffleboard.getTab("===== LAUNCHER SUBSYSTEM =====");
-        private GenericEntry testEntry1 = tab.add("===== SET LAUNCHER MOTOR 1 SPEED =====", 0).getEntry();
-        private GenericEntry testEntry2 = tab.add("===== SET LAUNCHER MOTOR 2 SPEED =====", 0).getEntry();
+        //private GenericEntry testEntry1 = tab.add("===== SET LAUNCHER MOTOR 1 SPEED =====", 0).getEntry();
+        //private GenericEntry testEntry1 = tab.add("===== SET LAUNCHER MOTOR 1 SPEED =====", 0).getEntry();
+        private GenericEntry testEntry2 = tab.add("===== SET LAUNCHER MOTOR SPEED =====", 0).getEntry();
 
         /** Constructor for the Subsystem */
         public LauncherSubsystem() {
                 /**
                  * Low-level configurations for the hardware objects
                  */
-                super();
+                super();                                                                                     //                 :>
                 Stream.of(REV_LAUNCH1, REV_LAUNCH2).forEach(CANSparkMax::restoreFactoryDefaults);
                 /*Stream.of(REV_0xM1, REV_0xF1)
                                 .forEach(motor -> motor.setInverted(false));
