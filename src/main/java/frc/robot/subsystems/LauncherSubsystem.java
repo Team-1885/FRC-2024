@@ -30,18 +30,18 @@ public class LauncherSubsystem extends SubsystemBase {
         private @Getter final ADAM adam = new ADAM(null);
 
         // Creates a CANSparkMax motor, inheriting physical constants from the {@link#REVLibCAN} helper class.
-        private static CANSparkMax REV_LAUNCH1 = new CANSparkMax(REVLibCAN.INTAKE_FEEDER_ID, REVLibCAN.MOTOR_TYPE);
+        private static CANSparkMax REV_LAUNCH1 = new CANSparkMax(REVLibCAN.LAUNCHER1_ID, REVLibCAN.MOTOR_TYPE);
 
         // Creates a CANSparkMax motor, inheriting physical constants from the {@link#REVLibCAN} helper class.
-        private static CANSparkMax REV_LAUNCH2 = new CANSparkMax(REVLibCAN.INTAKE_ROTATER_ID, REVLibCAN.MOTOR_TYPE);
+        private static CANSparkMax REV_LAUNCH2 = new CANSparkMax(REVLibCAN.LAUNCHER2_ID, REVLibCAN.MOTOR_TYPE);
         /**
          * Lorem Ipsum.
          */
         private @Getter RelativeEncoder launch1Encoder, launch2Encoder;
 
-        private ShuffleboardTab tab = Shuffleboard.getTab("===== INTAKE SUBSYSTEM =====");
-        private GenericEntry testEntry1 = tab.add("===== SET FEEDER SPEED =====", 0).getEntry();
-        private GenericEntry testEntry2 = tab.add("===== SET ROTATION SPEED =====", 0).getEntry();
+        private ShuffleboardTab tab = Shuffleboard.getTab("===== LAUNCHER SUBSYSTEM =====");
+        private GenericEntry testEntry1 = tab.add("===== SET LAUNCHER MOTOR 1 SPEED =====", 0).getEntry();
+        private GenericEntry testEntry2 = tab.add("===== SET LAUNCHER MOTOR 2 SPEED =====", 0).getEntry();
 
         /** Constructor for the Subsystem */
         public LauncherSubsystem() {
