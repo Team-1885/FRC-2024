@@ -70,7 +70,7 @@ public class LauncherSubsystem extends SubsystemBase {
         @Override
         public void periodic() { // This method will be called once per scheduler run (usually, once every 20 ms),
                 runTest(() -> {
-                        testEntry1.setDouble(REV_LAUNCH1.get());
+                        //testEntry1.setDouble(REV_LAUNCH1.get());
                         testEntry2.setDouble(REV_LAUNCH2.get());
                         REVLibCAN.logFaults(Stream.of(REV_LAUNCH1, REV_LAUNCH2));
                         // ... Other periodic tasks
