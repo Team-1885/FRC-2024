@@ -37,7 +37,7 @@ public class REVLibCAN {
   public static @Getter final int R_MASTER_ID = 4; //was 4
   public static @Getter final int R_FOLLOWER_ID = 2; //was 2
 
-  public static @Getter final int INTAKE_FEEDER_ID = 2;
+  public static @Getter final int INTAKE_FEEDER_ID = 1;
   public static @Getter final int INTAKE_ROTATER_ID = 3;
 
   // =======================================
