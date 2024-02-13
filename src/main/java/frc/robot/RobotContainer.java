@@ -19,14 +19,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.ExampleCommand;
-import frc.robot.commands.IntakeCommand;
+//import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.PeytonLaunchCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.WestCoastDrive;
-import frc.robot.subsystems.IntakeSubsystem;
+//import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.PeytonLauncher;
-//import frc.robot.subsystems.PneumaticsTest;
-//import frc.robot.commands.PneumaticsCommand;
 import lombok.Getter;
 
 /** 
@@ -44,8 +42,7 @@ import lombok.Getter;
   private @Getter final ExampleCommand exampleCommand = new ExampleCommand(exampleSubsystem);
   private @Getter final PeytonLauncher peytonCANLauncher  = new PeytonLauncher();
   private @Getter final PeytonLaunchCommand peytonCANLaunchCommand = new PeytonLaunchCommand(peytonCANLauncher);
-  // private @Getter final PneumaticsTest pneumaticsTest = new PneumaticsTest();
-  // private @Getter final PneumaticsCommand pneumaticsCommand = new PneumaticsCommand(pneumaticsTest);
+  
 
   //private @Getter final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   //private @Getter final IntakeCommand intakeCommand = new IntakeCommand(intakeSubsystem);
