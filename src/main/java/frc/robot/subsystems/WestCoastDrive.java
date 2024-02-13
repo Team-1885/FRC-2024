@@ -271,7 +271,8 @@ public class WestCoastDrive extends Module {
 
                 // Right velocity
                 double mRightVelocity = mWheelSpeeds.rightMetersPerSecond;
-
+                double leftSppeed = mLeftVelocity/kMaxMpsVelocity;
+                double rightSppeed = mRightVelocity/kMaxMpsVelocity;
                 // these values must be under the max velocity set in pathplanner
                 System.out.println("Left velocity: in MPS " + mLeftVelocity + "right velocity: in MPS" + mRightVelocity);
                 System.out.println("Left set velocity: in decimal " + mLeftVelocity/ kMaxMpsVelocity + "right set velocity: in decimal" + mRightVelocity/ kMaxMpsVelocity );
