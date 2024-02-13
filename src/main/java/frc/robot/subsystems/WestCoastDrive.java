@@ -237,6 +237,7 @@ public class WestCoastDrive extends Module {
         public void periodic() { // This method will be called once per scheduler run (usually, once every 20
                                  // ms),
                 runTest(() -> {
+                        System.out.println("periodic is called");
                         mField.setRobotPose(getPose());
                         REVLibCAN.logFaults(Stream.of(mLeftMaster, mLeftFollower, mRightMaster, mRightFollower));
                         // sets the Odometry with the current information.
@@ -273,7 +274,7 @@ public class WestCoastDrive extends Module {
 
                 // these values must be under the max velocity set in pathplanner
                 System.out.println("Left velocity: in MPS " + mLeftVelocity + "right velocity: in MPS" + mRightVelocity);
-                System.out.println("Left velocity: in decimal " + mLeftVelocity/ kMaxMpsVelocity + "right velocity: in decimal" + mRightVelocity/ kMaxMpsVelocity );
+                System.out.println("Left set velocity: in decimal " + mLeftVelocity/ kMaxMpsVelocity + "right set velocity: in decimal" + mRightVelocity/ kMaxMpsVelocity );
                 setMotorSpeed(mLeftVelocity/ kMaxMpsVelocity, mRightVelocity/ kMaxMpsVelocity);
         }
 
@@ -291,13 +292,16 @@ public class WestCoastDrive extends Module {
                 // Assuming mLeftEncoder and mRightEncoder are your encoder objects
                 double leftEncoderValue = mLeftEncoder.getPosition();
                 double rightEncoderValue = mRightEncoder.getPosition();
-                System.out.println("Left Encoder: " + leftEncoderValue + ", Right Encoder: " + rightEncoderValue);
-
+                System.out.println("Left Encoder position " +leftEncoderValue+ ", Right Encoder: " + rightEncoderValue);
+                System.out.println("the Left encoder speed is in mps " + leftSpeed * kRpmToMpsFactor+ " the right encoder speed is in mps" + rightSpeed * kRpmToMpsFactor);
                 return chassisSpeeds;
         }
 
         public Pose2d getPose() {
+                System.out.println("the pose meters is : " + mOdometry.getPoseMeters().getX());
+                System.out.println("the pose meters is : " + mOdometry.getPoseMeters().getY());
                 return mOdometry.getPoseMeters();
+        
         }
 
         public void resetPose(Pose2d pose) {
@@ -307,8 +311,11 @@ public class WestCoastDrive extends Module {
         }
 
         public void setMotorSpeed(final double leftSpeed, final double rightSpeed) {
-                mLeftMaster.set(leftSpeed);
-                mRightMaster.set(rightSpeed);
+                // set motor speed is slowed for testing
+                getCurrentSpeeds();
+                getPose();
+                mLeftMaster.set(leftSpeed * .2);
+                mRightMaster.set(rightSpeed * .2);
         }
 
         public double getMotorSpeed() {
