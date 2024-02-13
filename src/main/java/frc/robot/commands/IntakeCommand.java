@@ -50,28 +50,21 @@ public class IntakeCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   public void execute() {
     runTest(() -> {
-      double feedSpeed = 0;
-      double rotateSpeed = 0;
-
-      //input from buttons
-      if(ELogitech310.A_BTN.isButton())
-      {
-        feedSpeed = 0.5;
-      }
       
-      //rotate up
-      if(ELogitech310.L_BTN.isButton())
-      {
-        rotateSpeed = 0.5;
-      }
-      else if(ELogitech310.LEFT_TRIGGER_AXIS.isAxis())
-      {
-        rotateSpeed = -0.5;
-      }
+      double forwardSpeed = RobotContainer.logitech.getRawAxis(1) * 0.4;
+      double turnSpeed = RobotContainer.logitech.getZ() * 0.7; // Get X-axis value of left stick
 
-      // Set motor speeds in the IntakeSubsystem
-      intakeSubsystem.setFeederSpeed(feedSpeed);
-      intakeSubsystem.setRotaterSpeed(rotateSpeed);
+      // You may want to add deadzones to prevent small joystick values from causing
+      // unintended movement
+      forwardSpeed = applyDeadzone(forwardSpeed, 0.05);
+      turnSpeed = applyDeadzone(turnSpeed, 0.05);
+
+      // Calculate left and right motor speeds for tank drive
+      double leftSpeed = forwardSpeed + turnSpeed;
+      double rightSpeed = forwardSpeed - turnSpeed;
+
+      // Set motor speeds in the WestCoastDrive subsystem
+      westCoastDrive.setMotorSpeed(leftSpeed, rightSpeed);
     });
   }
 

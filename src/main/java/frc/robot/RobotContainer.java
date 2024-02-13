@@ -40,7 +40,7 @@ public class RobotContainer {
   private @Getter final ExampleSubsystem mExampleSubsystem;
   private @Getter final ExampleCommand mExampleCommand;
   private @Getter final XboxController xboxController = new XboxController(RobotMap.DriverConstants.D_XBOX_PORT);
-  public @Getter final static Joystick logitech = new Joystick(RobotMap.DriverConstants.D_LOGITECH_PORT);
+  public @Getter final static Joystick logitech1 = new Joystick(RobotMap.DriverConstants.D_LOGITECH_PORT);
   private final SendableChooser<Command> autoChooser;
   private final Field2d mField;
 
