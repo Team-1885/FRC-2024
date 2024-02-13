@@ -271,8 +271,7 @@ public class WestCoastDrive extends Module {
 
                 // Right velocity
                 double mRightVelocity = mWheelSpeeds.rightMetersPerSecond;
-                double leftSppeed = mLeftVelocity/kMaxMpsVelocity;
-                double rightSppeed = mRightVelocity/kMaxMpsVelocity;
+
                 // these values must be under the max velocity set in pathplanner
                 System.out.println("Left velocity: in MPS " + mLeftVelocity + "right velocity: in MPS" + mRightVelocity);
                 System.out.println("Left set velocity: in decimal " + mLeftVelocity/ kMaxMpsVelocity + "right set velocity: in decimal" + mRightVelocity/ kMaxMpsVelocity );
@@ -293,14 +292,14 @@ public class WestCoastDrive extends Module {
                 // Assuming mLeftEncoder and mRightEncoder are your encoder objects
                 double leftEncoderValue = mLeftEncoder.getPosition();
                 double rightEncoderValue = mRightEncoder.getPosition();
-                System.out.println("Left Encoder position " +leftEncoderValue+ ", Right Encoder: " + rightEncoderValue);
+                System.out.println("Left Encoder position " + leftEncoderValue+ ", Right Encoder: " + rightEncoderValue);
                 System.out.println("the Left encoder speed is in mps " + leftSpeed * kRpmToMpsFactor+ " the right encoder speed is in mps" + rightSpeed * kRpmToMpsFactor);
                 return chassisSpeeds;
         }
 
         public Pose2d getPose() {
-                System.out.println("the pose meters is : " + mOdometry.getPoseMeters().getX());
-                System.out.println("the pose meters is : " + mOdometry.getPoseMeters().getY());
+                System.out.println("the pose x meters is : " + mOdometry.getPoseMeters().getX());
+                System.out.println("the pose  y meters is : " + mOdometry.getPoseMeters().getY());
                 return mOdometry.getPoseMeters();
         
         }
@@ -314,9 +313,8 @@ public class WestCoastDrive extends Module {
         public void setMotorSpeed(final double leftSpeed, final double rightSpeed) {
                 // set motor speed is slowed for testing
                 getCurrentSpeeds();
-                getPose();
-                mLeftMaster.set(leftSpeed * .2);
-                mRightMaster.set(rightSpeed * .2);
+                mLeftMaster.set(leftSpeed * .5);
+                mRightMaster.set(rightSpeed * .5);
         }
 
         public double getMotorSpeed() {
