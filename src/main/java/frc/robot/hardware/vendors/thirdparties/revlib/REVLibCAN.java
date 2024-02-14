@@ -40,8 +40,8 @@ public class REVLibCAN {
   public static @Getter final int INTAKE_FEEDER_ID = 5;
   public static @Getter final int INTAKE_ROTATER_ID = 6;
 
-  public static @Getter final int SHOOTER_1_ID = 0;
-  public static @Getter final int SHOOTER_2_ID = 0;
+  public static @Getter final int SHOOTER_1_ID = 1;
+  public static @Getter final int SHOOTER_2_ID = 3;
 
   // =======================================
   // DO NOT EDIT THESE CONFIGURATION OPTIONS
