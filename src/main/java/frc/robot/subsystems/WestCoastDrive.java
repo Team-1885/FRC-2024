@@ -79,7 +79,7 @@ public class WestCoastDrive extends Module {
         private NetworkTable mTable;
         private final Field2d mField = new Field2d();
         private ShuffleboardTab tab = Shuffleboard.getTab("West Coast Drive");
-        private GenericEntry leftMaster = tab.add("Left Master", 0)
+        /*private GenericEntry leftMaster = tab.add("Left Master", 0)
                         .getEntry();
         private GenericEntry leftFollower = tab.add("Left Follower", 0)
                         .getEntry();
@@ -87,7 +87,7 @@ public class WestCoastDrive extends Module {
                         .getEntry();
         private GenericEntry rightFollower = tab.add("Right Follower", 0)
                         .getEntry();
-        private GenericEntry gyro = tab.add("Gyro", 0).getEntry();
+        private GenericEntry gyro = tab.add("Gyro", 0).getEntry();*/
 
         // ========================================
         // DO NOT MODIFY THESE PHYSICAL CONSTANTS
@@ -248,7 +248,7 @@ public class WestCoastDrive extends Module {
         public void periodic() { // This method will be called once per scheduler run (usually, once every 20
                                  // ms),
                 runTest(() -> {
-                        mField.setRobotPose(getPose());
+                        /*mField.setRobotPose(getPose());
                         REVLibCAN.logFaults(Stream.of(mLeftMaster, mLeftFollower, mRightMaster, mRightFollower));
 
                         var mGyroAngle = mGyro.getRotation2d();
@@ -259,7 +259,7 @@ public class WestCoastDrive extends Module {
                         rightMaster.setDouble(mRightMaster.get());
                         rightFollower.setDouble(mRightFollower.get());
                         gyro.setDouble(mGyro.getRotation2d().getDegrees());
-                        // ... Other periodic tasks
+                        // ... Other periodic tasks*/
                 });
         }
 
