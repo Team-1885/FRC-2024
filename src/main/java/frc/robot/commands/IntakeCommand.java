@@ -69,8 +69,11 @@ public class IntakeCommand extends Command {
         rotateSpeed = -0.5;
       }*/
 
-      rotateSpeed = RobotContainer.logitech.getRawAxis(1) * 1;
+      /*rotateSpeed = RobotContainer.logitech.getRawAxis(1) * 1;
       feedSpeed = RobotContainer.logitech.getRawAxis(2) * 1;
+*/
+      rotateSpeed = RobotContainer.logitech2.getRawAxis(1) * 1;
+      feedSpeed = RobotContainer.logitech2.getRawAxis(2) * 1;
       //double turnSpeed = RobotContainer.logitech.getZ() * 0.7; // Get X-axis value of left stick //AVI DID THIS
 
       // You may want to add deadzones to prevent small joystick values from causing
