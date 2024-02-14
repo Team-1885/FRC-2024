@@ -39,9 +39,13 @@ import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 
 /**
+ * Main class of the project. Responsible for initializing and controlling
+ * the robot in different modes such as autonomous and teleoperated.
+ * 
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
  * documentation.
+ * 
  * If you change the name of this class or the package after creating this
  * project, you must also update the build.gradle file in the project.
  */

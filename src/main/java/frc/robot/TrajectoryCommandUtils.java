@@ -20,9 +20,17 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-
+/**
+ * Provides utility methods for working with trajectories.
+ */
 public class TrajectoryCommandUtils {
   public static ABC abc = new ABC();
+  /**
+   * Reads a JSON file containing a trajectory path and returns the
+   * corresponding {@link Trajectory}.
+   * 
+   * @return the retrieved {@link Trajectory}.
+   */
   public static Trajectory getJSONTrajectory() {
     String trajectoryJSON = "paths/Unnamed_0.wpilib.json";
     Trajectory trajectory = new Trajectory();
@@ -35,6 +43,11 @@ public class TrajectoryCommandUtils {
     return trajectory;
   }
 
+  /**
+   * Retrieves a {@link Trajectory} from a JSON file.
+   * 
+   * @return the retrieved {@link Trajectory}
+   */
   public static Trajectory getOtherJSONTrajectory() {
     String trajectoryJSON = "paths/second_test_five_ball.wpilib.json";
     Trajectory trajectory = new Trajectory();
@@ -47,6 +60,13 @@ public class TrajectoryCommandUtils {
     return trajectory;
   }
 
+  /**
+   * Builds a trajectory using waypoints and configuration settings.
+   * (WIP, should eventually have parameters that take in the waypoints
+   * and the config).
+   * 
+   * @return The method is returning a Trajectory object.
+   */
   public static Trajectory buildExampleTrajectory() {
     // TODO Normally this method would build the trajectory based off of the
     // waypoints and config that is passed in

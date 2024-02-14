@@ -24,7 +24,10 @@ import frc.robot.subsystems.WestCoastDrive;
 import lombok.Getter;
 
 /**
- * This class is where the bulk of the robot should be declared.
+ * Responsible for initializing and configuring the robot's subsystems,
+ * commands, and trigger mappings.
+ * 
+ * This is where the bulk of the robot should be declared.
  * Since Command-based is a "declarative" paradigm, very little robot logic
  * should actually be handled in the {@link Robot} periodic methods (other than
  * the scheduler calls).
@@ -45,7 +48,9 @@ public class RobotContainer {
   private final Field2d mField;
 
   /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
+   * The container for the robot. 
+   * Responsible for initializing and configuring the robot's
+   * subsystems, commands, OI, and trigger mappings.
    */
   public RobotContainer() {
     // Subsystem Initialization
@@ -105,9 +110,10 @@ public class RobotContainer {
   }
 
   /**
+   * Returns a command that follows a predefined path.
    * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
+   * 
+   * @return the command to run during the autonomous period.
    */
   public Command getAutonomousCommand() {
     // Load the path you want to follow using its name in the GUI

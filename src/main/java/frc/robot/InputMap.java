@@ -13,22 +13,18 @@ import lombok.Getter;
 /**
  * Manages controller input and bindings for the Operator Interface (OI).
  */
-
 @SuppressWarnings("PMD.CommentSize")
 public class InputMap {
 
-  /**
-   * ...
-   */
   private @Getter static ADAM adam = new ADAM(null);
 
   /**
-   * ...
+   * Logitech Controller Driver.
    */
   private @Getter Joystick driverLGTCtrlr;
 
   /**
-   * ...
+   * Logitech Controller Operator.
    */
   private @Getter Joystick operatorLGTCtrlr;
 
@@ -44,9 +40,10 @@ public class InputMap {
   }
 
   /**
-   * ================================
-   * // ...
-   * ================================
+   * Defines constants for various controls on a Logitech G F310 controller
+   * used to drive the robot.
+   * 
+   * @see <a href="https://www.logitechg.com/en-us/products/gamepads/f310-gamepad.940-000110.html">Logitech G</a>
    */
   public static class DRIVER {
     public static final ELogitech310 TURN_AXIS = ELogitech310.RIGHT_X_AXIS,
@@ -58,10 +55,12 @@ public class InputMap {
         TARGET_LOCK = ELogitech310.LEFT_TRIGGER_AXIS;
   }
 
+
   /**
-   * ================================
-   * // ...
-   * ================================
+   * Defines constants for various controls on a Logitech G F310 controller
+   * used to operate the robot.
+   * 
+   * @see <a href="https://www.logitechg.com/en-us/products/gamepads/f310-gamepad.940-000110.html">Logitech G</a>
    */
   public static class OPERATOR {
     public static final ELogitech310 RETRACT_INTAKE = ELogitech310.RIGHT_TRIGGER_AXIS,
@@ -78,6 +77,12 @@ public class InputMap {
         DECREASE_FEEDER_SPEED = ELogitech310.DPAD_DOWN;;
   }
 
+  /**
+   * Defines constants for various controls on a Logitech G F310 controller
+   * used to control the hanger.
+   * 
+   * @see <a href="https://www.logitechg.com/en-us/products/gamepads/f310-gamepad.940-000110.html">Logitech G</a>
+   */
   public static class HANGER {
     public static final ELogitech310 SPIN_DOUBLE = ELogitech310.RIGHT_TRIGGER_AXIS,
         SPIN_SINGLE = ELogitech310.LEFT_TRIGGER_AXIS,
@@ -95,6 +100,10 @@ public class InputMap {
         CONFIRM_CLAMPED_ON_TRAVERSAL_RELEASE_HIGH = ELogitech310.X_BTN;
   }
 
+  /**
+   * Represents various drive-related data points.
+   * Implements the CodexOf interface for a generic type of Double.
+   */
   public enum EDriveData implements CodexOf<Double> {
     // Sensor inputs
     L_ACTUAL_POS_FT, R_ACTUAL_POS_FT,

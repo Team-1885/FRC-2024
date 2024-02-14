@@ -1,5 +1,11 @@
 package frc.robot;
 
+/**
+ * Contains various enums representing different states and modes for
+ * the robot's climber, clamp, climber angle, Limelight camera, Limelight
+ * LED, Limelight stream, Limelight snapshot, drivetrain, intake module
+ * (roller, arm, feeder), and LED color.
+ */
 public class Enums {
   public enum EClimberMode {
     VELOCITY,
@@ -9,44 +15,69 @@ public class Enums {
     DEFAULT
   }
 
-  public enum ERungState {
-    NULL,
+  /**
+ * Represents different states of the climber.
+ */
+public enum ERungState {
+  /**
+   * Initial state indicating no specific action or state.
+   */
+  NULL,
 
-    // Driver activates move to initial position
-    GROUND,
+  /**
+   * Driver activates the move to the initial position.
+   */
+  GROUND,
 
-    // Grab the mid bar. Operator pushes button to enter this state.
-    // Automated go to high bar
-    GO_TO_HIGH_BAR,
+  /**
+   * Grab the mid bar. Operator pushes the button to enter this state.
+   * Automated go to the high bar afterward.
+   */
+  GO_TO_HIGH_BAR,
 
-    TRAVEL_TILL_HIT_HIGH,
+  /**
+   * Travel until hitting the high bar after reaching the high bar position.
+   */
+  TRAVEL_TILL_HIT_HIGH,
 
-    GRAB_HIGH_BAR,
+  /**
+   * Grab the high bar. Operator pushes the button to enter this state.
+   */
+  GRAB_HIGH_BAR,
 
-    // Operator pushes button to enter this state.
-    // Balancing while grabbing both Mid and High. Drives the climber in reverse.
-    BALANCING,
+  /**
+   * Operator pushes the button to enter this state.
+   * Balancing while grabbing both Mid and High. Drives the climber in reverse.
+   */
+  BALANCING,
 
-    // Automated entry.
-    // Release double claw after we're balanced. Should be 1 cycle or so.
-    RELEASING_MID,
+  /**
+   * Automated entry. Release double claw after balancing. Should be 1 cycle or so.
+   */
+  RELEASING_MID,
 
-    // Automated entry.
-    // Go to traversal position. Keep double claw released during this time
-    MOVE_TO_TRAVERSAL,
+  /**
+   * Automated entry. Go to traversal position. Keep double claw released during this time.
+   */
+  MOVE_TO_TRAVERSAL,
 
-    // Automated entry.
-    // Close double claw, stay in this state until driver pushes button
-    GRAB_TRAVERSAL,
+  /**
+   * Automated entry. Close double claw, stay in this state until the driver pushes the button.
+   */
+  GRAB_TRAVERSAL,
 
-    // Driver pushes the button to enter this state.
-    // Open single claw.
-    RELEASE_HIGH,
+  /**
+   * Driver pushes the button to enter this state. Open single claw.
+   */
+  RELEASE_HIGH,
 
-    // Autoated entry after N seconds of RELEASE_HIGH state
-    // Move to final traversal position.
-    FINAL_LIFT
-  }
+  /**
+   * Automated entry after N seconds of RELEASE_HIGH state.
+   * Move to the final traversal position.
+   */
+  FINAL_LIFT
+}
+
 
   public enum EClampMode {
     NULL,
