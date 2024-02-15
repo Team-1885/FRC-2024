@@ -10,7 +10,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,10 +17,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommand;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.CANLauncher;
 import frc.robot.subsystems.WestCoastDrive;
 import lombok.Getter;
+import frc.robot.commands.PrepareLaunch;
+import frc.robot.commands.LaunchNote;
 
 /**
  * This class is where the bulk of the robot should be declared.
@@ -35,30 +35,25 @@ import lombok.Getter;
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
-  private @Getter final WestCoastDrive mWestCoastDrive;
+  private @Getter final WestCoastDrive mWestCoastDrive = WestCoastDrive.getInstance();
   private @Getter final DriveCommand mDriveCommand;
-  private @Getter final ExampleSubsystem mExampleSubsystem;
-  private @Getter final ExampleCommand mExampleCommand;
-  private @Getter final XboxController xboxController = new XboxController(RobotMap.DriverConstants.D_XBOX_PORT);
-  public @Getter final static Joystick logitech = new Joystick(RobotMap.DriverConstants.D_LOGITECH_PORT);
+  
+  private @Getter final CANLauncher mLauncher = new CANLauncher();
+  public @Getter final static Joystick logitech = new Joystick(0);
   private final SendableChooser<Command> autoChooser;
   private final Field2d mField;
+
+  private final CommandXboxController mOperatorController = new CommandXboxController(1);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    // Subsystem Initialization
-    mWestCoastDrive = WestCoastDrive.getInstance();
-    mExampleSubsystem = new ExampleSubsystem();
-
     // Register Named Commands
-    NamedCommands.registerCommand("DriveCommand", new ExampleCommand(mExampleSubsystem));
     NamedCommands.registerCommand("DriveCommand", new DriveCommand(mWestCoastDrive));
 
     // Command Initialization
     mDriveCommand = new DriveCommand(mWestCoastDrive);
-    mExampleCommand = new ExampleCommand(mExampleSubsystem);
 
     // Build an auto chooser. This will use Commands.none() as the default option.
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -91,17 +86,13 @@ public class RobotContainer {
 
   /**
    * Use this method to define your trigger->command mappings.
-   * Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-   * an arbitrary predicate, or via the named factories in
-   * {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses
-   * for {@link CommandXboxController
-   * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4}
-   * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick
-   * Flight joysticks}.
+   * Triggers can be created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
-    // ...
+    mOperatorController
+        .a().whileTrue(new PrepareLaunch(mLauncher).withTimeout(1).andThen(new LaunchNote(mLauncher).handleInterrupt(() -> mLauncher.stop())));
+
+    mOperatorController.leftBumper().whileTrue(mLauncher.getIntakeCommand());
   }
 
   /**
@@ -113,7 +104,8 @@ public class RobotContainer {
     // Load the path you want to follow using its name in the GUI
     PathPlannerPath mPath = PathPlannerPath.fromPathFile("Drive Straight");
 
-    // Create a path following command using AutoBuilder. This will also trigger event markers.
+    // Create a path following command using AutoBuilder. This will also trigger
+    // event markers.
     return AutoBuilder.followPath(mPath);
     // return autoChooser.getSelected();
   }

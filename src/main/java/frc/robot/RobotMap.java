@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.XboxController;
     /**
      * ...
      */
-    public static final int D_XBOX_PORT = 0;
+    public static final int D_XBOX_PORT = 1;
     /**
      * ...
      */
