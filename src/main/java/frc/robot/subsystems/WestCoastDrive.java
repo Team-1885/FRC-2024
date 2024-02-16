@@ -77,7 +77,7 @@ public class WestCoastDrive extends Module {
 
         private NetworkTable mTable;
         private final Field2d mField = new Field2d();
-        private ShuffleboardTab tab = Shuffleboard.getTab("West Coast Drive");
+        private ShuffleboardTab tab = Shuffleboard.getTab("WestCoastDrive");
         private GenericEntry leftMaster = tab.add("Left Master", 0)
                         .getEntry();
         private GenericEntry leftFollower = tab.add("Left Follower", 0)
@@ -288,8 +288,8 @@ public class WestCoastDrive extends Module {
         public void setMotorSpeed(double leftSpeed, double rightSpeed) {
                 // set motor speed is slowed for testing
                 
-                mLeftMaster.set(leftSpeed * 0.5);
-                mRightMaster.set(rightSpeed * 0.5);
+                mLeftMaster.set(leftSpeed);
+                mRightMaster.set(rightSpeed);
         }
 
         public double getMotorSpeed() {

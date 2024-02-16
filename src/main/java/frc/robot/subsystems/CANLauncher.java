@@ -7,14 +7,26 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
+
 import static frc.robot.Constants.LauncherConstants.*;
 
+import java.util.stream.Stream;
 
 public class CANLauncher extends SubsystemBase {
   CANSparkMax mLaunchWheel;
   CANSparkMax mFeedWheel;
+
+  private ShuffleboardTab tab = Shuffleboard.getTab("CANLauncher");
+  private GenericEntry FeedWheel = tab.add("Feed Wheel", 0)
+      .getEntry();
+  private GenericEntry LaunchWheel = tab.add("Launch Wheel", 0)
+      .getEntry();
 
   /** Creates a new Launcher. */
   public CANLauncher() {
@@ -29,14 +41,11 @@ public class CANLauncher extends SubsystemBase {
   }
 
   /**
-   * This method is an example of the 'subsystem factory' style of command creation. A method inside
-   * the subsytem is created to return an instance of a command. This works for commands that
-   * operate on only that subsystem, a similar approach can be done in RobotContainer for commands
-   * that need to span subsystems. The Subsystem class has helper methods, such as the startEnd
-   * method used here, to create these commands.
+   * This method is an example of the 'subsystem factory' style of command creation. A method inside the subsytem is created to return an instance of a command. This works for commands that operate on only that subsystem, a similar approach can be done in RobotContainer for commands that need to span subsystems. The Subsystem class has helper methods, such as the startEnd method used here, to create these commands.
    */
   public Command getIntakeCommand() {
-    // The startEnd helper method takes a method to call when the command is initialized and one to
+    // The startEnd helper method takes a method to call when the command is
+    // initialized and one to
     // call when it ends
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
@@ -50,26 +59,35 @@ public class CANLauncher extends SubsystemBase {
         });
   }
 
-  // An accessor method to set the speed (technically the output percentage) of the launch wheel
+  // An accessor method to set the speed (technically the output percentage) of
+  // the launch wheel
   public void setLaunchWheel(double speed) {
     System.out.println("setLaunchWheel() is Called");
     mLaunchWheel.set(speed);
     System.out.println("mLaunchWheel set to speed " + speed);
   }
 
-  // An accessor method to set the speed (technically the output percentage) of the feed wheel
+  // An accessor method to set the speed (technically the output percentage) of
+  // the feed wheel
   public void setFeedWheel(double speed) {
     System.out.println("setFeedWheel() is Called");
     mFeedWheel.set(speed);
     System.out.println("mFeedWheel set to speed " + speed);
   }
 
-  // A helper method to stop both wheels. You could skip having a method like this and call the
-  // individual accessors with speed = 0 instead
+  // A helper method to stop both wheels. You could skip having a method like this and call the individual accessors with speed = 0 instead
   public void stop() {
     System.out.println("stop() is Called");
     mLaunchWheel.set(0);
     mFeedWheel.set(0);
     System.out.println("mLaunchWheel & mFeedWheel set to speed 0.0");
+  }
+
+  @Override
+  public void periodic() {
+    REVLibCAN.logFaults(Stream.of(mFeedWheel, mLaunchWheel));
+
+    FeedWheel.setDouble(mFeedWheel.get());
+    LaunchWheel.setDouble(mLaunchWheel.get());
   }
 }
