@@ -307,8 +307,8 @@ public class WestCoastDrive extends Module {
         }
 
         public void setMotorSpeed(final double leftSpeed, final double rightSpeed) {
-                mLeftMaster.set(leftSpeed*.5);
-                mRightMaster.set(rightSpeed*.5);
+                mLeftMaster.set(leftSpeed);
+                mRightMaster.set(rightSpeed);
         }
 
         public double getMotorSpeed() {
