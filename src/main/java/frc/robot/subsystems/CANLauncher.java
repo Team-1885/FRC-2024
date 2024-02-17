@@ -24,20 +24,15 @@ public class CANLauncher extends SubsystemBase {
     System.out.println("mLaunchWheel is Constructed");
     System.out.println("mFeedWheel is Constructed");
 
-    mLaunchWheel.setSmartCurrentLimit(kLauncherCurrentLimit);
-    mFeedWheel.setSmartCurrentLimit(kFeedCurrentLimit);
+    // mLaunchWheel.setSmartCurrentLimit(kLauncherCurrentLimit);
+    // mFeedWheel.setSmartCurrentLimit(kFeedCurrentLimit);
   }
 
   /**
-   * This method is an example of the 'subsystem factory' style of command creation. A method inside
-   * the subsytem is created to return an instance of a command. This works for commands that
-   * operate on only that subsystem, a similar approach can be done in RobotContainer for commands
-   * that need to span subsystems. The Subsystem class has helper methods, such as the startEnd
-   * method used here, to create these commands.
+   * This method is an example of the 'subsystem factory' style of command creation. A method inside the subsytem is created to return an instance of a command. This works for commands that operate on only that subsystem, a similar approach can be done in RobotContainer for commands that need to span subsystems. The Subsystem class has helper methods, such as the startEnd method used here, to create these commands.
    */
   public Command getIntakeCommand() {
-    // The startEnd helper method takes a method to call when the command is initialized and one to
-    // call when it ends
+    // The startEnd helper method takes a method to call when the command is initialized and one to call when it ends
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {

@@ -17,9 +17,9 @@ public class PrepareLaunch extends Command {
   CANLauncher mLauncher;
 
   /** Creates a new PrepareLaunch. */
-  public PrepareLaunch(CANLauncher launcher) {
+  public PrepareLaunch(CANLauncher pLauncher) {
     // save the launcher system internally
-    mLauncher = launcher;
+    mLauncher = pLauncher;
     System.out.println("PrepareLaunch object is made");
 
     // indicate that this command requires the launcher system
@@ -38,9 +38,7 @@ public class PrepareLaunch extends Command {
   @Override
   public void execute() {
     System.out.println("Prepare launch is executed");
-    // There is nothing we need this command to do on each iteration. You could remove this method
-    // and the default blank method
-    // of the base class will run.
+    // There is nothing we need this command to do on each iteration. You could remove this method and the default blank method of the base class will run.
   }
 
   // Called once the command ends or is interrupted.

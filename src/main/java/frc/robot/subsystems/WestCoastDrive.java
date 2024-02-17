@@ -11,6 +11,8 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.SparkRelativeEncoder.Type;
+
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.hardware.vendors.firstparties.ABC;
@@ -58,7 +60,7 @@ public class WestCoastDrive extends Module {
         private @Getter RelativeEncoder mRightEncoder;
         private ADXRS450_Gyro mGyro = new ADXRS450_Gyro();
 
-        private DifferentialDrive mDifferentialDrive = new DifferentialDrive(mRightMaster, mLeftMaster);
+        private DifferentialDrive mDifferentialDrive = new DifferentialDrive(mLeftMaster, mRightMaster);
         
         private final PIDController mLeftPIDController = new PIDController(0.1, 0, 0);
         private final PIDController mRightPIDController = new PIDController(0.1, 0, 0);
@@ -68,12 +70,6 @@ public class WestCoastDrive extends Module {
                         ABC.feet_to_meters(kTrackWidthFeet));
 
         ChassisSpeeds mChassisSpeeds = new ChassisSpeeds(2.0, 0, 1.0);
-        DifferentialDriveWheelSpeeds mWheelSpeeds = mKinematics.toWheelSpeeds(mChassisSpeeds);
-
-        double leftVelocity = mWheelSpeeds.leftMetersPerSecond;
-        double rightVelocity = mWheelSpeeds.rightMetersPerSecond;
-
-        private SparkPIDController mLeftCtrl, mRightCtrl;
 
         private NetworkTable mTable;
         private final Field2d mField = new Field2d();
@@ -165,21 +161,27 @@ public class WestCoastDrive extends Module {
                 mRightMaster.restoreFactoryDefaults();
                 mRightFollower.restoreFactoryDefaults();
 
-                mRightMaster.setInverted(false);
-                mRightFollower.setInverted(false);
+                mLeftFollower.follow(mLeftMaster);
+                mRightFollower.follow(mRightMaster);
+
+                mLeftMaster.setInverted(false);
+                mLeftFollower.setInverted(false);
 
                 mRightMaster.setInverted(true);
                 mRightFollower.setInverted(true);
 
-                mLeftFollower.follow(mLeftMaster);
-                mRightFollower.follow(mRightMaster);
+                mLeftMaster.setIdleMode(CANSparkMax.IdleMode.kCoast);
+                mLeftFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
+                mRightMaster.setIdleMode(CANSparkMax.IdleMode.kCoast);
+                mRightFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
+
+                mLeftEncoder = mLeftMaster.getEncoder(Type.kQuadrature, mLeftEncoder.getCountsPerRevolution());
+                mRightEncoder = mRightMaster.getEncoder(Type.kQuadrature, mRightEncoder.getCountsPerRevolution());
 
                 mGyro.calibrate();
 
                 mDifferentialDrive.setSafetyEnabled(false);
 
-                mLeftEncoder = mLeftMaster.getEncoder();
-                mRightEncoder = mRightMaster.getEncoder();
                 mLeftEncoder.setPositionConversionFactor(kEncoderDistancePerPulse);
                 mRightEncoder.setPositionConversionFactor(kEncoderDistancePerPulse);
                 mLeftEncoder.setVelocityConversionFactor(kEncoderDistancePerPulse / 60);
@@ -201,19 +203,10 @@ public class WestCoastDrive extends Module {
                 mOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(mGyro.getAngle()),
                                 mLeftEncoder.getPosition(), mRightEncoder.getPosition());
 
-                mRightCtrl = mRightMaster.getPIDController();
-                mLeftCtrl = mLeftMaster.getPIDController();
-                mRightCtrl.setOutputRange(-kMaxVelocityRPM, kMaxVelocityRPM);
-                mLeftCtrl.setOutputRange(-kMaxVelocityRPM, kMaxVelocityRPM);
-
-                HardwareUtils.setGains(mLeftCtrl, kVelocityGains);
-                HardwareUtils.setGains(mRightCtrl, kVelocityGains);
-                HardwareUtils.setGains(mLeftCtrl, kSmartMotionGains);
-                HardwareUtils.setGains(mRightCtrl, kSmartMotionGains);
-
                 Stream.of(mLeftMaster, mLeftFollower, mRightMaster, mRightFollower)
                                 .forEach(CANSparkMax::burnFlash);
                 SmartDashboard.putData("Field", mField);
+
                 AutoBuilder.configureRamsete(
                                 this::getPose, // Robot pose supplier
                                 this::resetPose, // Method to reset odometry (will be called if your auto has a starting
@@ -258,15 +251,14 @@ public class WestCoastDrive extends Module {
         }
 
         public void drive(ChassisSpeeds pChassisSpeeds) {
-                // mDifferentialDrive.feed();
-                // mLeftPIDController.setSetpoint(mChassisSpeeds.vxMetersPerSecond);
-                // mRightPIDController.setSetpoint(mChassisSpeeds.omegaRadiansPerSecond);
-                
-                // mDifferentialDrive.arcadeDrive(0.5, 0.5);
+                        DifferentialDriveWheelSpeeds mWheelSpeeds = mKinematics.toWheelSpeeds(pChassisSpeeds);
+                        double mLeftVelocity = mWheelSpeeds.leftMetersPerSecond;
+                        double mRightVelocity = mWheelSpeeds.rightMetersPerSecond;
+                        setMotorSpeed(mLeftVelocity, mRightVelocity);
         }
 
         public ChassisSpeeds getCurrentSpeeds() {
-                return mKinematics.toChassisSpeeds(mWheelSpeeds);
+                return mChassisSpeeds;
         }
 
         public void resetEncoders() {
@@ -288,8 +280,8 @@ public class WestCoastDrive extends Module {
         public void setMotorSpeed(double leftSpeed, double rightSpeed) {
                 // set motor speed is slowed for testing
                 
-                mLeftMaster.set(leftSpeed * 0.5);
-                mRightMaster.set(rightSpeed * 0.5);
+                mLeftMaster.set(leftSpeed);
+                mRightMaster.set(rightSpeed);
         }
 
         public double getMotorSpeed() {

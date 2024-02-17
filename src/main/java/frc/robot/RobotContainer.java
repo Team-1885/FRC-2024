@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static frc.robot.Constants.LauncherConstants.kLauncherDelay;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -15,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.CANLauncher;
@@ -25,11 +28,7 @@ import frc.robot.commands.LaunchNote;
 
 /**
  * This class is where the bulk of the robot should be declared.
- * Since Command-based is a "declarative" paradigm, very little robot logic
- * should actually be handled in the {@link Robot} periodic methods (other than
- * the scheduler calls).
- * Instead, the structure of the robot (including subsystems, commands, and
- * trigger mappings) should be declared here.
+ * Since Command-based is a "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot} periodic methods (other than the scheduler calls). Instead, the structure of the robot (including subsystems, commands, and trigger mappings) should be declared here.
  */
 @SuppressWarnings("PMD.CommentSize")
 public class RobotContainer {
@@ -37,13 +36,13 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private @Getter final WestCoastDrive mWestCoastDrive = WestCoastDrive.getInstance();
   private @Getter final DriveCommand mDriveCommand;
-  
+
   private @Getter final CANLauncher mLauncher = new CANLauncher();
   public @Getter final static Joystick logitech = new Joystick(0);
   private final SendableChooser<Command> autoChooser;
   private final Field2d mField;
 
-  private final CommandXboxController mOperatorController = new CommandXboxController(1);
+  public @Getter final static Joystick mOperatorController = new Joystick(1);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -89,10 +88,16 @@ public class RobotContainer {
    * Triggers can be created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
-    mOperatorController
-        .a().whileTrue(new PrepareLaunch(mLauncher).withTimeout(1).andThen(new LaunchNote(mLauncher).handleInterrupt(() -> mLauncher.stop())));
+    new JoystickButton(mOperatorController, 1)
+        .whileTrue(
+            new PrepareLaunch(mLauncher)
+                .withTimeout(kLauncherDelay)
+                .andThen(new LaunchNote(mLauncher))
+                .handleInterrupt(() -> mLauncher.stop()));
 
-    mOperatorController.leftBumper().whileTrue(mLauncher.getIntakeCommand());
+    new JoystickButton(mOperatorController, 2)
+        .whileTrue(
+            mLauncher.getIntakeCommand());
   }
 
   /**
