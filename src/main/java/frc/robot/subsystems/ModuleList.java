@@ -65,11 +65,11 @@ public class ModuleList extends Module {
     mModules.clear();
   }
 
-  public void addModule(Module pModule) {
-    if (pModule == null) {
+  public void addModule(WestCoastDrive mWestCoastDrive) {
+    if (mWestCoastDrive == null) {
       throw new IllegalArgumentException("the module is null!");
     }
 
-    mModules.add(pModule);
+    mModules.add(mWestCoastDrive);
   }
 }

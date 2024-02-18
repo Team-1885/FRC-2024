@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import static frc.robot.RobotMap.*;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.CANLauncher;
 import frc.robot.subsystems.WestCoastDrive;
@@ -127,7 +128,6 @@ public class RobotContainer {
                 DriveConstants.kaVoltSecondsSquaredPerMeter),
             DriveConstants.kDriveKinematics,
             10);
-
     // Create config for trajectory
     TrajectoryConfig config =
         new TrajectoryConfig(
@@ -154,7 +154,7 @@ public class RobotContainer {
         new RamseteCommand(
             exampleTrajectory,
             mWestCoastDrive::getPose,
-            new RamseteController(DriveConstants.kRamseteB, DriveConstants.kRamseteZeta),
+            new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
             new SimpleMotorFeedforward(
                 DriveConstants.ksVolts,
                 DriveConstants.kvVoltSecondsPerMeter,

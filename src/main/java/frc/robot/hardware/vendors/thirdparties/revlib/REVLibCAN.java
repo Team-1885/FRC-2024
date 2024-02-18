@@ -32,10 +32,10 @@ public class REVLibCAN {
   public static @Getter final double MAX_VELOCITY_RPM = 5676;
   public static @Getter final double PULSES_PER_ROTATION = 256.0;
   public static @Getter final double CURRENT_LIMIT_AMPS = 60.0;
-  public static @Getter final int L_MASTER_ID = 10;
-  public static @Getter final int L_FOLLOWER_ID = 9;
-  public static @Getter final int R_MASTER_ID = 4;
-  public static @Getter final int R_FOLLOWER_ID = 2;
+  public static @Getter final int L_MASTER_ID = 3;
+  public static @Getter final int L_FOLLOWER_ID = 7;
+  public static @Getter final int R_MASTER_ID = 1;
+  public static @Getter final int R_FOLLOWER_ID = 5;
 
   public static @Getter final int INTAKE_FEEDER_ID = 5;
   public static @Getter final int INTAKE_ROTATER_ID = 6;

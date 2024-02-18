@@ -21,8 +21,6 @@ import frc.robot.Enums;
 import frc.robot.InputMap.EDriveData;
 import frc.robot.hardware.vendors.firstparties.ABC;
 import frc.robot.hardware.vendors.firstparties.Settings;
-import frc.robot.subsystems.WestCoastDrive;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;

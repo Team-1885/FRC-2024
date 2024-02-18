@@ -33,7 +33,6 @@ public class DriveCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.println("========== STARTING DRIVECOMMAND ==========");
     runTest(() -> {
 
     });
@@ -44,31 +43,16 @@ public class DriveCommand extends Command {
   @Override
   public void execute() {
     runTest(() -> {
-      
-      double forwardSpeed = RobotContainer.logitech.getRawAxis(1) * 0.4;
-      double turnSpeed = RobotContainer.logitech.getRawAxis(4) * 0.7; // Get X-axis value of left stick 
-
-      // You may want to add deadzones to prevent small joystick values from causing
-      // unintended movement
-      forwardSpeed = applyDeadzone(forwardSpeed, 0.05);
-      turnSpeed = applyDeadzone(turnSpeed, 0.05);
+      double mFwd = RobotContainer.logitech.getRawAxis(1) * 0.6;
+      double mRot = RobotContainer.logitech.getRawAxis(4) * 0.6; // Get X-axis value of left stick 
 
       // Calculate left and right motor speeds for tank drive
-      double leftSpeed = forwardSpeed + turnSpeed;
-      double rightSpeed = forwardSpeed - turnSpeed;
+      // double mFwd = mLeftAxis + mRightAxis;
+      // double mRot = mLeftAxis - mRightAxis;
 
       // Set motor speeds in the WestCoastDrive subsystem
-      westCoastDrive.setMotorSpeed(leftSpeed, rightSpeed);
+      westCoastDrive.arcadeDrive(mFwd, mRot);
     });
-  }
-
-  // Helper method to apply a deadzone to joystick values
-  private double applyDeadzone(double value, double deadzone) {
-    if (Math.abs(value) < deadzone) {
-      return 0.0;
-    } else {
-      return value;
-    }
   }
 
   // Called once the command ends or is interrupted.
