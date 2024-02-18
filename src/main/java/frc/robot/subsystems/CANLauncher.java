@@ -72,7 +72,7 @@ public class CANLauncher extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setLaunchWheel(-1);
+          setLaunchWheel(-1 * 5);
           setFeedWheel(-1);
         },
         // When the command stops, stop the wheels
