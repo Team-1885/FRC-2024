@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -53,7 +54,6 @@ public class RobotContainer {
 
   private @Getter final CANLauncher mLauncher = new CANLauncher();
   public @Getter final static Joystick logitech = new Joystick(0);
-  private final SendableChooser<Command> autoChooser;
   private final Field2d mField;
 
   public @Getter final static Joystick mOperatorController = new Joystick(1);
@@ -62,37 +62,18 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    
     // Register Named Commands
     NamedCommands.registerCommand("DriveCommand", new DriveCommand(mWestCoastDrive));
 
     // Command Initialization
     mDriveCommand = new DriveCommand(mWestCoastDrive);
 
-    // Build an auto chooser. This will use Commands.none() as the default option.
-    autoChooser = AutoBuilder.buildAutoChooser();
 
     // Another option that allows you to specify the default auto by its name
-    SmartDashboard.putData("Auto Chooser", autoChooser);
     mWestCoastDrive.setDefaultCommand(mDriveCommand);
 
     mField = new Field2d();
     SmartDashboard.putData("Field", mField);
-
-    // Logging callback for current robot pose
-    PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
-      mField.setRobotPose(pose);
-    });
-
-    // Logging callback for target robot pose
-    PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
-      mField.getObject("Target Pose").setPose(pose);
-    });
-
-    // Logging callback for the active path, this is sent as a list of poses
-    PathPlannerLogging.setLogActivePathCallback((poses) -> {
-      mField.getObject("Path").setPoses(poses);
-    });
 
     // Configure the trigger bindings
     configureBindings();
@@ -106,13 +87,13 @@ public class RobotContainer {
     new JoystickButton(mOperatorController, 1)
         .whileTrue(
             new PrepareLaunch(mLauncher)
-                .withTimeout(kLauncherDelay)
+                .withTimeout(1)
                 .andThen(new LaunchNote(mLauncher))
                 .handleInterrupt(() -> mLauncher.stop()));
 
-    new JoystickButton(mOperatorController, 2)
-        .whileTrue(
-            mLauncher.getIntakeCommand());
+
+
+    new JoystickButton(mOperatorController, 2).whileTrue(mLauncher.feedlaunchWheel()).onFalse(new InstantCommand(mLauncher::stop));
   }
 
   /**

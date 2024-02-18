@@ -36,12 +36,47 @@ public class CANLauncher extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setFeedWheel(kIntakeFeederSpeed);
-          setLaunchWheel(kIntakeLauncherSpeed);
+          setFeedWheel(-1);
+          setLaunchWheel(-1);
+        },
+        // When the command stops, stop the wheels
+        () -> {});
+  }
+
+    public Command feedWheel() {
+    // The startEnd helper method takes a method to call when the command is initialized and one to call when it ends
+    return this.startEnd(
+        // When the command is initialized, set the wheels to the intake speed values
+        () -> {
+          setFeedWheel(-1);
+        },
+        // When the command stops, stop the wheels
+        () -> {});
+  }
+
+  public Command launchWheel() {
+    // The startEnd helper method takes a method to call when the command is initialized and one to call when it ends
+    return this.startEnd(
+        // When the command is initialized, set the wheels to the intake speed values
+        () -> {
+          setLaunchWheel(-1);
         },
         // When the command stops, stop the wheels
         () -> {
           stop();
+        });
+  }
+
+  public Command feedlaunchWheel() {
+    // The startEnd helper method takes a method to call when the command is initialized and one to call when it ends
+    return this.startEnd(
+        // When the command is initialized, set the wheels to the intake speed values
+        () -> {
+          setLaunchWheel(-1);
+          setFeedWheel(-1);
+        },
+        // When the command stops, stop the wheels
+        () -> {
         });
   }
 
