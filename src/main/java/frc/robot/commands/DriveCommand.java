@@ -58,7 +58,7 @@ public class DriveCommand extends Command {
       double rightSpeed = forwardSpeed - turnSpeed;
 
       // Set motor speeds in the WestCoastDrive subsystem
-      westCoastDrive.setMotorSpeed(mFwd, mRot);
+      westCoastDrive.setMotorSpeed(leftSpeed, rightSpeed);
     });
   }
 
