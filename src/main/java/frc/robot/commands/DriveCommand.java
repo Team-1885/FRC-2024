@@ -50,9 +50,13 @@ public class DriveCommand extends Command {
   public void execute() {
     runTest(() -> {
       
-      double mFwd = RobotContainer.logitech.getRawAxis(1) * 0.5;
-      double mRot = RobotContainer.logitech.getRawAxis(4) * 0.5; // Get X-axis value of left stick
-      
+      double forwardSpeed = RobotContainer.logitech.getRawAxis(1) * 0.5;
+      double turnSpeed = RobotContainer.logitech.getRawAxis(4) * 0.5; // Get X-axis value of left stick //AVI DID THIS
+
+      // Calculate left and right motor speeds for tank drive
+      double leftSpeed = forwardSpeed + turnSpeed;
+      double rightSpeed = forwardSpeed - turnSpeed;
+
       // Set motor speeds in the WestCoastDrive subsystem
       westCoastDrive.setMotorSpeed(mFwd, mRot);
     });

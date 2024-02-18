@@ -10,11 +10,11 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
+import com.revrobotics.SparkRelativeEncoder.Type;
+
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.hardware.vendors.firstparties.ABC;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -26,14 +26,13 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.common.config.Settings;
-// import frc.common.lib.control.PIDController;
 import frc.common.lib.control.ProfileGains;
 import frc.robot.ADAM;
-import frc.robot.hardware.HardwareUtils;
 import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
 import lombok.Getter;
 
@@ -44,33 +43,27 @@ import lombok.Getter;
 public class WestCoastDrive extends Module {
         private @Getter final ADAM adam = new ADAM(null);
 
-        // Creates two CANSparkMax motors, inheriting physical constants from the
-        // {@link#REVLibCAN} helper class.
+        // Creates two CANSparkMax motors, inheriting physical constants from the {@link#REVLibCAN} helper class.
         private CANSparkMax mLeftMaster = new CANSparkMax(REVLibCAN.L_MASTER_ID, REVLibCAN.MOTOR_TYPE);
         private CANSparkMax mLeftFollower = new CANSparkMax(REVLibCAN.L_FOLLOWER_ID, REVLibCAN.MOTOR_TYPE);
 
-        // Creates two CANSparkMax motors, inheriting physical constants from the
-        // {@link#REVLibCAN} helper class.
+        // Creates two CANSparkMax motors, inheriting physical constants from the {@link#REVLibCAN} helper class.
         private CANSparkMax mRightMaster = new CANSparkMax(REVLibCAN.R_MASTER_ID, REVLibCAN.MOTOR_TYPE);
         private CANSparkMax mRightFollower = new CANSparkMax(REVLibCAN.R_FOLLOWER_ID, REVLibCAN.MOTOR_TYPE);
 
-        private @Getter RelativeEncoder mLeftEncoder;
-        private @Getter RelativeEncoder mRightEncoder;
-        private ADXRS450_Gyro mGyro = new ADXRS450_Gyro();
+        private @Getter RelativeEncoder mLeftEncoder = mLeftMaster.getEncoder();
+        private @Getter RelativeEncoder mRightEncoder = mRightMaster.getEncoder();
 
-        private DifferentialDrive mDifferentialDrive = new DifferentialDrive(mRightMaster, mLeftMaster);
+        // TODO: Implement Stabilization Into Teleop and Autonomous using ADXRS450_Gyro
+        // https://wiki.analog.com/first/adxrs450_gyro_board_frc/java, https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/gyros-software.html
+        private static final SPI.Port kGyroPort = SPI.Port.kOnboardCS0;
+        private ADXRS450_Gyro mGyro = new ADXRS450_Gyro(kGyroPort);
 
-        private DifferentialDriveOdometry mOdometry;
-        private DifferentialDriveKinematics mKinematics = new DifferentialDriveKinematics(
-                        ABC.feet_to_meters(kTrackWidthFeet));
-
-        ChassisSpeeds mChassisSpeeds = new ChassisSpeeds(2.0, 0, 1.0);
-        DifferentialDriveWheelSpeeds mWheelSpeeds = mKinematics.toWheelSpeeds(mChassisSpeeds);
-
-        double leftVelocity = mWheelSpeeds.leftMetersPerSecond;
-        double rightVelocity = mWheelSpeeds.rightMetersPerSecond;
-
-        private SparkPIDController mLeftCtrl, mRightCtrl;
+        private DifferentialDrive mDifferentialDrive = new DifferentialDrive(mLeftMaster, mRightMaster);
+        private DifferentialDriveOdometry mOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(mGyro.getAngle()), (mLeftEncoder.getPosition() * Math.PI) * kWheelDiameterFeet, (mRightEncoder.getPosition() * Math.PI) * kWheelDiameterFeet);
+        private DifferentialDriveKinematics mKinematics = new DifferentialDriveKinematics(ABC.feet_to_meters(kTrackWidthFeet));
+        private DifferentialDriveWheelSpeeds mWheelSpeeds;
+        private ChassisSpeeds mChassisSpeeds = new ChassisSpeeds(2.0, 0, 1.0);
 
         private NetworkTable mTable;
         private final Field2d mField = new Field2d();
@@ -102,10 +95,6 @@ public class WestCoastDrive extends Module {
         public static final double kPulsesPerRotation = 256.0;
         public static final double kCurrentLimitAmps = 60.0;
         public static final double kTrackWidthFeet = 20.875 / 12;
-        public static final double kRpmToMpsFactor = (ABC.feet_to_meters(kWheelCircumferenceFeet) / kGearboxRatio) * 1
-                        / 60;
-        public static final double kMaxMpsVelocity = kRpmToMpsFactor * kMaxVelocityRPM;
-        public static final int kMaxLimelightFOV = 22;
 
         public static final int kEncoderCPR = 1024;
         public static final double kEncoderDistancePerPulse = (ABC.feet_to_meters(kTrackWidthFeet) * Math.PI)
@@ -171,6 +160,9 @@ public class WestCoastDrive extends Module {
                 mLeftFollower.follow(mLeftMaster);
                 mRightFollower.follow(mRightMaster);
 
+                // mLeftEncoder = mLeftMaster.getEncoder(Type.kQuadrature, 8192);
+                // mRightEncoder = mRightMaster.getEncoder(Type.kQuadrature, 8192);
+
                 mGyro.calibrate();
 
                 mDifferentialDrive.setSafetyEnabled(false);
@@ -194,19 +186,6 @@ public class WestCoastDrive extends Module {
                                 .forEach(motor -> motor.setControlFramePeriodMs(1));
 
                 resetEncoders();
-
-                mOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(mGyro.getAngle()),
-                                mLeftEncoder.getPosition(), mRightEncoder.getPosition());
-
-                mRightCtrl = mRightMaster.getPIDController();
-                mLeftCtrl = mLeftMaster.getPIDController();
-                mRightCtrl.setOutputRange(-kMaxVelocityRPM, kMaxVelocityRPM);
-                mLeftCtrl.setOutputRange(-kMaxVelocityRPM, kMaxVelocityRPM);
-
-                HardwareUtils.setGains(mLeftCtrl, kVelocityGains);
-                HardwareUtils.setGains(mRightCtrl, kVelocityGains);
-                HardwareUtils.setGains(mLeftCtrl, kSmartMotionGains);
-                HardwareUtils.setGains(mRightCtrl, kSmartMotionGains);
 
                 Stream.of(mLeftMaster, mLeftFollower, mRightMaster, mRightFollower)
                                 .forEach(CANSparkMax::burnFlash);
@@ -242,8 +221,8 @@ public class WestCoastDrive extends Module {
                         mField.setRobotPose(getPose());
                         REVLibCAN.logFaults(Stream.of(mLeftMaster, mLeftFollower, mRightMaster, mRightFollower));
                         // sets the Odometry with the current information.
-                        mOdometry.update(Rotation2d.fromDegrees(mGyro.getAngle()), mLeftEncoder.getPosition(),
-                                        mRightEncoder.getPosition());
+                        mOdometry.update(Rotation2d.fromDegrees(mGyro.getAngle()), (mLeftEncoder.getPosition() * Math.PI) * kWheelDiameterFeet,
+                                        (mRightEncoder.getPosition() * Math.PI) * kWheelDiameterFeet);
 
                         leftMaster.setDouble(mLeftMaster.get());
                         leftFollower.setDouble(mLeftFollower.get());
@@ -255,11 +234,12 @@ public class WestCoastDrive extends Module {
         }
 
         public void drive(ChassisSpeeds pChassisSpeeds) {
-                // mDifferentialDrive.feed();
-                // mLeftPIDController.setSetpoint(mChassisSpeeds.vxMetersPerSecond);
-                // mRightPIDController.setSetpoint(mChassisSpeeds.omegaRadiansPerSecond);
+                mWheelSpeeds = mKinematics.toWheelSpeeds(pChassisSpeeds);
                 
-                // mDifferentialDrive.arcadeDrive(0.5, 0.5);
+                double mLeftVelocity = mWheelSpeeds.leftMetersPerSecond;
+                double mRightVelocity = mWheelSpeeds.rightMetersPerSecond;
+                
+                setMotorSpeed(mLeftVelocity, mRightVelocity);
         }
 
         public ChassisSpeeds getCurrentSpeeds() {
@@ -267,8 +247,8 @@ public class WestCoastDrive extends Module {
         }
 
         public void resetEncoders() {
-                mLeftEncoder.setPosition(0);
-                mRightEncoder.setPosition(0);
+                mLeftEncoder.setPosition(0.0);
+                mRightEncoder.setPosition(0.0);
         }
 
         public Pose2d getPose() {
