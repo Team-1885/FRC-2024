@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.constraint.DifferentialDriveKinematicsConst
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.DriveConstants;
 import frc.robot.Enums;
 import frc.robot.InputMap.EDriveData;
 import frc.robot.hardware.vendors.firstparties.ABC;
@@ -114,7 +115,7 @@ public class BaseAutonController extends AbstractController {
         SmartDashboard.putNumber("trajectory-seconds", -1);
 
         mTrajectoryConfig = new TrajectoryConfig(1.0, 1.0);
-        DifferentialDriveKinematics k = new DifferentialDriveKinematics(ABC.feet_to_meters(WestCoastDrive.kTrackWidthFeet));
+        DifferentialDriveKinematics k = new DifferentialDriveKinematics(ABC.feet_to_meters(DriveConstants.kTrackWidthFeet));
         mTrajectoryConfig.addConstraint(
                 new DifferentialDriveVoltageConstraint(
                         new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA),

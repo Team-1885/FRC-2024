@@ -4,25 +4,17 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.common.types.input.ELogitech310;
 import frc.robot.ADAM;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.IntakeSubsystem;
 import lombok.Getter;
 
-import com.flybotix.hfr.codex.CodexOf;
-import com.flybotix.hfr.codex.RobotCodex;
-import edu.wpi.first.wpilibj.Joystick;
 
-
-/**
- * An example command for use as a template.
- */
 
 @SuppressWarnings("PMD.CommentSize")
-public class IntakeCommand extends CommandBase {
+public class IntakeCommand extends Command {
 
 
   private @Getter ADAM adam = new ADAM(null);

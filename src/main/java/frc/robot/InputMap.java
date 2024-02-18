@@ -17,19 +17,9 @@ import lombok.Getter;
 @SuppressWarnings("PMD.CommentSize")
 public class InputMap {
 
-  /**
-   * ...
-   */
   private @Getter static ADAM adam = new ADAM(null);
 
-  /**
-   * ...
-   */
   private @Getter Joystick driverLGTCtrlr;
-
-  /**
-   * ...
-   */
   private @Getter Joystick operatorLGTCtrlr;
 
   /**

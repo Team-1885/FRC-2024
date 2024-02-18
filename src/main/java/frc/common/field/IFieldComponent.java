@@ -1,4 +1,4 @@
-package frc.common;
+package frc.common.field;
 
 public interface IFieldComponent {
 

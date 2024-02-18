@@ -4,20 +4,14 @@
 
 package frc.robot.subsystems;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.ADAM;
-import frc.robot.RobotMap;
 import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
 import lombok.Getter;
 
@@ -33,9 +27,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
         // Creates a CANSparkMax motor, inheriting physical constants from the {@link#REVLibCAN} helper class.
         private static CANSparkMax REV_INTAKE_ROTATER = new CANSparkMax(REVLibCAN.INTAKE_ROTATER_ID, REVLibCAN.MOTOR_TYPE);
-        /**
-         * Lorem Ipsum.
-         */
         private @Getter RelativeEncoder feederEncoder, rotateEncoder;
 
         private ShuffleboardTab tab = Shuffleboard.getTab("===== INTAKE SUBSYSTEM =====");

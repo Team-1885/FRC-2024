@@ -1,4 +1,4 @@
-package frc.common;
+package frc.common.field;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
