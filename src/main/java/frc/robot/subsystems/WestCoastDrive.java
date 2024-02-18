@@ -59,9 +59,6 @@ public class WestCoastDrive extends Module {
         private ADXRS450_Gyro mGyro = new ADXRS450_Gyro();
 
         private DifferentialDrive mDifferentialDrive = new DifferentialDrive(mRightMaster, mLeftMaster);
-        
-        private final PIDController mLeftPIDController = new PIDController(0.1, 0, 0);
-        private final PIDController mRightPIDController = new PIDController(0.1, 0, 0);
 
         private DifferentialDriveOdometry mOdometry;
         private DifferentialDriveKinematics mKinematics = new DifferentialDriveKinematics(

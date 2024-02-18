@@ -16,7 +16,6 @@ public class LaunchNote extends Command {
 
   /** Creates a new LaunchNote. */
   public LaunchNote(CANLauncher pLauncher) {
-    System.out.println("LaunchNote object is made");
     // save the launcher system internally
     mLauncher = pLauncher;
 
@@ -30,8 +29,6 @@ public class LaunchNote extends Command {
     // Set the wheels to launching speed
     mLauncher.setLaunchWheel(kLauncherSpeed);
     mLauncher.setFeedWheel(kLaunchFeederSpeed);
-    System.out.println("the speed is set to " + kLauncherSpeed);
-    System.out.println("the speed is set to " + kLaunchFeederSpeed);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -50,7 +47,6 @@ public class LaunchNote extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    System.out.println("Launch note command is ended ");
     // Stop the wheels when the command ends.
     mLauncher.stop();
   }

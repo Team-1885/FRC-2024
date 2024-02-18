@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.CANLauncher;
@@ -43,7 +44,7 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
   private final Field2d mField;
 
-  private final CommandXboxController mOperatorController = new CommandXboxController(1);
+  private final Joystick mOperatorController = new Joystick(1);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -89,10 +90,16 @@ public class RobotContainer {
    * Triggers can be created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
-    mOperatorController
-        .a().whileTrue(new PrepareLaunch(mLauncher).withTimeout(1).andThen(new LaunchNote(mLauncher).handleInterrupt(() -> mLauncher.stop())));
+    new JoystickButton(mOperatorController, 1)
+        .whileTrue(
+            new PrepareLaunch(mLauncher)
+                .withTimeout(1)
+                .andThen(new LaunchNote(mLauncher))
+                .handleInterrupt(() -> mLauncher.stop()));
 
-    mOperatorController.leftBumper().whileTrue(mLauncher.getIntakeCommand());
+    new JoystickButton(mOperatorController, 2)
+        .whileTrue(
+            mLauncher.getIntakeCommand());
   }
 
   /**
@@ -102,11 +109,11 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // Load the path you want to follow using its name in the GUI
-    PathPlannerPath mPath = PathPlannerPath.fromPathFile("Drive Straight");
+    // PathPlannerPath mPath = PathPlannerPath.fromPathFile("Drive Straight");
 
     // Create a path following command using AutoBuilder. This will also trigger
     // event markers.
-    return AutoBuilder.followPath(mPath);
-    // return autoChooser.getSelected();
+    // return AutoBuilder.followPath(mPath);
+    return autoChooser.getSelected();
   }
 }
