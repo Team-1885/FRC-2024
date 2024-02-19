@@ -7,14 +7,15 @@ package frc.robot;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.hardware.vendors.firstparties.ABC;
 
 @SuppressWarnings({ "PMD.CommentSize", "PMD.LongVariable" })
 public final class RobotMap {
 
   public static final class DriveConstants {
-    public static final double kTrackwidthMeters = 0.69;
+    public static final double kTrackWidthMeters = 0.530225;
     public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(
-        kTrackwidthMeters);
+        kTrackWidthMeters);
 
     public static final int kEncoderCPR = 1024;
     public static final double kWheelDiameterMeters = 0.15;
@@ -30,6 +31,11 @@ public final class RobotMap {
 
     // Example value only - as above, this must be tuned for your drive!
     public static final double kPDriveVel = 8.5;
+
+    public static final double kGearRatio = 8.46;
+    public static final double kWheelRadiusInches = 3;
+
+    public static final double kLinearDistanceConversionFactor = (ABC.inches_to_meters(1 / (kGearRatio * 2 * Math.PI * ABC.inches_to_meters(kWheelRadiusInches)) * 10));
   }
 
   public static final class OIConstants {

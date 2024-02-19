@@ -4,36 +4,30 @@
 
 package frc.robot;
 
-import static frc.robot.ShooterConstants.LauncherConstants.kLauncherDelay;
-
-import java.util.List;
-
-import com.pathplanner.lib.auto.AutoBuilder;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.util.PathPlannerLogging;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.math.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import static frc.robot.RobotMap.*;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.CANLauncher;
 import frc.robot.subsystems.WestCoastDrive;
@@ -51,10 +45,11 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private @Getter final WestCoastDrive mWestCoastDrive = WestCoastDrive.getInstance();
   private @Getter final DriveCommand mDriveCommand;
-
+  CommandGenericHID controller = new CommandGenericHID(5);
   private @Getter final CANLauncher mLauncher = new CANLauncher();
   public @Getter final static Joystick logitech = new Joystick(0);
   private final Field2d mField;
+  SendableChooser<Command> mChooser = new SendableChooser<>();
 
   public @Getter final static Joystick mOperatorController = new Joystick(1);
 
@@ -73,10 +68,37 @@ public class RobotContainer {
     mWestCoastDrive.setDefaultCommand(mDriveCommand);
 
     mField = new Field2d();
+
+    mChooser.addOption("Curvy", loadTrajectory("src/main/deploy/pathplanner/paths/Curvy.path", true));
+    mChooser.addOption("Straight", loadTrajectory("Paths/PathWeaver_Straight.path", true));
+
+    Shuffleboard.getTab("Autonomous").add(mChooser);
+
     SmartDashboard.putData("Field", mField);
 
     // Configure the trigger bindings
     configureBindings();
+  }
+
+  public Command loadTrajectory(String pFilename, boolean pResetOdometry) {
+    Trajectory trajectory;
+    try {
+        Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(pFilename);
+        trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+    }
+    catch (IOException pException){
+        DriverStation.reportError("Unable to open trajectory" + pFilename, pException.getStackTrace());
+        System.out.println("Unable to read from file " + pFilename);
+        return new InstantCommand();
+    }
+
+    RamseteCommand ramseteCommand = new RamseteCommand(trajectory, mWestCoastDrive::getPose, new RamseteController(RobotMap.AutoConstants.kRamseteB, RobotMap.AutoConstants.kRamseteZeta), new SimpleMotorFeedforward(RobotMap.DriveConstants.ksVolts, RobotMap.DriveConstants.kvVoltSecondsPerMeter, RobotMap.DriveConstants.kaVoltSecondsSquaredPerMeter), RobotMap.DriveConstants.kDriveKinematics, mWestCoastDrive::getWheelSpeeds, new PIDController(RobotMap.DriveConstants.kPDriveVel, 0, 0), new PIDController(RobotMap.DriveConstants.kPDriveVel, 0, 0), mWestCoastDrive::tankDriveVolts, mWestCoastDrive);
+    if(pResetOdometry) {
+        return new SequentialCommandGroup(new InstantCommand(()->mWestCoastDrive.resetOdometry(trajectory.getInitialPose())), ramseteCommand);
+    }
+    else {
+        return ramseteCommand;
+    }
   }
 
   /**
@@ -84,74 +106,24 @@ public class RobotContainer {
    * Triggers can be created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
-    new JoystickButton(mOperatorController, 1)
+    controller.button(0).onTrue(mDriveCommand);
+        new JoystickButton(mOperatorController, 1)
         .whileTrue(
             new PrepareLaunch(mLauncher)
                 .withTimeout(1)
                 .andThen(new LaunchNote(mLauncher))
                 .handleInterrupt(() -> mLauncher.stop()));
 
-
-
     new JoystickButton(mOperatorController, 2).whileTrue(mLauncher.feedlaunchWheel()).onFalse(new InstantCommand(mLauncher::stop));
   }
 
   /**
-   * ALL THEROETICAL
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   * 
+   * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // Create a voltage constraint to ensure we don't accelerate too fast
-    var autoVoltageConstraint =
-        new DifferentialDriveVoltageConstraint(
-            new SimpleMotorFeedforward(
-                DriveConstants.ksVolts,
-                DriveConstants.kvVoltSecondsPerMeter,
-                DriveConstants.kaVoltSecondsSquaredPerMeter),
-            DriveConstants.kDriveKinematics,
-            10);
-    // Create config for trajectory
-    TrajectoryConfig config =
-        new TrajectoryConfig(
-                DriveConstants.kMaxSpeedMetersPerSecond,
-                DriveConstants.kMaxAccelerationMetersPerSecondSquared)
-            // Add kinematics to ensure max speed is actually obeyed
-            .setKinematics(DriveConstants.kDriveKinematics)
-            // Apply the voltage constraint
-            .addConstraint(autoVoltageConstraint);
-
-    // An example trajectory to follow. All units in meters.
-    Trajectory exampleTrajectory =
-        TrajectoryGenerator.generateTrajectory(
-            // Start at the origin facing the +X direction
-            new Pose2d(0, 0, new Rotation2d(0)),
-            // Pass through these two interior waypoints, making an 's' curve path
-            List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-            // End 3 meters straight ahead of where we started, facing forward
-            new Pose2d(3, 0, new Rotation2d(0)),
-            // Pass config
-            config);
-
-    RamseteCommand ramseteCommand =
-        new RamseteCommand(
-            exampleTrajectory,
-            mWestCoastDrive::getPose,
-            new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
-            new SimpleMotorFeedforward(
-                DriveConstants.ksVolts,
-                DriveConstants.kvVoltSecondsPerMeter,
-                DriveConstants.kaVoltSecondsSquaredPerMeter),
-            DriveConstants.kDriveKinematics,
-            mWestCoastDrive::getWheelSpeeds,
-            new PIDController(DriveConstants.kPDriveVel, 0, 0),
-            new PIDController(DriveConstants.kPDriveVel, 0, 0),
-            // RamseteCommand passes volts to the callback
-            mWestCoastDrive::tankDriveVolts, mWestCoastDrive);
-
-    // Reset odometry to the initial pose of the trajectory, run path following
-    // command, then stop at the end.
-    return Commands.runOnce(() -> mWestCoastDrive.resetOdometry(exampleTrajectory.getInitialPose()))
-        .andThen(ramseteCommand)
-        .andThen(Commands.runOnce(() -> mWestCoastDrive.tankDriveVolts(0, 0)));
+    return mChooser.getSelected();
   }
 }
 

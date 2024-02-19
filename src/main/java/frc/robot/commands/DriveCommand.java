@@ -43,8 +43,8 @@ public class DriveCommand extends Command {
   @Override
   public void execute() {
     runTest(() -> {
-      double mFwd = RobotContainer.logitech.getRawAxis(1) * 0.6;
-      double mRot = -RobotContainer.logitech.getRawAxis(4) * 0.6; // Get X-axis value of left stick 
+      double mFwd = RobotContainer.logitech.getRawAxis(1) * 0.8;
+      double mRot = -RobotContainer.logitech.getRawAxis(4) * 0.7; // Get X-axis value of left stick 
 
       // Calculate left and right motor speeds for tank drive
       // double mFwd = mLeftAxis + mRightAxis;
