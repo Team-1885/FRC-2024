@@ -10,7 +10,6 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
@@ -24,10 +23,7 @@ public class WestCoastDrive extends Module {
   private final RelativeEncoder mLeftEncoder = mLeftMaster.getEncoder();
   private final RelativeEncoder mRightEncoder = mLeftMaster.getEncoder();
 
-  MotorControllerGroup mLeftControllerGroup = new MotorControllerGroup(mLeftMaster, mLeftFollower);
-  MotorControllerGroup mRightControllerGroup = new MotorControllerGroup(mRightMaster, mRightFollower);
-
-  private final DifferentialDrive mDrive = new DifferentialDrive(mLeftControllerGroup, mRightControllerGroup);
+  private final DifferentialDrive mDrive = new DifferentialDrive(mLeftMaster::set, mRightMaster::set);
 
   private final ADXRS450_Gyro mGyro = new ADXRS450_Gyro();
 
@@ -63,8 +59,7 @@ public class WestCoastDrive extends Module {
     mLeftFollower.follow(mLeftMaster);
     mRightFollower.follow(mRightMaster);
 
-    mLeftControllerGroup.setInverted(false);
-    mRightControllerGroup.setInverted(true);
+    mRightMaster.setInverted(true);
 
     mGyro.reset();
     mGyro.calibrate();
@@ -138,8 +133,8 @@ public class WestCoastDrive extends Module {
    * @param rightVolts the commanded right output
    */
   public void tankDriveVolts(double pLeftVolts, double pRightVolts) {
-    mLeftControllerGroup.setVoltage(pLeftVolts);
-    mRightControllerGroup.setVoltage(pRightVolts);
+    mLeftMaster.setVoltage(pLeftVolts);
+    mRightMaster.setVoltage(pRightVolts);
     mDrive.feed();
   }
 

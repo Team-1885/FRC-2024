@@ -9,7 +9,6 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.ShooterConstants.LauncherConstants.*;
 
 
 public class CANLauncher extends SubsystemBase {
@@ -18,11 +17,8 @@ public class CANLauncher extends SubsystemBase {
 
   /** Creates a new Launcher. */
   public CANLauncher() {
-    System.out.println("CANLauncher is Constructed");
     mLaunchWheel = new CANSparkMax(1, MotorType.kBrushed);
     mFeedWheel = new CANSparkMax(3, MotorType.kBrushed);
-    System.out.println("mLaunchWheel is Constructed");
-    System.out.println("mFeedWheel is Constructed");
 
     // mLaunchWheel.setSmartCurrentLimit(kLauncherCurrentLimit);
     // mFeedWheel.setSmartCurrentLimit(kFeedCurrentLimit);
@@ -82,24 +78,18 @@ public class CANLauncher extends SubsystemBase {
 
   // An accessor method to set the speed (technically the output percentage) of the launch wheel
   public void setLaunchWheel(double speed) {
-    System.out.println("setLaunchWheel() is Called");
     mLaunchWheel.set(speed);
-    System.out.println("mLaunchWheel set to speed " + speed);
   }
 
   // An accessor method to set the speed (technically the output percentage) of the feed wheel
   public void setFeedWheel(double speed) {
-    System.out.println("setFeedWheel() is Called");
     mFeedWheel.set(speed);
-    System.out.println("mFeedWheel set to speed " + speed);
   }
 
   // A helper method to stop both wheels. You could skip having a method like this and call the
   // individual accessors with speed = 0 instead
   public void stop() {
-    System.out.println("stop() is Called");
     mLaunchWheel.set(0);
     mFeedWheel.set(0);
-    System.out.println("mLaunchWheel & mFeedWheel set to speed 0.0");
   }
 }

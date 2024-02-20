@@ -69,7 +69,7 @@ public class RobotContainer {
 
     mField = new Field2d();
 
-    mChooser.addOption("Curvy", loadTrajectory("src/main/deploy/pathplanner/paths/Curvy.path", true));
+    mChooser.addOption("Curvy", loadTrajectory("Paths/PathWeaver_Curvy.path", true));
     mChooser.addOption("Straight", loadTrajectory("Paths/PathWeaver_Straight.path", true));
 
     Shuffleboard.getTab("Autonomous").add(mChooser);
