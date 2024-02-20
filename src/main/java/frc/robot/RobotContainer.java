@@ -47,11 +47,11 @@ public class RobotContainer {
   private @Getter final DriveCommand mDriveCommand;
   CommandGenericHID controller = new CommandGenericHID(5);
   private @Getter final CANLauncher mLauncher = new CANLauncher();
-  public @Getter final static Joystick logitech = new Joystick(0);
+  public @Getter final static Joystick logitech = new Joystick(1);
   private final Field2d mField;
   SendableChooser<Command> mChooser = new SendableChooser<>();
 
-  public @Getter final static Joystick mOperatorController = new Joystick(1);
+  public @Getter final static Joystick mOperatorController = new Joystick(2);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -69,8 +69,8 @@ public class RobotContainer {
 
     mField = new Field2d();
 
-    mChooser.addOption("Curvy", loadTrajectory("Paths/PathWeaver_Curvy.path", true));
-    mChooser.addOption("Straight", loadTrajectory("Paths/PathWeaver_Straight.path", true));
+    mChooser.addOption("Curvy", loadTrajectory("/Users/xXBootySniffer69Xx/Desktop/FRC-2024/src/main/deploy/pathplanner/generatedJSON/New New Path.wpilib.json", true));
+    mChooser.addOption("Straight", loadTrajectory("/Users/xXBootySniffer69Xx/Desktop/FRC-2024/src/main/deploy/pathplanner/generatedJSON/New New Path.wpilib.json", true));
 
     Shuffleboard.getTab("Autonomous").add(mChooser);
 
