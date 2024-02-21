@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
 
   private WestCoastDrive mWestCoastDrive;
   // private AutonSelection mAutonSelection;
-  private ClimbModeSelection mClimberSelector;
+  //private ClimbModeSelection mClimberSelector;
   private BaseAutonController mBaseAutonController;
   private InputMap mOI;
   private MatchMetadata mMatchMeta = null;
