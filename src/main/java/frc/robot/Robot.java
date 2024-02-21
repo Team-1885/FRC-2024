@@ -65,7 +65,7 @@ public class Robot extends TimedRobot {
   private final Settings mSettings = new Settings();
   private CSVLogger mCSVLogger;
   private Timer initTimer = new Timer();
-
+  private final SysIdRoutineBot m_robot = new SysIdRoutineBot();
   private WestCoastDrive mWestCoastDrive;
   // private AutonSelection mAutonSelection;
   private BaseAutonController mBaseAutonController;
@@ -96,6 +96,8 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.
     // This will perform all our button bindings, and put our autonomous chooser on the dashboard.
     RobotContainer robotContainer = new RobotContainer();
+    m_robot.configureBindings();
+
 
     UsbCamera camera = CameraServer.startAutomaticCapture();
     camera.setFPS(30);
@@ -206,6 +208,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     RobotContainer robotContainer = new RobotContainer();
+    
     MODE = EMatchMode.AUTONOMOUS;
     //Robot.DATA.registerAllWithShuffleboard();
     mRunningModules.clearModules();
@@ -216,7 +219,7 @@ public class Robot extends TimedRobot {
     //    mAutonSelection.getSelectedAutonController().schedule();
     // }
 
-    autonomousCommand = robotContainer.getAutonomousCommand();
+    autonomousCommand = m_robot.getAutonomousCommand();
 
     // Schedule the autonomous command (example)
     if (autonomousCommand != null) {
