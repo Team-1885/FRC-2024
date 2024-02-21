@@ -79,6 +79,9 @@ public class RobotContainer {
 
     mField = new Field2d();
 
+    mChooser.addOption("Curvy", loadTrajectory(Robot.trajectoryJSON, true));
+    mChooser.addOption("Straight", loadTrajectory(Robot.trajectoryJSON, true));
+
     Shuffleboard.getTab("Autonomous").add(mChooser);
 
     SmartDashboard.putData("Field", mField);
@@ -87,28 +90,33 @@ public class RobotContainer {
     configureBindings();
   }
 
+  public Command loadTrajectory(String pFilename, boolean pResetOdometry) {
+    RamseteCommand ramseteCommand = new RamseteCommand(Robot.trajectory, mWestCoastDrive::getPose, new RamseteController(RobotMap.AutoConstants.kRamseteB, RobotMap.AutoConstants.kRamseteZeta), new SimpleMotorFeedforward(RobotMap.DriveConstants.ksVolts, RobotMap.DriveConstants.kvVoltSecondsPerMeter, RobotMap.DriveConstants.kaVoltSecondsSquaredPerMeter), RobotMap.DriveConstants.kDriveKinematics, mWestCoastDrive::getWheelSpeeds, new PIDController(RobotMap.DriveConstants.kPDriveVel, 0, 0), new PIDController(RobotMap.DriveConstants.kPDriveVel, 0, 0), mWestCoastDrive::tankDriveVolts, mWestCoastDrive);
+    if(pResetOdometry) {
+        return new SequentialCommandGroup(new InstantCommand(()->mWestCoastDrive.resetOdometry(Robot.trajectory.getInitialPose())), ramseteCommand);
+    }
+    else {
+        return ramseteCommand;
+    }
+  }
+
   /**
    * Use this method to define your trigger->command mappings.
    * Triggers can be created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
-    //controller.button(0).onTrue(mDriveCommand);
-    //    new JoystickButton(mOperatorController, 1)
-    //    .whileTrue(
-    //        new PrepareLaunch(mLauncher)
-    //            .withTimeout(1)
-    //            .andThen(new LaunchNote(mLauncher))
-    //            .handleInterrupt(() -> mLauncher.stop()));
+    // controller.button(0).onTrue(mDriveCommand);
+    //     new JoystickButton(mOperatorController, 1)
+    //     .whileTrue(
+    //         new PrepareLaunch(mLauncher)
+    //             .withTimeout(1)
+    //             .andThen(new LaunchNote(mLauncher))
+    //             .handleInterrupt(() -> mLauncher.stop()));
     //
     // new JoystickButton(mOperatorController, 2).whileTrue(mLauncher.feedlaunchWheel()).onFalse(new InstantCommand(mLauncher::stop));
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   * 
-   * @return the command to run in autonomous
-   */
-  /**
+/**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
@@ -134,21 +142,9 @@ public class RobotContainer {
             // Apply the voltage constraint
             .addConstraint(autoVoltageConstraint);
 
-    // An example trajectory to follow. All units in meters.
-    Trajectory exampleTrajectory =
-        TrajectoryGenerator.generateTrajectory(
-            // Start at the origin facing the +X direction
-            new Pose2d(0, 0, new Rotation2d(0)),
-            // Pass through these two interior waypoints, making an 's' curve path
-            List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-            // End 3 meters straight ahead of where we started, facing forward
-            new Pose2d(3, 0, new Rotation2d(0)),
-            // Pass config
-            config);
-
     RamseteCommand ramseteCommand =
         new RamseteCommand(
-            exampleTrajectory,
+            Robot.trajectory,
             mWestCoastDrive::getPose,
             new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
             new SimpleMotorFeedforward(
@@ -165,8 +161,9 @@ public class RobotContainer {
 
     // Reset odometry to the initial pose of the trajectory, run path following
     // command, then stop at the end.
-    return Commands.runOnce(() -> mWestCoastDrive.resetOdometry(exampleTrajectory.getInitialPose()))
+    return Commands.runOnce(() -> mWestCoastDrive.resetOdometry(Robot.trajectory.getInitialPose()))
         .andThen(ramseteCommand)
         .andThen(Commands.runOnce(() -> mWestCoastDrive.tankDriveVolts(0, 0)));
   }
 }
+

@@ -6,12 +6,16 @@ package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -30,6 +34,8 @@ import frc.robot.subsystems.ModuleList;
 import frc.robot.subsystems.WestCoastDrive;
 import lombok.Getter;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import com.flybotix.hfr.codex.CodexMetadata;
@@ -68,6 +74,8 @@ public class Robot extends TimedRobot {
   private @Getter Command autonomousCommand;
   private static final @Getter java.util.logging.Logger LOGGER = java.util.logging.Logger
       .getLogger(Robot.class.getName());
+  public static String trajectoryJSON = "Paths/output/PathWeaver_Straight.wpilib.json";
+  public static Trajectory trajectory = new Trajectory();
 
   /**
    * Default constructor for the Robot class. This constructor is automatically
@@ -136,7 +144,16 @@ public class Robot extends TimedRobot {
     if (!Settings.kIsLogging) {
       mLogger.warn("------------Not Logging to CSV------------");
     }
+    sigma();
+  }
 
+  public void sigma() {
+    try {
+      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+      trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+    } catch (IOException ex) {
+        DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+    }
   }
 
   /**
