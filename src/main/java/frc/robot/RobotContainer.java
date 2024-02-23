@@ -4,26 +4,14 @@
 
 package frc.robot;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -35,15 +23,11 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotMap.AutoConstants;
 import frc.robot.commands.DriveCommand;
-import frc.robot.subsystems.CANLauncher;
-import frc.robot.subsystems.WestCoastDrive;
+import frc.robot.subsystems.WC;
 import lombok.Getter;
-import frc.robot.commands.PrepareLaunch;
-import frc.robot.commands.LaunchNote;
 
 /**
  * This class is where the bulk of the robot should be declared.
@@ -53,15 +37,15 @@ import frc.robot.commands.LaunchNote;
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
-  private @Getter final WestCoastDrive mWestCoastDrive = WestCoastDrive.getInstance();
+  private @Getter final WC mWestCoastDrive = WC.getInstance();
   private @Getter final DriveCommand mDriveCommand;
   CommandGenericHID controller = new CommandGenericHID(5);
   // private @Getter final CANLauncher mLauncher = new CANLauncher();
-  public @Getter final static Joystick logitech = new Joystick(1);
+  public @Getter final static Joystick mDriverController = new Joystick(1); // 1 is the USB Port to be used as indicated on the Driver Station
   private final Field2d mField;
   SendableChooser<Command> mChooser = new SendableChooser<>();
 
-  public @Getter final static Joystick mOperatorController = new Joystick(2);
+  public @Getter final static Joystick mOperatorController = new Joystick(2); // 2 is the USB Port to be used as indicated on the Driver Station
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.

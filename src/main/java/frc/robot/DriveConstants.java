@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.util.Units;
 import frc.robot.hardware.vendors.firstparties.ABC;
 
 public class DriveConstants {
@@ -18,10 +19,10 @@ public class DriveConstants {
     public static final double kPulsesPerRotation = 256.0;
     public static final double kCurrentLimitAmps = 60.0;
     public static final double kTrackWidthFeet = 20.875 / 12;
-    public static final double kRpmToMpsFactor = (ABC.feet_to_meters(kWheelCircumferenceFeet) / kGearboxRatio) * 1 / 60;
+    public static final double kRpmToMpsFactor = (Units.feetToMeters(kWheelCircumferenceFeet) / kGearboxRatio) * 1 / 60;
     public static final double kMaxMpsVelocity = kRpmToMpsFactor * kMaxVelocityRPM;
     public static final int kEncoderCPR = 1024;
-    public static final double kEncoderDistancePerPulse = (ABC.feet_to_meters(kTrackWidthFeet) * Math.PI) / (double) kEncoderCPR;
+    public static final double kEncoderDistancePerPulse = (Units.feetToMeters(kTrackWidthFeet) * Math.PI) / (double) kEncoderCPR;
     // ========================================
     // DO NOT MODIFY THESE CONSTANTS
     // ========================================

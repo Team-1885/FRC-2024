@@ -5,7 +5,9 @@
 package frc.robot;
 
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.hardware.vendors.firstparties.ABC;
 
@@ -35,7 +37,7 @@ public final class RobotMap {
     public static final double kGearRatio = 8.46;
     public static final double kWheelRadiusInches = 3;
 
-    public static final double kLinearDistanceConversionFactor = (ABC.inches_to_meters(1 / (kGearRatio * 2 * Math.PI * ABC.inches_to_meters(kWheelRadiusInches)) * 10));
+    public static final double kLinearDistanceConversionFactor = (Units.inchesToMeters(1 / (kGearRatio * 2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches)) * 10));
   }
 
   public static final class OIConstants {

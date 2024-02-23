@@ -4,10 +4,12 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.ADAM;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.WestCoastDrive;
+import frc.robot.subsystems.WC;
 import lombok.Getter;
 
 /**
@@ -20,10 +22,10 @@ public class DriveCommand extends Command {
   private @Getter ADAM adam = new ADAM(null);
 
 
-  private final @Getter WestCoastDrive westCoastDrive;
+  private final @Getter WC westCoastDrive;
 
   /** Creates a new ExampleCommand. */
-  public DriveCommand(final WestCoastDrive westCoastDrive) {
+  public DriveCommand(final WC westCoastDrive) {
     super();
     // Use addRequirements() here to declare subsystem dependencies.
     this.westCoastDrive = westCoastDrive;
@@ -43,14 +45,9 @@ public class DriveCommand extends Command {
   @Override
   public void execute() {
     runTest(() -> {
-      double mFwd = RobotContainer.logitech.getRawAxis(1) * 0.5;
-      double mRot = -RobotContainer.logitech.getRawAxis(4) * 0.7; // Get X-axis value of left stick 
+      double mFwd = RobotContainer.mDriverController.getRawAxis(1);
+      double mRot = -RobotContainer.mDriverController.getRawAxis(4);
 
-      // Calculate left and right motor speeds for tank drive
-      // double mFwd = mLeftAxis + mRightAxis;
-      // double mRot = mLeftAxis - mRightAxis;
-
-      // Set motor speeds in the WestCoastDrive subsystem
       westCoastDrive.arcadeDrive(mFwd, mRot);
     });
   }

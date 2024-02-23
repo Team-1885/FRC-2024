@@ -4,43 +4,31 @@
 
 package frc.robot;
 
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.common.config.AbstractSystemSettingsUtils;
-import frc.common.network.Network;
-import frc.common.types.EMatchMode;
-import frc.common.types.MatchMetadata;
-import frc.logging.CSVLogger;
-import frc.logging.Log;
-import frc.robot.controller.BaseAutonController;
 import frc.robot.hardware.vendors.firstparties.Clock;
-import frc.robot.hardware.vendors.firstparties.Data;
 import frc.robot.hardware.vendors.firstparties.Settings;
-import frc.robot.network.EForwardableConnections;
-import frc.robot.subsystems.ModuleList;
-import frc.robot.subsystems.WestCoastDrive;
-import lombok.Getter;
-
+import frc.robot.subsystems.WC;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Optional;
 
 import com.flybotix.hfr.codex.CodexMetadata;
 import com.flybotix.hfr.codex.ICodexTimeProvider;
-import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 
@@ -54,25 +42,40 @@ import com.flybotix.hfr.util.log.ILog;
 
 @SuppressWarnings("PMD.CommentSize")
 public class Robot extends TimedRobot {
+  private Command mAutonomousCommand;
+  private final SysIdRoutineBot mRobot = new SysIdRoutineBot();
+  private final PowerDistribution mPDP = new PowerDistribution();
+  static final edu.wpi.first.wpilibj.I2C.Port kPort = edu.wpi.first.wpilibj.I2C.Port.kOnboard;
+  private static final int kDeviceAddress = 4;
+
+  private final I2C mArduino = new I2C(kPort, kDeviceAddress);
+
+  private void writeString(String input) {
+    // Creates a char array from the input string
+    char[] chars = input.toCharArray();
+
+    // Creates a byte array from the char array
+    byte[] data = new byte[chars.length];
+
+    // Adds each character
+    for (int i = 0; i < chars.length; i++) {
+      data[i] = (byte) chars[i];
+    }
+
+    // Writes bytes over I2C
+    mArduino.transaction(data, data.length, new byte[] {}, 0);
+  }
+  
+
   private ILog mLogger = com.flybotix.hfr.util.log.Logger.createLog(this.getClass());
-  public static final Data DATA = new Data();
   public static final Clock CLOCK = (RobotBase.isReal() ? new Clock() : new Clock().simulated());
   public static final Field2d FIELD = new Field2d();
   public static final boolean IS_SIMULATED = RobotBase.isSimulation();
-  private static EMatchMode MODE = EMatchMode.DISABLED;
   public static String CLIMB_MODE = "";
-  private ModuleList mRunningModules = new ModuleList();
   private final Settings mSettings = new Settings();
-  private CSVLogger mCSVLogger;
   private Timer initTimer = new Timer();
-  private final SysIdRoutineBot m_robot = new SysIdRoutineBot();
-  private WestCoastDrive mWestCoastDrive;
-  // private AutonSelection mAutonSelection;
-  private BaseAutonController mBaseAutonController;
-  private InputMap mOI;
-  private MatchMetadata mMatchMeta = null;
-  private @Getter Command autonomousCommand;
-  private static final @Getter java.util.logging.Logger LOGGER = java.util.logging.Logger
+  private WC mWestCoastDrive;
+  private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
       .getLogger(Robot.class.getName());
   public static String trajectoryJSON = "Paths/output/PathWeaver_Straight.wpilib.json";
   public static Trajectory trajectory = new Trajectory();
@@ -96,30 +99,16 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.
     // This will perform all our button bindings, and put our autonomous chooser on the dashboard.
     RobotContainer robotContainer = new RobotContainer();
-    m_robot.configureBindings();
+    DataLogManager.start();
+    DriverStation.startDataLog(DataLogManager.getLog());
+    SmartDashboard.putData("PDP", mPDP);
+  
+    mRobot.configureBindings();
 
-
-    UsbCamera camera = CameraServer.startAutomaticCapture();
-    camera.setFPS(30);
     CLOCK.update();
-    Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::portForwarding);
-    // mAutonSelection = new AutonSelection();
-    mBaseAutonController = new BaseAutonController();
-    // mShootMoveController = new ShootMoveController();
-    // mThreeBallAuton = new ThreeBallTrajectoryController();
-    // mFourBallAuton = new FourBallTrajectoryAuton();
-    MODE = EMatchMode.INITIALIZING;
     mLogger.warn("===> ROBOT INIT Starting");
-    mOI = new InputMap();
-    // mLEDControl = new LEDModule();
-    // mAddressableLEDs = new AddressableLEDs();
-    mWestCoastDrive = WestCoastDrive.getInstance();
-    // mLimelight = new Limelight();
-    if (IS_SIMULATED) {
-      // mSimulation = new SimulationModule();
-    }
+    mWestCoastDrive = WC.getInstance();
 
-    AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
     com.flybotix.hfr.util.log.Logger.setLevel(ELevel.WARN);
     mLogger.info("Starting Robot Initialization...");
     ICodexTimeProvider provider = new ICodexTimeProvider() {
@@ -129,8 +118,6 @@ public class Robot extends TimedRobot {
       }
     };
     CodexMetadata.overrideTimeProvider(provider);
-
-    mRunningModules.clearModules();
 
     LiveWindow.disableAllTelemetry();
 
@@ -162,8 +149,6 @@ public class Robot extends TimedRobot {
    * These things rely on match metadata, so we need to wait for the DS to connect
    */
   private void initAfterConnection() {
-    initMatchMetadata();
-    mCSVLogger = new CSVLogger(Settings.kIsLogging, mMatchMeta);
   }
 
   /**
@@ -180,25 +165,72 @@ public class Robot extends TimedRobot {
     // This must be called from the robot's periodic block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     SmartDashboard.putData(FIELD);
+    
+    // Get the current going through channel 7, in Amperes.
+    // The PDP returns the current in increments of 0.125A.
+    // At low currents the current readings tend to be less accurate.
+    double lCurrent7 = mPDP.getCurrent(7);
+    SmartDashboard.putNumber("Current Channel 7", lCurrent7);
+
+    // Get the voltage going into the PDP, in Volts.
+    // The PDP returns the voltage in increments of 0.05 Volts.
+    double voltage = mPDP.getVoltage();
+    SmartDashboard.putNumber("Voltage", voltage);
+
+    // Retrieves the temperature of the PDP, in degrees Celsius.
+    double temperatureCelsius = mPDP.getTemperature();
+    SmartDashboard.putNumber("Temperature", temperatureCelsius);
+
+    // Get the total current of all channels.
+    double totalCurrent = mPDP.getTotalCurrent();
+    SmartDashboard.putNumber("Total Current", totalCurrent);
+
+    // Get the total power of all channels.
+    // Power is the bus voltage multiplied by the current with the units Watts.
+    double totalPower = mPDP.getTotalPower();
+    SmartDashboard.putNumber("Total Power", totalPower);
+
+    // Get the total energy of all channels.
+    // Energy is the power summed over time with units Joules.
+    double totalEnergy = mPDP.getTotalEnergy();
+    SmartDashboard.putNumber("Total Energy", totalEnergy);
+
+    // Creates a string to hold current robot state information, including alliance, enabled state, operation mode, and match time. The message is sent in format "AEM###" where A is the alliance color, (R)ed or (B)lue, E is the enabled state, (E)nabled or (D)isabled, M is the operation mode, (A)utonomous or (T)eleop, and ### is the zero-padded time remaining in the match.
+    //
+    // For example, "RET043" would indicate that the robot is on the red alliance, enabled in teleop mode, with 43 seconds left in the match.
+    StringBuilder stateMessage = new StringBuilder(6);
+
+    String allianceString = "U";
+    Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+    if (alliance.isPresent()) {
+      allianceString = alliance.get() == DriverStation.Alliance.Red ? "R" : "B";
+    }
+
+    stateMessage
+        .append(allianceString)
+        .append(DriverStation.isEnabled() ? "E" : "D")
+        .append(DriverStation.isAutonomous() ? "A" : "T")
+        .append(String.format("%03d", (int) DriverStation.getMatchTime()));
+
+    writeString(stateMessage.toString());
+  }
+
+  /** Close all resources. */
+  @Override
+  public void close() {
+    mArduino.close();
+    super.close();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    MODE = EMatchMode.DISABLED;
     mLogger.info("Disabled Initialization");
-    mRunningModules.modeInit(EMatchMode.DISABLED);
-
-    mRunningModules.shutdown();
-
-    // if (mActiveController != null) {
-    //   mActiveController.setEnabled(false);
-    // }
   }
 
   @Override
   public void disabledPeriodic() {
-    mRunningModules.safeReadInputs();
+
   }
 
   /**
@@ -207,23 +239,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    RobotContainer robotContainer = new RobotContainer();
-    
-    MODE = EMatchMode.AUTONOMOUS;
-    //Robot.DATA.registerAllWithShuffleboard();
-    mRunningModules.clearModules();
-    mRunningModules.addModule(mWestCoastDrive);
-    // mRunningModules.modeInit(EMatchMode.AUTONOMOUS);
-    // mWestCoastDrive.readInputs();
-    // if (mAutonSelection.getSelectedAutonController() != null) {
-    //    mAutonSelection.getSelectedAutonController().schedule();
-    // }
-
-    autonomousCommand = m_robot.getAutonomousCommand();
-
-    // Schedule the autonomous command (example)
-    if (autonomousCommand != null) {
-      autonomousCommand.schedule();
+    mAutonomousCommand = mRobot.getAutonomousCommand();
+    if(mAutonomousCommand != null) {
+      mAutonomousCommand.schedule();
     }
   }
 
@@ -231,47 +249,31 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     CommandScheduler.getInstance().run();
-    commonPeriodic();
   }
 
   @Override
   public void teleopInit() {
-    if ( Settings.kIsLogging ){
-      mCSVLogger.start();
-    }
-    mRunningModules.clearModules();
-    // mRunningModules.addModule(mOI);
-    mRunningModules.addModule(mWestCoastDrive);
-    MODE = EMatchMode.TELEOPERATED;
-    // mActiveController = mTeleopController;
-    // mActiveController.setEnabled(true);
-    mRunningModules.modeInit(EMatchMode.TELEOPERATED);
-
     // This makes sure that the autonomous stops running when teleop starts running.
     // If you want the autonomous to continue until interrupted by another command, remove this line or comment it out.
-    if (autonomousCommand != null) {
-      autonomousCommand.cancel();
+    if (mAutonomousCommand != null) {
+      mAutonomousCommand.cancel();
     }
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    commonPeriodic();
   }
 
   @Override
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
-    Robot.DATA.registerAllWithShuffleboard();
-    teleopInit();
   }
 
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {
-    commonPeriodic();
   }
 
   /** This function is called once when the robot is first started up. */
@@ -284,39 +286,6 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationPeriodic() {
     // ...
-  }
-
-  void commonPeriodic() {
-    double start = Timer.getFPGATimestamp();
-    CLOCK.update();
-    if (Settings.kIsLogging && MODE != EMatchMode.DISABLED) {
-      for (RobotCodex c : DATA.mLoggedCodexes) {
-        mCSVLogger.addToQueue(new Log(c.toFormattedCSV(), c.meta().gid()));
-      }
-    }
-    for (RobotCodex c : DATA.mAllCodexes) {
-      c.reset();
-    }
-
-    mRunningModules.safeReadInputs();
-
-    mRunningModules.safeSetOutputs();
-    SmartDashboard.putNumber("common_periodic_dt", Timer.getFPGATimestamp() - start);
-    SmartDashboard.putNumber("Clock Time", CLOCK.now());
-  }
-
-  private void initMatchMetadata() {
-    if (mMatchMeta == null) {
-      mMatchMeta = new MatchMetadata();
-      int gid = mMatchMeta.hash;
-      for (RobotCodex c : DATA.mAllCodexes) {
-        c.meta().setGlobalId(gid);
-      }
-    }
-  }
-
-  public static EMatchMode mode() {
-    return MODE;
   }
 
   public String toString() {

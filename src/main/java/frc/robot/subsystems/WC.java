@@ -16,8 +16,12 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.RobotMap;
 import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
@@ -28,12 +32,12 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.DoubleSupplier;
 
-public class WestCoastDrive extends Module {
-  private final CANSparkMax mLeftMaster = new CANSparkMax(REVLibCAN.L_MASTER_ID, REVLibCAN.MOTOR_TYPE);
-  private final CANSparkMax mLeftFollower = new CANSparkMax(REVLibCAN.L_FOLLOWER_ID, REVLibCAN.MOTOR_TYPE);
-  private final CANSparkMax mRightMaster = new CANSparkMax(REVLibCAN.R_MASTER_ID, REVLibCAN.MOTOR_TYPE);
-  private final CANSparkMax mRightFollower = new CANSparkMax(REVLibCAN.R_FOLLOWER_ID, REVLibCAN.MOTOR_TYPE);
-
+public class WC extends SubsystemBase {
+  private final CANSparkMax mLeftMaster = new CANSparkMax(10, REVLibCAN.MOTOR_TYPE);
+  private final CANSparkMax mLeftFollower = new CANSparkMax(9, REVLibCAN.MOTOR_TYPE);
+  private final CANSparkMax mRightMaster = new CANSparkMax(4, REVLibCAN.MOTOR_TYPE);
+  private final CANSparkMax mRightFollower = new CANSparkMax(2, REVLibCAN.MOTOR_TYPE);
+  
   private final RelativeEncoder mLeftEncoder = mLeftMaster.getEncoder();
   private final RelativeEncoder mRightEncoder = mLeftMaster.getEncoder();
 
@@ -43,15 +47,17 @@ public class WestCoastDrive extends Module {
 
   private final DifferentialDriveOdometry mOdometry;
 
+  ShuffleboardTab mTab = Shuffleboard.getTab("WC_Drive");
+
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
-  private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
+  private final MutableMeasure<Voltage> mAppliedVoltage = mutable(Volts.of(0));
   // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
-  private final MutableMeasure<Distance> m_distance = mutable(Meters.of(0));
+  private final MutableMeasure<Distance> mDistance = mutable(Meters.of(0));
   // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
-  private final MutableMeasure<Velocity<Distance>> m_velocity = mutable(MetersPerSecond.of(0));
+  private final MutableMeasure<Velocity<Distance>> mVelocity = mutable(MetersPerSecond.of(0));
 
   // Create a new SysId routine for characterizing the drive.
-  private final SysIdRoutine m_sysIdRoutine =
+  private final SysIdRoutine mSysIdRoutine =
       new SysIdRoutine(
           // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
           new SysIdRoutine.Config(),
@@ -68,34 +74,34 @@ public class WestCoastDrive extends Module {
                 // the entire group to be one motor.
                 log.motor("drive-left")
                     .voltage(
-                        m_appliedVoltage.mut_replace(
+                        mAppliedVoltage.mut_replace(
                             mLeftMaster.get() * RobotController.getBatteryVoltage(), Volts))
-                    .linearPosition(m_distance.mut_replace(mLeftEncoder.getPosition(), Meters))
+                    .linearPosition(mDistance.mut_replace(getLeftEncoderPosition(), Meters))
                     .linearVelocity(
-                        m_velocity.mut_replace(mLeftEncoder.getVelocity(), MetersPerSecond));
+                        mVelocity.mut_replace(getLeftEncoderVelocity(), MetersPerSecond));
                 // Record a frame for the right motors.  Since these share an encoder, we consider
                 // the entire group to be one motor.
                 log.motor("drive-right")
                     .voltage(
-                        m_appliedVoltage.mut_replace(
+                        mAppliedVoltage.mut_replace(
                             mRightMaster.get() * RobotController.getBatteryVoltage(), Volts))
-                    .linearPosition(m_distance.mut_replace(mRightEncoder.getPosition(), Meters))
+                    .linearPosition(mDistance.mut_replace(getRightEncoderPosition(), Meters))
                     .linearVelocity(
-                        m_velocity.mut_replace(mRightEncoder.getVelocity(), MetersPerSecond));
+                        mVelocity.mut_replace(getRightEncoderVelocity(), MetersPerSecond));
               },
               // Tell SysId to make generated commands require this subsystem, suffix test state in
               // WPILog with this subsystem's name ("drive")
               this));
 
 
-  private static final WestCoastDrive instance = new WestCoastDrive();
+  private static final WC instance = new WC();
 
-  public static WestCoastDrive getInstance() {
+  public static WC getInstance() {
     return instance;
   }
 
   /** Creates a new DriveSubsystem. */
-  public WestCoastDrive() {
+  public WC() {
     SendableRegistry.addChild(mDrive, mLeftMaster);
     SendableRegistry.addChild(mDrive, mRightMaster);
 
@@ -140,10 +146,6 @@ public class WestCoastDrive extends Module {
     // Update the odometry in the periodic block
     mOdometry.update(
       mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
-
-    SmartDashboard.putNumber("Left Encoder Value Meters", getLeftEncoderPosition());
-    SmartDashboard.putNumber("Right Encoder Value Meters", getRightEncoderPosition());
-    SmartDashboard.putNumber("Gyro Heading", getHeading());
   }
 
   /**
@@ -181,8 +183,8 @@ public class WestCoastDrive extends Module {
    * @param fwd the commanded forward movement
    * @param rot the commanded rotation
    */
-  public void arcadeDrive(double fwd, double rot) {
-    mDrive.arcadeDrive(fwd, rot);
+  public void arcadeDrive(double pFwd, double pRot) {
+    mDrive.arcadeDrive(pFwd, pRot);
   }
 
   /**
@@ -195,6 +197,11 @@ public class WestCoastDrive extends Module {
     mLeftMaster.setVoltage(pLeftVolts);
     mRightMaster.setVoltage(pRightVolts);
     mDrive.feed();
+
+    // if (Math.abs(pLeftVolts / 12) < 1 && Math.abs(pRightVolts / 12) < 1) {
+    //   mLeftMaster.set(pLeftVolts / 12);
+    //   mRightMaster.set(pRightVolts / 12);
+    // }
   }
 
   public void setCoastMode() {
@@ -316,7 +323,7 @@ public class WestCoastDrive extends Module {
    * @param direction The direction (forward or reverse) to run the test in
    */
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.quasistatic(direction);
+    return mSysIdRoutine.quasistatic(direction);
   }
 
   /**
@@ -325,16 +332,6 @@ public class WestCoastDrive extends Module {
    * @param direction The direction (forward or reverse) to run the test in
    */
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.dynamic(direction);
-  }
-
-  public void setVolts(double pLeftVolts, double pRightVolts) {
-        // Safety check, only if the desired .set() value is less than one should it be
-        // set to the motors
-        if (Math.abs(pLeftVolts / 12) < 1 && Math.abs(pRightVolts / 12) < 1) {
-                mLeftMaster.set(pLeftVolts / 12);
-                mRightMaster.set(pRightVolts / 12);
-        }
-        // mTable.getEntry("volts").setNumber(leftVolts / 12);
+    return mSysIdRoutine.dynamic(direction);
   }
 }

@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.subsystems.WestCoastDrive;
+import frc.robot.subsystems.WC;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -17,7 +17,7 @@ import frc.robot.subsystems.WestCoastDrive;
  */
 public class SysIdRoutineBot {
   // The robot's subsystems
-  private final WestCoastDrive m_drive = new WestCoastDrive();
+  private final WC m_drive = WC.getInstance();
   
 
   // The driver's controller
@@ -42,24 +42,6 @@ public class SysIdRoutineBot {
     // once.
     // Using bumpers as a modifier and combining it with the buttons so that we can have both sets
     // of bindings at once
-    m_driverController
-        .a()
-        .and(m_driverController.rightBumper())
-        .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    m_driverController
-        .b()
-        .and(m_driverController.rightBumper())
-        .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    m_driverController
-        .x()
-        .and(m_driverController.rightBumper())
-        .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    m_driverController
-        .y()
-        .and(m_driverController.rightBumper())
-        .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-
     m_driverController
         .a()
         .and(m_driverController.leftBumper())
