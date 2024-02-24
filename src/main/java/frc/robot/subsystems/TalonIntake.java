@@ -5,12 +5,12 @@
 package frc.robot.subsystems;
 
 
-import java.util.stream.Stream;
-
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.revrobotics.CANSparkMax;
+import com.ctre.phoenix6.hardware.core.CoreTalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.networktables.GenericEntry;
@@ -21,7 +21,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.ADAM;
 import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
-import lombok.Getter;
+import frc.robot.hardware.vendors.thirdparties.ctre.CTRETalonFX;
+
 
 /**
  * Creates CANTalon objects and configures all the parameters we care about to factory defaults. Closed-loop and sensor
@@ -30,88 +31,32 @@ import lombok.Getter;
 public class TalonIntake extends SubsystemBase{
 
 
-private @Getter final ADAM adam = new ADAM(null);
+private final ADAM adam = new ADAM(null);
+    // instantiate motor controllers
+TalonFX m_motorLeft = new TalonFX(0);
+TalonFX m_motorRight = new TalonFX(1);
+        // initialize devices on the rio can bus
+final TalonFX m_leftLeader = new TalonFX(0, "rio");
+final TalonFX m_rightLeader = new TalonFX(1, "rio");
 
-        // Creates a CANSparkMax motor, inheriting physical constants from the {@link#REVLibCAN} helper class.
-        private static CANSparkMax REV_INTAKE_FEEDER = new CANSparkMax(REVLibCAN.INTAKE_FEEDER_ID, REVLibCAN.MOTOR_TYPE);
+// users should reuse control requests when possible
+final DutyCycleOut m_leftRequest = new DutyCycleOut(0.0);
+final DutyCycleOut m_rightRequest = new DutyCycleOut(0.0);
 
-        // Creates a CANSparkMax motor, inheriting physical constants from the {@link#REVLibCAN} helper class.
-        private static CANSparkMax REV_INTAKE_ROTATER = new CANSparkMax(REVLibCAN.INTAKE_ROTATER_ID, REVLibCAN.MOTOR_TYPE);
-        /**
-         * Lorem Ipsum.
-         */
-        private @Getter RelativeEncoder feederEncoder, rotateEncoder;
+       
+private RelativeEncoder feederEncoder, rotateEncoder;
 
         private ShuffleboardTab tab = Shuffleboard.getTab("===== INTAKE SUBSYSTEM =====");
         private GenericEntry testEntry1 = tab.add("===== SET FEEDER SPEED =====", 0).getEntry();
         private GenericEntry testEntry2 = tab.add("===== SET ROTATION SPEED =====", 0).getEntry();
 
-        /** Constructor for the Subsystem */
-        public TalonIntake() {
-                /**
-                 * Low-level configurations for the hardware objects
-                 */
-                super();
-                Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER).forEach(CANSparkMax::restoreFactoryDefaults);
-                /*Stream.of(REV_0xM1, REV_0xF1)
-                                .forEach(motor -> motor.setInverted(false));
-                Stream.of(REV_0xM2, REV_0xF2)
-                                .forEach(motor -> motor.setInverted(true));
-                Stream.of(REV_0xM1, REV_0xF1, REV_0xM2, REV_0xF2)
-                                .forEach(motor -> motor.setIdleMode(CANSparkMax.IdleMode.kCoast)); */
-                Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER).forEach(motor -> motor.setSmartCurrentLimit(30, 35, 100));
-                feederEncoder = REV_INTAKE_FEEDER.getEncoder();
-                rotateEncoder = REV_INTAKE_ROTATER.getEncoder();
-                Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER).forEach(motor -> motor.setClosedLoopRampRate(0.5));
-                Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER).forEach(motor -> motor.setOpenLoopRampRate(0.5));
-                Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER).forEach(motor -> motor.setControlFramePeriodMs(1));
-                Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER).forEach(CANSparkMax::burnFlash);
+        private static final TalonIntake instance = new TalonIntake();
+        private static final CoreTalonFX m_feeder = null;
+        private static final CoreTalonFX m_rotater = null;
 
+        public static TalonIntake getInstance() {
+                return instance;
         }
-
-        @Override
-        public void periodic() { // This method will be called once per scheduler run (usually, once every 20 ms),
-                runTest(() -> {
-                        testEntry1.setDouble(REV_INTAKE_FEEDER.get());
-                        testEntry2.setDouble(REV_INTAKE_ROTATER.get());
-                        REVLibCAN.logFaults(Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER));
-                        // ... Other periodic tasks
-                });
-        }
-
-        /**
-         * Executes a custom method, running it within a testing environment.
-         *
-         * @see #runTest(Runnable)
-         */
-        public void reset() {
-                runTest(() -> {
-                        // Resets
-                        Stream.of(feederEncoder, rotateEncoder).forEach(encoder -> encoder.setPosition(0));
-                        Stream.of(REV_INTAKE_FEEDER, REV_INTAKE_ROTATER).forEach(motor -> motor.stopMotor());
-                });
-        }
-
-        public void setFeederSpeed(final double feedSpeed) {
-                // Setting motor speed using the ".set()" method from the CANSparkMax class
-                REV_INTAKE_FEEDER.set(feedSpeed);
-        }
-
-        public void setRotaterSpeed(final double rotateSpeed) {
-                // Setting motor speed using the ".set()" method from the CANSparkMax class
-                REV_INTAKE_ROTATER.set(rotateSpeed);
-        }
-
-        public double getFeederSpeed() {
-                // Getting motor speed using the ".get()" method from the CANSparkMax class
-                return REV_INTAKE_FEEDER.get();
-        }
-
-        public double getRotaterSpeed() {
-                // Getting motor speed using the ".get()" method from the CANSparkMax class
-                return REV_INTAKE_ROTATER.get();
-                }
-
         /**
          * Executes custom testing and validation methods in a controlled environment.
          * Any exceptions thrown during execution are caught and logged.
@@ -121,6 +66,24 @@ private @Getter final ADAM adam = new ADAM(null);
         public void debugSubsystem() {
                 runTest(() -> periodic());
                 runTest(() -> reset());
+        }
+        public TalonIntake(){
+        // start with factory-default configs
+        var currentConfigs = new MotorOutputConfigs();
+
+        // The left motor is CCW+
+        currentConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
+        m_feeder.getConfigurator().apply(currentConfigs);
+
+        // The right motor is CW+
+        currentConfigs.Inverted = InvertedValue.Clockwise_Positive;
+        m_rotater.getConfigurator().apply(currentConfigs);
+
+    }
+
+        private Object reset() {
+                // TODO Auto-generated method stub
+                throw new UnsupportedOperationException("Unimplemented method 'reset'");
         }
 
         /**
@@ -136,9 +99,7 @@ private @Getter final ADAM adam = new ADAM(null);
                         adam.uncaughtException(Thread.currentThread(), e);
                 }
         }
-    // instantiate motor controllers
-TalonFX m_motorLeft = new TalonFX(0);
-TalonFX m_motorRight = new TalonFX(1);
+
 
 // create differentialdrive object for robot control
 DifferentialDrive m_diffDrive = new DifferentialDrive(m_motorLeft, m_motorRight);
@@ -165,13 +126,6 @@ m_leftLeader.setControl(m_leftRequest.withOutput(leftOut));
 m_rightLeader.setControl(m_rightRequest.withOutput(rightOut));
 }
 
-// initialize devices on the rio can bus
-final TalonFX m_leftLeader = new TalonFX(0, "rio");
-final TalonFX m_rightLeader = new TalonFX(1, "rio");
-
-// users should reuse control requests when possible
-final DutyCycleOut m_leftRequest = new DutyCycleOut(0.0);
-final DutyCycleOut m_rightRequest = new DutyCycleOut(0.0);
 
 
 
@@ -241,6 +195,14 @@ final DutyCycleOut m_rightRequest = new DutyCycleOut(0.0);
     private static TalonFX createTalon(int id, Configuration kslaveconfiguration2) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'createTalon'");
+    }
+    public void setRotaterSpeed(double rotateSpeed) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setRotaterSpeed'");
+    }
+    public void setFeederSpeed(double feedSpeed) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setFeederSpeed'");
     }
 
     /*public static VictorSPX createPermanentSlaveVictor(int id, TalonSRX master) {

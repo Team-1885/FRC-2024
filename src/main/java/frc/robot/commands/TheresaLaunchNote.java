@@ -4,9 +4,10 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
-public class TheresaLaunchNote extends CommandBase {
+
+public class TheresaLaunchNote extends Command {
   /** Creates a new TheresaLaunchNote. */
   public TheresaLaunchNote() {
     // Use addRequirements() here to declare subsystem dependencies.

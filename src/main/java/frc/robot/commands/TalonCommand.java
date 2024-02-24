@@ -6,16 +6,11 @@ package frc.robot.commands;
 
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.common.types.input.ELogitech310;
 import frc.robot.ADAM;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.TalonIntake;
 import lombok.Getter;
-
-import com.flybotix.hfr.codex.CodexOf;
-import com.flybotix.hfr.codex.RobotCodex;
-import edu.wpi.first.wpilibj.Joystick;
 
 
 /**
@@ -29,14 +24,14 @@ public class TalonCommand extends Command {
   private @Getter ADAM adam = new ADAM(null);
   
 
-  private final @Getter IntakeSubsystem intakeSubsystem;
+  private final @Getter TalonIntake talonIntake;
 
   /** Creates a new ExampleCommand. */
-  public TalonCommand(final IntakeSubsystem intakeSubsystem) {
+  public TalonCommand(final TalonIntake talonIntake) {
     super();
     // Use addRequirements() here to declare subsystem dependencies.
-    this.intakeSubsystem = intakeSubsystem;
-    addRequirements(intakeSubsystem);
+    this.talonIntake = talonIntake;
+    addRequirements(talonIntake);
   }
 
   // Called when the command is initially scheduled.
@@ -71,8 +66,8 @@ public class TalonCommand extends Command {
       }
 
       // Set motor speeds in the IntakeSubsystem
-      intakeSubsystem.setFeederSpeed(feedSpeed);
-      intakeSubsystem.setRotaterSpeed(rotateSpeed);
+      talonIntake.setFeederSpeed(feedSpeed);
+      talonIntake.setRotaterSpeed(rotateSpeed);
     });
   }
 
