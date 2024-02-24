@@ -44,27 +44,27 @@ import com.flybotix.hfr.util.log.ILog;
 public class Robot extends TimedRobot {
   private Command mAutonomousCommand;
   private final SysIdRoutineBot mRobot = new SysIdRoutineBot();
-  private final PowerDistribution mPDP = new PowerDistribution();
-  static final edu.wpi.first.wpilibj.I2C.Port kPort = edu.wpi.first.wpilibj.I2C.Port.kOnboard;
-  private static final int kDeviceAddress = 4;
+  // private final PowerDistribution mPDP = new PowerDistribution();
+  // static final edu.wpi.first.wpilibj.I2C.Port kPort = edu.wpi.first.wpilibj.I2C.Port.kOnboard;
+  // private static final int kDeviceAddress = 4;
 
-  private final I2C mArduino = new I2C(kPort, kDeviceAddress);
+  // private final I2C mArduino = new I2C(kPort, kDeviceAddress);
 
-  private void writeString(String input) {
-    // Creates a char array from the input string
-    char[] chars = input.toCharArray();
-
-    // Creates a byte array from the char array
-    byte[] data = new byte[chars.length];
-
-    // Adds each character
-    for (int i = 0; i < chars.length; i++) {
-      data[i] = (byte) chars[i];
-    }
-
-    // Writes bytes over I2C
-    mArduino.transaction(data, data.length, new byte[] {}, 0);
-  }
+  // private void writeString(String input) {
+  //   // Creates a char array from the input string
+  //   char[] chars = input.toCharArray();
+  // 
+  //   // Creates a byte array from the char array
+  //   byte[] data = new byte[chars.length];
+  // 
+  //   // Adds each character
+  //   for (int i = 0; i < chars.length; i++) {
+  //     data[i] = (byte) chars[i];
+  //   }
+  // 
+  //   // Writes bytes over I2C
+  //   mArduino.transaction(data, data.length, new byte[] {}, 0);
+  // }
   
 
   private ILog mLogger = com.flybotix.hfr.util.log.Logger.createLog(this.getClass());
@@ -101,7 +101,7 @@ public class Robot extends TimedRobot {
     RobotContainer robotContainer = new RobotContainer();
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
-    SmartDashboard.putData("PDP", mPDP);
+    // SmartDashboard.putData("PDP", mPDP);
   
     mRobot.configureBindings();
 
@@ -165,62 +165,62 @@ public class Robot extends TimedRobot {
     // This must be called from the robot's periodic block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     SmartDashboard.putData(FIELD);
-    
+    // 
     // Get the current going through channel 7, in Amperes.
     // The PDP returns the current in increments of 0.125A.
     // At low currents the current readings tend to be less accurate.
-    double lCurrent7 = mPDP.getCurrent(7);
-    SmartDashboard.putNumber("Current Channel 7", lCurrent7);
-
+    // double lCurrent7 = mPDP.getCurrent(7);
+    // SmartDashboard.putNumber("Current Channel 7", lCurrent7);
+    // 
     // Get the voltage going into the PDP, in Volts.
     // The PDP returns the voltage in increments of 0.05 Volts.
-    double voltage = mPDP.getVoltage();
-    SmartDashboard.putNumber("Voltage", voltage);
-
+    // double voltage = mPDP.getVoltage();
+    // SmartDashboard.putNumber("Voltage", voltage);
+    // 
     // Retrieves the temperature of the PDP, in degrees Celsius.
-    double temperatureCelsius = mPDP.getTemperature();
-    SmartDashboard.putNumber("Temperature", temperatureCelsius);
-
+    // double temperatureCelsius = mPDP.getTemperature();
+    // SmartDashboard.putNumber("Temperature", temperatureCelsius);
+    // 
     // Get the total current of all channels.
-    double totalCurrent = mPDP.getTotalCurrent();
-    SmartDashboard.putNumber("Total Current", totalCurrent);
-
+    // double totalCurrent = mPDP.getTotalCurrent();
+    // SmartDashboard.putNumber("Total Current", totalCurrent);
+    // 
     // Get the total power of all channels.
     // Power is the bus voltage multiplied by the current with the units Watts.
-    double totalPower = mPDP.getTotalPower();
-    SmartDashboard.putNumber("Total Power", totalPower);
-
+    // double totalPower = mPDP.getTotalPower();
+    // SmartDashboard.putNumber("Total Power", totalPower);
+    // 
     // Get the total energy of all channels.
     // Energy is the power summed over time with units Joules.
-    double totalEnergy = mPDP.getTotalEnergy();
-    SmartDashboard.putNumber("Total Energy", totalEnergy);
-
+    // double totalEnergy = mPDP.getTotalEnergy();
+    // SmartDashboard.putNumber("Total Energy", totalEnergy);
+    // 
     // Creates a string to hold current robot state information, including alliance, enabled state, operation mode, and match time. The message is sent in format "AEM###" where A is the alliance color, (R)ed or (B)lue, E is the enabled state, (E)nabled or (D)isabled, M is the operation mode, (A)utonomous or (T)eleop, and ### is the zero-padded time remaining in the match.
     //
     // For example, "RET043" would indicate that the robot is on the red alliance, enabled in teleop mode, with 43 seconds left in the match.
-    StringBuilder stateMessage = new StringBuilder(6);
-
-    String allianceString = "U";
-    Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
-    if (alliance.isPresent()) {
-      allianceString = alliance.get() == DriverStation.Alliance.Red ? "R" : "B";
-    }
-
-    stateMessage
-        .append(allianceString)
-        .append(DriverStation.isEnabled() ? "E" : "D")
-        .append(DriverStation.isAutonomous() ? "A" : "T")
-        .append(String.format("%03d", (int) DriverStation.getMatchTime()));
-
-    writeString(stateMessage.toString());
+    // StringBuilder stateMessage = new StringBuilder(6);
+    // 
+    // String allianceString = "U";
+    // Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+    // if (alliance.isPresent()) {
+    //   allianceString = alliance.get() == DriverStation.Alliance.Red ? "R" : "B";
+    // }
+    // 
+    // stateMessage
+    //     .append(allianceString)
+    //     .append(DriverStation.isEnabled() ? "E" : "D")
+    //     .append(DriverStation.isAutonomous() ? "A" : "T")
+    //     .append(String.format("%03d", (int) DriverStation.getMatchTime()));
+    // 
+    // writeString(stateMessage.toString());
   }
 
   /** Close all resources. */
-  @Override
-  public void close() {
-    mArduino.close();
-    super.close();
-  }
+  // @Override
+  // public void close() {
+  //   mArduino.close();
+  //   super.close();
+  // }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
