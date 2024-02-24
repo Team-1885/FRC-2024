@@ -26,5 +26,8 @@
       }
     },
   ],
-  "java.test.defaultConfig": "WPIlibUnitTests"
+  "java.test.defaultConfig": "WPIlibUnitTests",
+  "docwriter.style": "Javadoc",
+  "docwriter.progress.trackClasses": true,
+  "docify.commentService.docstringFormat": "JavaDoc"
 }

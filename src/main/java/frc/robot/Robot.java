@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import com.flybotix.hfr.codex.CodexMetadata;
+import com.flybotix.hfr.codex.ICodexTimeProvider;
+import com.flybotix.hfr.util.log.ELevel;
+import com.flybotix.hfr.util.log.ILog;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -12,7 +16,6 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -24,13 +27,11 @@ import frc.robot.hardware.vendors.firstparties.Settings;
 import frc.robot.subsystems.WC;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Optional;
-
-import com.flybotix.hfr.codex.CodexMetadata;
-import com.flybotix.hfr.codex.ICodexTimeProvider;
-import com.flybotix.hfr.util.log.ELevel;
-import com.flybotix.hfr.util.log.ILog;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -40,290 +41,310 @@ import com.flybotix.hfr.util.log.ILog;
  * project, you must also update the build.gradle file in the project.
  */
 
-@SuppressWarnings("PMD.CommentSize")
-public class Robot extends TimedRobot {
-  private Command mAutonomousCommand;
-  private final SysIdRoutineBot mRobot = new SysIdRoutineBot();
-  private final PowerDistribution mPDP = new PowerDistribution();
-  static final edu.wpi.first.wpilibj.I2C.Port kPort = edu.wpi.first.wpilibj.I2C.Port.kOnboard;
-  private static final int kDeviceAddress = 4;
+public class Robot extends LoggedRobot {
+	private RobotContainer robotContainer;
+	private Command mAutonomousCommand;
+	private final SysIdRoutineBot mRobot = new SysIdRoutineBot();
+	private final PowerDistribution mPDP = new PowerDistribution();
+	static final edu.wpi.first.wpilibj.I2C.Port kPort =
+		edu.wpi.first.wpilibj.I2C.Port.kOnboard;
+	private static final int kDeviceAddress = 4;
 
-  private final I2C mArduino = new I2C(kPort, kDeviceAddress);
+	private final I2C mArduino = new I2C(kPort, kDeviceAddress);
 
-  private void writeString(String input) {
-    // Creates a char array from the input string
-    char[] chars = input.toCharArray();
+	public static final Clock CLOCK =
+		(RobotBase.isReal() ? new Clock() : new Clock().simulated());
+	public static final Field2d FIELD = new Field2d();
+	public static final boolean IS_SIMULATED = RobotBase.isSimulation();
+	public static String CLIMB_MODE = "";
+	public static String trajectoryJSON =
+		"Paths/output/PathWeaver_Straight.wpilib.json";
+	public static Trajectory trajectory = new Trajectory();
 
-    // Creates a byte array from the char array
-    byte[] data = new byte[chars.length];
+	private void writeString(String input) {
+		// Creates a char array from the input string
+		char[] chars = input.toCharArray();
 
-    // Adds each character
-    for (int i = 0; i < chars.length; i++) {
-      data[i] = (byte) chars[i];
-    }
+		// Creates a byte array from the char array
+		byte[] data = new byte[chars.length];
 
-    // Writes bytes over I2C
-    mArduino.transaction(data, data.length, new byte[] {}, 0);
-  }
-  
+		// Adds each character
+		for (int i = 0; i < chars.length; i++) {
+			data[i] = (byte) chars[i];
+		}
 
-  private ILog mLogger = com.flybotix.hfr.util.log.Logger.createLog(this.getClass());
-  public static final Clock CLOCK = (RobotBase.isReal() ? new Clock() : new Clock().simulated());
-  public static final Field2d FIELD = new Field2d();
-  public static final boolean IS_SIMULATED = RobotBase.isSimulation();
-  public static String CLIMB_MODE = "";
-  private final Settings mSettings = new Settings();
-  private Timer initTimer = new Timer();
-  private WC mWestCoastDrive;
-  private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
-      .getLogger(Robot.class.getName());
-  public static String trajectoryJSON = "Paths/output/PathWeaver_Straight.wpilib.json";
-  public static Trajectory trajectory = new Trajectory();
+		// Writes bytes over I2C
+		mArduino.transaction(data, data.length, new byte[] {}, 0);
+	}
 
-  /**
-   * Default constructor for the Robot class. This constructor is automatically
-   * invoked when an instance of the Robot class is created.
-   * Initializes the Robot instance by calling the no-argument constructor of the
-   * superclass (TimedRobot).
-   */
-  public Robot() {
-    super();
-  }
+	/**
+	 * Default constructor for the Robot class. This constructor is
+	 * automatically invoked when an instance of the Robot class is created.
+	 * Initializes the Robot instance by calling the no-argument constructor of
+	 * the superclass (TimedRobot).
+	 */
+	public Robot() {
+		super();
+	}
 
-  /**
-   * This function is run when the robot is first started up and should be used
-   * for any initialization code.
-   */
-  @Override
-  public void robotInit() {
-    // Instantiate our RobotContainer.
-    // This will perform all our button bindings, and put our autonomous chooser on the dashboard.
-    RobotContainer robotContainer = new RobotContainer();
-    DataLogManager.start();
-    DriverStation.startDataLog(DataLogManager.getLog());
-    SmartDashboard.putData("PDP", mPDP);
-  
-    mRobot.configureBindings();
+	/**
+	 * This function is run when the robot is first started up and should be
+	 * used for any initialization code. It instantiates the RobotContainer,
+	 * performs all button bindings, and puts the autonomous selector on the
+	 * dashboard.
+	 */
+	@Override
+	public void robotInit() {
+		// Initialization timer
+		Timer initTimer = new Timer();
+		initTimer.start();
+		
+		DataLogManager.start();
+		DriverStation.startDataLog(DataLogManager.getLog());
+		SmartDashboard.putData("PDP", mPDP);
 
-    CLOCK.update();
-    mLogger.warn("===> ROBOT INIT Starting");
-    mWestCoastDrive = WC.getInstance();
+		mRobot.configureBindings();
 
-    com.flybotix.hfr.util.log.Logger.setLevel(ELevel.WARN);
-    mLogger.info("Starting Robot Initialization...");
-    ICodexTimeProvider provider = new ICodexTimeProvider() {
-      @Override
-      public double getTimestamp() {
-        return CLOCK.now();
-      }
-    };
-    CodexMetadata.overrideTimeProvider(provider);
+		CLOCK.update();
+		Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+		Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+		Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+		Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+		Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+		switch (BuildConstants.DIRTY) {
+		case 0:
+			Logger.recordMetadata("GitDirty", "All changes committed");
+			break;
+		case 1:
+			Logger.recordMetadata("GitDirty", "Uncomitted changes");
+			break;
+		default:
+			Logger.recordMetadata("GitDirty", "Unknown");
+			break;
+		}
+		ICodexTimeProvider provider = new ICodexTimeProvider() {
+			@Override
+			public double getTimestamp() {
+				return CLOCK.now();
+			}
+		};
+		CodexMetadata.overrideTimeProvider(provider);
 
-    LiveWindow.disableAllTelemetry();
+		LiveWindow.disableAllTelemetry();
 
-    /*
-     * Some things need to wait until after the robot connects to the DS. So keep
-     * this thread here.
-     */
-    new Thread(new DSConnectInitThread()).start();
+		/*
+		Some things need to wait until after the robot connects to the DS. So 
+		keep this thread here
+		*/
+		new Thread(new DSConnectInitThread()).start();
 
-    initTimer.stop();
-    mLogger.warn("Robot initialization finished. Took: ", initTimer.get(), " seconds");
+		Logger.addDataReceiver(new WPILOGWriter());
+		Logger.addDataReceiver(new NT4Publisher());
 
-    if (!Settings.kIsLogging) {
-      mLogger.warn("------------Not Logging to CSV------------");
-    }
-    sigma();
-  }
+		sigma();
 
-  public void sigma() {
-    try {
-      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-      trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-    } catch (IOException ex) {
-        DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
-    }
-  }
+		// Initialization Complete
+		initTimer.stop();
+		Logger.recordMetadata("InitTime", String.valueOf(initTimer.get()));
 
-  /**
-   * These things rely on match metadata, so we need to wait for the DS to connect
-   */
-  private void initAfterConnection() {
-  }
+		Logger.start();
 
-  /**
-   * This function is called every 20 ms, no matter the mode.
-   * Use this for items like diagnostics that you want ran during disabled,
-   * autonomous, teleoperated and test.
-   * This runs after the mode specific periodic functions, but before LiveWindow
-   * and SmartDashboard integrated updating.
-   */
-  @Override
-  public void robotPeriodic() {
-    // Runs the Scheduler.
-    // This is responsible for polling buttons, adding newly-scheduled commands, running already-scheduled commands, removing finished or interrupted commands, and running subsystem periodic() methods.
-    // This must be called from the robot's periodic block in order for anything in the Command-based framework to work.
-    CommandScheduler.getInstance().run();
-    SmartDashboard.putData(FIELD);
-    
-    // Get the current going through channel 7, in Amperes.
-    // The PDP returns the current in increments of 0.125A.
-    // At low currents the current readings tend to be less accurate.
-    double lCurrent7 = mPDP.getCurrent(7);
-    SmartDashboard.putNumber("Current Channel 7", lCurrent7);
+		robotContainer = new RobotContainer();
+	}
 
-    // Get the voltage going into the PDP, in Volts.
-    // The PDP returns the voltage in increments of 0.05 Volts.
-    double voltage = mPDP.getVoltage();
-    SmartDashboard.putNumber("Voltage", voltage);
+	public void sigma() {
+		try {
+			Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+			trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+		} catch (IOException ex) {
+			DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+		}
+	}
 
-    // Retrieves the temperature of the PDP, in degrees Celsius.
-    double temperatureCelsius = mPDP.getTemperature();
-    SmartDashboard.putNumber("Temperature", temperatureCelsius);
+	/**
+	 * These things rely on match metadata, so we need to wait for the DS to
+	 * connect
+	 */
+	private void initAfterConnection() {}
 
-    // Get the total current of all channels.
-    double totalCurrent = mPDP.getTotalCurrent();
-    SmartDashboard.putNumber("Total Current", totalCurrent);
+	/**
+	 * This function is called every 20 ms, no matter the mode.
+	 * Use this for items like diagnostics that you want ran during disabled,
+	 * autonomous, teleoperated and test.
+	 * This runs after the mode specific periodic functions, but before
+	 * LiveWindow and SmartDashboard integrated updating.
+	 */
+	@Override
+	public void robotPeriodic() {
+		// Runs the Scheduler.
+		// This is responsible for polling buttons, adding newly-scheduled
+		// commands, running already-scheduled commands, removing finished or
+		// interrupted commands, and running subsystem periodic() methods. This
+		// must be called from the robot's periodic block in order for anything
+		// in the Command-based framework to work.
+		CommandScheduler.getInstance().run();
+		SmartDashboard.putData(FIELD);
 
-    // Get the total power of all channels.
-    // Power is the bus voltage multiplied by the current with the units Watts.
-    double totalPower = mPDP.getTotalPower();
-    SmartDashboard.putNumber("Total Power", totalPower);
+		// Get the current going through channel 7, in Amperes.
+		// The PDP returns the current in increments of 0.125A.
+		// At low currents the current readings tend to be less accurate.
+		double lCurrent7 = mPDP.getCurrent(7);
+		SmartDashboard.putNumber("Current Channel 7", lCurrent7);
 
-    // Get the total energy of all channels.
-    // Energy is the power summed over time with units Joules.
-    double totalEnergy = mPDP.getTotalEnergy();
-    SmartDashboard.putNumber("Total Energy", totalEnergy);
+		// Get the voltage going into the PDP, in Volts.
+		// The PDP returns the voltage in increments of 0.05 Volts.
+		double voltage = mPDP.getVoltage();
+		SmartDashboard.putNumber("Voltage", voltage);
 
-    // Creates a string to hold current robot state information, including alliance, enabled state, operation mode, and match time. The message is sent in format "AEM###" where A is the alliance color, (R)ed or (B)lue, E is the enabled state, (E)nabled or (D)isabled, M is the operation mode, (A)utonomous or (T)eleop, and ### is the zero-padded time remaining in the match.
-    //
-    // For example, "RET043" would indicate that the robot is on the red alliance, enabled in teleop mode, with 43 seconds left in the match.
-    StringBuilder stateMessage = new StringBuilder(6);
+		// Retrieves the temperature of the PDP, in degrees Celsius.
+		double temperatureCelsius = mPDP.getTemperature();
+		SmartDashboard.putNumber("Temperature", temperatureCelsius);
 
-    String allianceString = "U";
-    Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
-    if (alliance.isPresent()) {
-      allianceString = alliance.get() == DriverStation.Alliance.Red ? "R" : "B";
-    }
+		// Get the total current of all channels.
+		double totalCurrent = mPDP.getTotalCurrent();
+		SmartDashboard.putNumber("Total Current", totalCurrent);
 
-    stateMessage
-        .append(allianceString)
-        .append(DriverStation.isEnabled() ? "E" : "D")
-        .append(DriverStation.isAutonomous() ? "A" : "T")
-        .append(String.format("%03d", (int) DriverStation.getMatchTime()));
+		// Get the total power of all channels.
+		// Power is the bus voltage multiplied by the current with the units
+		// Watts.
+		double totalPower = mPDP.getTotalPower();
+		SmartDashboard.putNumber("Total Power", totalPower);
 
-    writeString(stateMessage.toString());
-  }
+		// Get the total energy of all channels.
+		// Energy is the power summed over time with units Joules.
+		double totalEnergy = mPDP.getTotalEnergy();
+		SmartDashboard.putNumber("Total Energy", totalEnergy);
 
-  /** Close all resources. */
-  @Override
-  public void close() {
-    mArduino.close();
-    super.close();
-  }
+		// Creates a string to hold current robot state information, including
+		// alliance, enabled state, operation mode, and match time. The message
+		// is sent in format "AEM###" where A is the alliance color, (R)ed or
+		// (B)lue, E is the enabled state, (E)nabled or (D)isabled, M is the
+		// operation mode, (A)utonomous or (T)eleop, and ### is the zero-padded
+		// time remaining in the match.
+		//
+		// For example, "RET043" would indicate that the robot is on the red
+		// alliance, enabled in teleop mode, with 43 seconds left in the match.
+		StringBuilder stateMessage = new StringBuilder(6);
 
-  /** This function is called once each time the robot enters Disabled mode. */
-  @Override
-  public void disabledInit() {
-    mLogger.info("Disabled Initialization");
-  }
+		String allianceString = "U";
+		Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+		if (alliance.isPresent()) {
+			allianceString =
+				alliance.get() == DriverStation.Alliance.Red ? "R" : "B";
+		}
 
-  @Override
-  public void disabledPeriodic() {
+		stateMessage.append(allianceString)
+			.append(DriverStation.isEnabled() ? "E" : "D")
+			.append(DriverStation.isAutonomous() ? "A" : "T")
+			.append(String.format("%03d", (int) DriverStation.getMatchTime()));
 
-  }
+		writeString(stateMessage.toString());
+	}
 
-  /**
-   * This autonomous runs the autonomous command selected by your
-   * {@link RobotContainer} class.
-   */
-  @Override
-  public void autonomousInit() {
-    mAutonomousCommand = mRobot.getAutonomousCommand();
-    if(mAutonomousCommand != null) {
-      mAutonomousCommand.schedule();
-    }
-  }
+	/** Close all resources. */
+	@Override
+	public void close() {
+		mArduino.close();
+		super.close();
+	}
 
-  /** This function is called periodically during autonomous. */
-  @Override
-  public void autonomousPeriodic() {
-    CommandScheduler.getInstance().run();
-  }
+	/**
+	 * This function is called once each time the robot enters Disabled mode.
+	 */
+	@Override
+	public void disabledInit() {}
 
-  @Override
-  public void teleopInit() {
-    // This makes sure that the autonomous stops running when teleop starts running.
-    // If you want the autonomous to continue until interrupted by another command, remove this line or comment it out.
-    if (mAutonomousCommand != null) {
-      mAutonomousCommand.cancel();
-    }
-  }
+	@Override
+	public void disabledPeriodic() {}
 
-  /** This function is called periodically during operator control. */
-  @Override
-  public void teleopPeriodic() {
-  }
+	/**
+	 * This autonomous runs the autonomous command selected by your
+	 * {@link RobotContainer} class.
+	 */
+	@Override
+	public void autonomousInit() {
+		mAutonomousCommand = mRobot.getAutonomousCommand();
+		if (mAutonomousCommand != null) {
+			mAutonomousCommand.schedule();
+		}
+	}
 
-  @Override
-  public void testInit() {
-    // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
-  }
+	/** This function is called periodically during autonomous. */
+	@Override
+	public void autonomousPeriodic() {
+		CommandScheduler.getInstance().run();
+	}
 
-  /** This function is called periodically during test mode. */
-  @Override
-  public void testPeriodic() {
-  }
+	@Override
+	public void teleopInit() {
+		// This makes sure that the autonomous stops running when teleop starts
+		// running. If you want the autonomous to continue until interrupted by
+		// another command, remove this line or comment it out.
+		if (mAutonomousCommand != null) {
+			mAutonomousCommand.cancel();
+		}
+	}
 
-  /** This function is called once when the robot is first started up. */
-  @Override
-  public void simulationInit() {
-    // ...
-  }
+	/** This function is called periodically during operator control. */
+	@Override
+	public void teleopPeriodic() {}
 
-  /** This function is called periodically whilst in simulation. */
-  @Override
-  public void simulationPeriodic() {
-    // ...
-  }
+	@Override
+	public void testInit() {
+		// Cancels all running commands at the start of test mode.
+		CommandScheduler.getInstance().cancelAll();
+	}
 
-  public String toString() {
+	/** This function is called periodically during test mode. */
+	@Override
+	public void testPeriodic() {}
 
-    String mRobotMode = "Unknown";
-    String mRobotEnabledDisabled = "Unknown";
-    double mNow = Timer.getFPGATimestamp();
+	/** This function is called once when the robot is first started up. */
+	@Override
+	public void simulationInit() {
+		// ...
+	}
 
-    if (this.isAutonomous()) {
-      mRobotMode = "Autonomous";
-    }
-    if (this.isTest()) {
-      mRobotEnabledDisabled = "Test";
-    }
-    if (this.isEnabled()) {
-      mRobotEnabledDisabled = "Enabled";
-    }
-    if (this.isDisabled()) {
-      mRobotEnabledDisabled = "Disabled";
-    }
+	/** This function is called periodically whilst in simulation. */
+	@Override
+	public void simulationPeriodic() {
+		// ...
+	}
 
-    return String.format("State: %s\tMode: %s\tTime: %s", mRobotEnabledDisabled, mRobotMode, mNow);
+	public String toString() {
+		String mRobotMode = "Unknown";
+		String mRobotEnabledDisabled = "Unknown";
+		double mNow = Timer.getFPGATimestamp();
 
-  }
+		if (this.isAutonomous()) {
+			mRobotMode = "Autonomous";
+		}
+		if (this.isTest()) {
+			mRobotEnabledDisabled = "Test";
+		}
+		if (this.isEnabled()) {
+			mRobotEnabledDisabled = "Enabled";
+		}
+		if (this.isDisabled()) {
+			mRobotEnabledDisabled = "Disabled";
+		}
 
-  private class DSConnectInitThread implements Runnable {
+		return String.format("State: %s\tMode: %s\tTime: %s",
+			mRobotEnabledDisabled, mRobotMode, mNow);
+	}
 
-    @Override
-    public void run() {
-      while (!DriverStation.isDSAttached()) {
-        try {
-          mLogger.error("Waiting on Robot <--> DS Connection...");
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      }
-      initAfterConnection();
-    }
-  }
+	private class DSConnectInitThread implements Runnable {
+		@Override
+		public void run() {
+			while (!DriverStation.isDSAttached()) {
+				try {
+					mLogger.error("Waiting on Robot <--> DS Connection...");
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			initAfterConnection();
+		}
+	}
 }
