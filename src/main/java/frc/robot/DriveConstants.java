@@ -11,18 +11,18 @@ public class DriveConstants {
     public static final double kGearboxRatio = 8.46; // rotated 8.46 times, rotates gear that spins the wheel once
     public static final double kWheelDiameterInches = 6;
     public static final double kWheelDiameterFeet = 0.5;
-    public static final double kWheelCircumferenceInches = kWheelDiameterInches * Math.PI;
-    public static final double kWheelCircumferenceFeet = kWheelDiameterFeet * Math.PI;
+    public static final double kWheelCircumferenceMeters = Units.inchesToMeters(kWheelDiameterInches * Math.PI);
+    public static final double kWheelCircumferenceFeet = Units.feetToMeters(kWheelDiameterFeet * Math.PI);
     public static final double kReductionRatio = 0.01;
-    public static final double kConversionFactor = kWheelCircumferenceInches * kReductionRatio;
+    public static final double kConversionFactor = kWheelCircumferenceMeters * kReductionRatio;
     public static final double kMaxVelocityRPM = 5676;
     public static final double kPulsesPerRotation = 256.0;
     public static final double kCurrentLimitAmps = 60.0;
-    public static final double kTrackWidthFeet = 20.875 / 12;
+    public static final double kTrackWidthMeters = Units.feetToMeters(20.875 / 12);
     public static final double kRpmToMpsFactor = (Units.feetToMeters(kWheelCircumferenceFeet) / kGearboxRatio) * 1 / 60;
     public static final double kMaxMpsVelocity = kRpmToMpsFactor * kMaxVelocityRPM;
     public static final int kEncoderCPR = 1024;
-    public static final double kEncoderDistancePerPulse = (Units.feetToMeters(kTrackWidthFeet) * Math.PI) / (double) kEncoderCPR;
+    public static final double kEncoderDistancePerPulse = (kTrackWidthMeters * Math.PI) / (double) kEncoderCPR;
     // ========================================
     // DO NOT MODIFY THESE CONSTANTS
     // ========================================
