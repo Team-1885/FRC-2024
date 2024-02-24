@@ -15,6 +15,7 @@ import frc.robot.subsystems.CANLauncher;
 
 public class PrepareLaunch extends Command {
   CANLauncher mLauncher;
+  
 
   /** Creates a new PrepareLaunch. */
   public PrepareLaunch(CANLauncher launcher) {

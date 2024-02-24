@@ -23,6 +23,9 @@ import frc.robot.subsystems.WestCoastDrive;
 import lombok.Getter;
 import frc.robot.commands.PrepareLaunch;
 import frc.robot.commands.LaunchNote;
+import frc.robot.subsystems.TalonIntake;
+import frc.robot.commands.TalonFeed;
+import frc.robot.commands.TalonRotate;
 
 /**
  * This class is where the bulk of the robot should be declared.
@@ -43,6 +46,9 @@ public class RobotContainer {
   public @Getter final static Joystick logitech = new Joystick(0);
   private final SendableChooser<Command> autoChooser;
   private final Field2d mField;
+
+  private @Getter final TalonIntake mTalonIntake = new TalonIntake();
+  //private @Getter(lazy=true) final TalonRotate mTalonRotate;
 
   private final Joystick mOperatorController = new Joystick(1);
 
@@ -100,6 +106,16 @@ public class RobotContainer {
     new JoystickButton(mOperatorController, 2)
         .whileTrue(
             mLauncher.getIntakeCommand());
+
+    new JoystickButton(mOperatorController, 3)
+        .whileTrue(
+            new TalonRotate(mTalonIntake)
+                .handleInterrupt(() -> mLauncher.stop()));
+    
+    new JoystickButton(mOperatorController, 4)
+        .whileTrue(
+            new TalonFeed(mTalonIntake)
+                .handleInterrupt(() -> mLauncher.stop()));
   }
 
   /**
