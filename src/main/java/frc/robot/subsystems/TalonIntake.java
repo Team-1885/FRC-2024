@@ -60,31 +60,12 @@ private @Getter(lazy=true) final ADAM adam = new ADAM(null);
           });
   }
 
- public void setINTAKE1Speed(final double INTAKE1Speed) {
-    // Setting motor speed using the ".set()" method from the CANSparkMax class
-    INTAKE1.set(INTAKE1Speed);
-    }
-
-public void setINTAKE2Speed(final double INTAKE2Speed) {
-    // Setting motor speed using the ".set()" method from the CANSparkMax class
-    INTAKE2.set(INTAKE2Speed);
-    }
-
-public double getINTAKE1Speed() {
-    // Getting motor speed using the ".get()" method from the CANSparkMax class
-    return INTAKE1.get();
-    }
-
-public double getINTAKE2Speed() {
-    // Getting motor speed using the ".get()" method from the CANSparkMax class
-    return INTAKE2.get();
-    } 
 
     //intake not driving? maybe can get rid of it
     /* calculate motor outputs, utilizes a "arcade" style of driving;
     // where left Y controls forward and right X controls rotation/turn
-    var leftOut = forward + turn;
-    var rightOut = forward - turn; */
+    var 1Out = forward + turn;
+    var 2Out = forward - turn; */
 
   public void runTest(final Runnable code) {
       try {
