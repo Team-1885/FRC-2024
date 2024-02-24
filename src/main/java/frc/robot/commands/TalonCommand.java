@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.Joystick;
  */
 
 @SuppressWarnings("PMD.CommentSize")
-public class IntakeCommand extends Command {
+public class TalonCommand extends Command {
 
 
   private @Getter ADAM adam = new ADAM(null);
@@ -32,7 +32,7 @@ public class IntakeCommand extends Command {
   private final @Getter IntakeSubsystem intakeSubsystem;
 
   /** Creates a new ExampleCommand. */
-  public IntakeCommand(final IntakeSubsystem intakeSubsystem) {
+  public TalonCommand(final IntakeSubsystem intakeSubsystem) {
     super();
     // Use addRequirements() here to declare subsystem dependencies.
     this.intakeSubsystem = intakeSubsystem;
