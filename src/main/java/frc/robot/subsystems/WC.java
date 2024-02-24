@@ -146,6 +146,10 @@ public class WC extends SubsystemBase {
     // Update the odometry in the periodic block
     mOdometry.update(
       mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
+    SmartDashboard.putNumber("Left Master Speed", mLeftMaster.get());
+    SmartDashboard.putNumber("Left Follower Speed", mLeftFollower.get());
+    SmartDashboard.putNumber("Right Master Speed", mRightMaster.get());
+    SmartDashboard.putNumber("Right Follower Speed", mRightFollower.get());
   }
 
   /**

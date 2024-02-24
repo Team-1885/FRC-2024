@@ -11,7 +11,6 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -21,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotMap.AutoConstants;
@@ -40,7 +38,6 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private @Getter final WC mWestCoastDrive = WC.getInstance();
   private @Getter final DriveCommand mDriveCommand;
-  CommandGenericHID controller = new CommandGenericHID(5);
   // private @Getter final CANLauncher mLauncher = new CANLauncher();
   public @Getter final static Joystick mDriverController = new Joystick(1); // 1 is the USB Port to be used as indicated on the Driver Station
   private final Field2d mField;
