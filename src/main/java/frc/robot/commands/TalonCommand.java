@@ -7,13 +7,12 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.ADAM;
 import frc.robot.subsystems.TalonIntake;
-import lombok.Getter;
 
 public class TalonCommand extends Command {
 
-private @Getter ADAM adam = new ADAM(null);
+private ADAM adam = new ADAM(null);
 
-private final @Getter TalonIntake talonIntake;
+private final TalonIntake talonIntake;
 
   /** Creates a new TalonCommand. */
   public TalonCommand(final TalonIntake talonIntake) {

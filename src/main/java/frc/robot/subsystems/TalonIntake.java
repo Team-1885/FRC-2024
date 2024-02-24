@@ -19,16 +19,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.ADAM;
 import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
-import lombok.Getter;
-
 
 public class TalonIntake extends Module {
   
-private @Getter(lazy=true) final ADAM adam = new ADAM(null);
+private final ADAM adam = new ADAM(null);
 
   //is this controller the right one? 
   //why isn't the import working
-  XboxController m_XboxController = new XboxController(port:0);
+  XboxController m_XboxController = new XboxController(0);
 
   // initialize devices on the rio can bus
   final TalonFX INTAKE1 = new TalonFX(0, "rio");
@@ -38,7 +36,7 @@ private @Getter(lazy=true) final ADAM adam = new ADAM(null);
   final DutyCycleOut m_INTAKE1Request = new DutyCycleOut(0.0);
   final DutyCycleOut m_INTAKE2Request = new DutyCycleOut(0.0);
 
-  private @Getter(lazy=true) RelativeEncoder intake1Encoder, intake2Encoder;
+  private RelativeEncoder intake1Encoder, intake2Encoder;
 
   private ShuffleboardTab tab = Shuffleboard.getTab("===== TALON INTAKE SUBSYSTEM =====");
   private GenericEntry testEntry1 = tab.add("===== SET FEEDER SPEED =====", 0).getEntry();
