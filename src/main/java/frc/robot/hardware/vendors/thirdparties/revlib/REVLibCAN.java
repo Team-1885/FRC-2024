@@ -67,6 +67,16 @@ public class REVLibCAN {
     });
   }
 
+  //attempt to fix logFaults error on TalonIntake, didn't work :(
+  /* public static void logFaults(Stream<FalconFX> REVLibCAN) {
+    runTest(() -> {
+      REVLibCAN.forEach(motor -> {
+        reportFaults(motor);
+        reportStickyFaults(motor);
+      });
+    });
+  } */
+
   public static void reportFaults(CANSparkMax REVLibCAN) {
     runTest(() -> {
       if (hasFaults(REVLibCAN)) {
