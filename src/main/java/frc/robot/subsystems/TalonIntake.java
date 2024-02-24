@@ -6,9 +6,9 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class TalonsIntake extends SubsystemBase {
-  /** Creates a new TalonsIntake. */
-  public TalonsIntake() {}
+public class TalonIntake extends SubsystemBase {
+  /** Creates a new TalonIntake. */
+  public TalonIntake() {}
 
   @Override
   public void periodic() {
