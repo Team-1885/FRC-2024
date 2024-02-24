@@ -58,7 +58,7 @@ public abstract class Module extends SubsystemBase {
    * The module's update function. Runs every time [mode]Periodic() is called
    * (Roughly ~50Hz), or in a loop running at a custom frequency.
    */
-  protected void readInputs() {
+  public void readInputs() {
 
   }
 

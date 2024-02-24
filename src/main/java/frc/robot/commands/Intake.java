@@ -4,22 +4,24 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.Command;
+
 //import static frc.robot.hardware.KitBotCONSTANT.LauncherConstants.*;
 
 //import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+
 //import frc.robot.subsystems.PWMLauncher;
 
 // import frc.robot.subsystems.CANLauncher;
 
-public class PrepareLaunch extends CommandBase {
+public class Intake extends Command {
   private static final Object kLauncherSpeed = null;
   frc.robot.commands.PWMLauncher m_launcher;
 
   // CANLauncher m_launcher;
 
   /** Creates a new PrepareLaunch. */
-  public PrepareLaunch(PWMLauncher launcher) {
+  public Intake(PWMLauncher launcher) {
     // save the launcher system internally
     m_launcher = launcher;
 

@@ -20,7 +20,7 @@ public class ModuleList extends Module {
   }
 
   @Override
-  protected void readInputs() {
+  public void readInputs() {
     if (Robot.mode() == EMatchMode.TEST) {
       mModules.forEach(
           module -> Robot.CLOCK.report("R-" + module.getClass().getSimpleName(), t -> module.safeReadInputs()));

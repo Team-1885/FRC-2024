@@ -5,7 +5,8 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
+
 import frc.robot.ADAM;
 import frc.robot.RobotContainer;
 //import frc.robot.subsystems.MakeMotorSpin;
@@ -37,6 +38,11 @@ public class MakeMotorSpinCommand extends Command {
     // Use addRequirements() here to declare subsystem dependencies.
     this.makeMotorSpin = makeMotorSpin;
     addRequirements(makeMotorSpin);
+  }
+
+  private void addRequirements(MakeMotorSpin makeMotorSpin3) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'addRequirements'");
   }
 
   // Called when the command is initially scheduled.

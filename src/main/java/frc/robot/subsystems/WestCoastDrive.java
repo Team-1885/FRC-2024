@@ -4,27 +4,19 @@
 
 package frc.robot.subsystems;
 
-import java.util.Map;
 import java.util.stream.Stream;
-
-import javax.sound.sampled.Port;
-
-import org.apache.logging.log4j.util.Constants;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
-import com.revrobotics.SparkRelativeEncoder;
-import com.revrobotics.SparkAbsoluteEncoder.Type;
+import com.revrobotics.SparkRelativeEncoder.Type;
 
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.hardware.vendors.firstparties.ABC;
-import frc.robot.hardware.vendors.thirdparties.EGyro;
-import frc.robot.hardware.vendors.thirdparties.LL3.ELimelightData;
-import frc.robot.hardware.vendors.thirdparties.ctre.CTREPigeon;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -36,17 +28,13 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.common.config.Settings;
 // import frc.common.lib.control.PIDController;
 import frc.common.lib.control.ProfileGains;
-import frc.common.types.EMatchMode;
 import frc.robot.ADAM;
-import frc.robot.Enums;
-import frc.robot.Robot;
-import frc.robot.InputMap.EDriveData;
-import frc.robot.hardware.ECommonNeutralMode;
 import frc.robot.hardware.HardwareUtils;
 import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
 import lombok.Getter;
@@ -60,21 +48,28 @@ public class WestCoastDrive extends Module {
 
         // Creates two CANSparkMax motors, inheriting physical constants from the
         // {@link#REVLibCAN} helper class.
-        private static CANSparkMax mLeftMaster = new CANSparkMax(REVLibCAN.L_MASTER_ID, REVLibCAN.MOTOR_TYPE),
-                        mLeftFollower = new CANSparkMax(REVLibCAN.L_FOLLOWER_ID, REVLibCAN.MOTOR_TYPE);
+        private CANSparkMax mLeftMaster = new CANSparkMax(REVLibCAN.L_MASTER_ID, REVLibCAN.MOTOR_TYPE);
+        private CANSparkMax mLeftFollower = new CANSparkMax(REVLibCAN.L_FOLLOWER_ID, REVLibCAN.MOTOR_TYPE);
 
         // Creates two CANSparkMax motors, inheriting physical constants from the
         // {@link#REVLibCAN} helper class.
-        private static CANSparkMax mRightMaster = new CANSparkMax(REVLibCAN.R_MASTER_ID, REVLibCAN.MOTOR_TYPE),
-                        mRightFollower = new CANSparkMax(REVLibCAN.R_FOLLOWER_ID, REVLibCAN.MOTOR_TYPE);
+        private CANSparkMax mRightMaster = new CANSparkMax(REVLibCAN.R_MASTER_ID, REVLibCAN.MOTOR_TYPE);
+        private CANSparkMax mRightFollower = new CANSparkMax(REVLibCAN.R_FOLLOWER_ID, REVLibCAN.MOTOR_TYPE);
 
-        private @Getter RelativeEncoder mLeftEncoder = mLeftMaster.getEncoder();
-        private @Getter RelativeEncoder mRightEncoder = mRightMaster.getEncoder();
-
-        private SparkPIDController mLeftCtrl, mRightCtrl;
-        // private PIDController mTurnToDegreePID, mLeftPositionPID, mRightPositionPID,
-        // mTargetLockPID;
+        private @Getter RelativeEncoder mLeftEncoder;
+        private @Getter RelativeEncoder mRightEncoder;
         private ADXRS450_Gyro mGyro = new ADXRS450_Gyro();
+
+        private DifferentialDrive mDifferentialDrive = new DifferentialDrive(mLeftMaster, mRightMaster);
+        
+        private final PIDController mLeftPIDController = new PIDController(0.1, 0, 0);
+        private final PIDController mRightPIDController = new PIDController(0.1, 0, 0);
+
+        private DifferentialDriveOdometry mOdometry;
+        private DifferentialDriveKinematics mKinematics = new DifferentialDriveKinematics(
+                        ABC.feet_to_meters(kTrackWidthFeet));
+
+        ChassisSpeeds mChassisSpeeds = new ChassisSpeeds(2.0, 0, 1.0);
 
         private NetworkTable mTable;
         private final Field2d mField = new Field2d();
@@ -93,11 +88,12 @@ public class WestCoastDrive extends Module {
         // DO NOT MODIFY THESE PHYSICAL CONSTANTS
         // ========================================
         public static final double kGearboxRatio = 8.46; // rotated 8.46 times, rotates gear that spins the wheel once
-        public static final double kReductionRatio = 0.01;
-        public static final double kWheelDiameterFeet = 0.5;
         public static final double kWheelDiameterInches = 6;
+        public static final double kWheelDiameterFeet = 0.5;
         public static final double kWheelCircumferenceInches = kWheelDiameterInches * Math.PI;
         public static final double kWheelCircumferenceFeet = kWheelDiameterFeet * Math.PI;
+
+        public static final double kReductionRatio = 0.01;
         public static final double kConversionFactor = kWheelCircumferenceInches * kReductionRatio;
         public static final double kDriveNEOPositionFactor = kGearboxRatio * kWheelCircumferenceFeet;
         public static final double kDriveNEOVelocityFactor = kDriveNEOPositionFactor / 60.0;
@@ -105,8 +101,14 @@ public class WestCoastDrive extends Module {
         public static final double kPulsesPerRotation = 256.0;
         public static final double kCurrentLimitAmps = 60.0;
         public static final double kTrackWidthFeet = 20.875 / 12;
+        public static final double kRpmToMpsFactor = (ABC.feet_to_meters(kWheelCircumferenceFeet) / kGearboxRatio) * 1
+                        / 60;
+        public static final double kMaxMpsVelocity = kRpmToMpsFactor * kMaxVelocityRPM;
         public static final int kMaxLimelightFOV = 22;
 
+        public static final int kEncoderCPR = 1024;
+        public static final double kEncoderDistancePerPulse = (ABC.feet_to_meters(kTrackWidthFeet) * Math.PI)
+                        / (double) kEncoderCPR;
         // ========================================
         // DO NOT MODIFY THESE PID CONSTANTS
         // ========================================
@@ -153,16 +155,38 @@ public class WestCoastDrive extends Module {
         public WestCoastDrive() {
                 super();
                 mTable = NetworkTableInstance.getDefault().getTable("drive");
-                Stream.of(mLeftMaster, mLeftFollower, mRightMaster, mRightFollower)
-                                .forEach(CANSparkMax::restoreFactoryDefaults);
-                final Map<CANSparkMax, CANSparkMax> masterFollowerMap = Map.of(
-                                mLeftMaster, mLeftFollower,
-                                mRightMaster, mRightFollower);
-                masterFollowerMap.forEach((master, follower) -> follower.follow(master));
-                Stream.of(mLeftMaster, mLeftFollower)
-                                .forEach(motor -> motor.setInverted(false));
-                Stream.of(mRightMaster, mRightFollower)
-                                .forEach(motor -> motor.setInverted(true));
+
+                mLeftMaster.restoreFactoryDefaults();
+                mLeftFollower.restoreFactoryDefaults();
+                mRightMaster.restoreFactoryDefaults();
+                mRightFollower.restoreFactoryDefaults();
+
+                mLeftFollower.follow(mLeftMaster);
+                mRightFollower.follow(mRightMaster);
+
+                mLeftMaster.setInverted(false);
+                mLeftFollower.setInverted(false);
+
+                mRightMaster.setInverted(true);
+                mRightFollower.setInverted(true);
+
+                mLeftMaster.setIdleMode(CANSparkMax.IdleMode.kCoast);
+                mLeftFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
+                mRightMaster.setIdleMode(CANSparkMax.IdleMode.kCoast);
+                mRightFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
+
+                mLeftEncoder = mLeftMaster.getEncoder(Type.kQuadrature, mLeftEncoder.getCountsPerRevolution());
+                mRightEncoder = mRightMaster.getEncoder(Type.kQuadrature, mRightEncoder.getCountsPerRevolution());
+
+                mGyro.calibrate();
+
+                mDifferentialDrive.setSafetyEnabled(false);
+
+                mLeftEncoder.setPositionConversionFactor(kEncoderDistancePerPulse);
+                mRightEncoder.setPositionConversionFactor(kEncoderDistancePerPulse);
+                mLeftEncoder.setVelocityConversionFactor(kEncoderDistancePerPulse / 60);
+                mRightEncoder.setVelocityConversionFactor(kEncoderDistancePerPulse / 60);
+
                 Stream.of(mLeftMaster, mLeftFollower, mRightMaster, mRightFollower)
                                 .forEach(motor -> motor.setIdleMode(CANSparkMax.IdleMode.kCoast));
                 Stream.of(mLeftMaster, mLeftFollower, mRightMaster, mRightFollower)
@@ -170,41 +194,19 @@ public class WestCoastDrive extends Module {
                 Stream.of(mLeftMaster, mLeftFollower, mRightMaster, mRightFollower)
                                 .forEach(motor -> motor.setClosedLoopRampRate(1));
                 // Stream.of(mLeftMaster, mLeftFollower, mRightMaster, mRightFollower)
-                // .forEach(motor -> motor.setOpenLoopRampRate(0.5));
+                //                 .forEach(motor -> motor.setOpenLoopRampRate(0.5));
                 Stream.of(mLeftMaster, mLeftFollower, mRightMaster, mRightFollower)
                                 .forEach(motor -> motor.setControlFramePeriodMs(1));
-                mLeftEncoder = mLeftMaster.getEncoder();
-                mRightEncoder = mRightMaster.getEncoder();
-                mRightCtrl = mRightMaster.getPIDController();
-                mLeftCtrl = mLeftMaster.getPIDController();
-                mRightCtrl.setOutputRange(-kMaxVelocityRPM, kMaxVelocityRPM);
-                mLeftCtrl.setOutputRange(-kMaxVelocityRPM, kMaxVelocityRPM);
 
-                // mTurnToDegreePID = new PIDController(kTurnToProfileGains, -180, 180,
-                // Settings.kControlLoopPeriod);
-                // mTurnToDegreePID.setContinuous(true);
-                // mTurnToDegreePID.setOutputRange(-1, 1);
+                resetEncoders();
 
-                // mRightPositionPID = new PIDController(kPositionGains, 0, 10,
-                // Settings.kControlLoopPeriod);
-                // mRightPositionPID.setOutputRange(-1, 1);
-                // mLeftPositionPID = new PIDController(kPositionGains, 0, 10,
-                // Settings.kControlLoopPeriod);
-                // mLeftPositionPID.setOutputRange(-1, 1);
-
-                // mTargetLockPID = new PIDController(kTargetAngleLockGains, -180, 180,
-                // Settings.kControlLoopPeriod);
-                // mTargetLockPID.setOutputRange(Settings.kTargetAngleLockMinPower,
-                // Settings.kTargetAngleLockMaxPower);
-
-                HardwareUtils.setGains(mLeftCtrl, kVelocityGains);
-                HardwareUtils.setGains(mRightCtrl, kVelocityGains);
-                HardwareUtils.setGains(mLeftCtrl, kSmartMotionGains);
-                HardwareUtils.setGains(mRightCtrl, kSmartMotionGains);
+                mOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(mGyro.getAngle()),
+                                mLeftEncoder.getPosition(), mRightEncoder.getPosition());
 
                 Stream.of(mLeftMaster, mLeftFollower, mRightMaster, mRightFollower)
                                 .forEach(CANSparkMax::burnFlash);
                 SmartDashboard.putData("Field", mField);
+
                 AutoBuilder.configureRamsete(
                                 this::getPose, // Robot pose supplier
                                 this::resetPose, // Method to reset odometry (will be called if your auto has a starting
@@ -229,28 +231,15 @@ public class WestCoastDrive extends Module {
                 );
         }
 
-        double leftCountsPerRevolution = mLeftEncoder.getCountsPerRevolution();
-        double rightCountsPerRevolution = mRightEncoder.getCountsPerRevolution();
-
-        double leftEncoderPosition = mLeftEncoder.getPosition();
-        double rightEncoderPosition = mRightEncoder.getPosition();
-
-        double leftDistanceTraveled = (leftEncoderPosition / leftCountsPerRevolution)
-                        * (ABC.feet_to_meters(kWheelDiameterFeet) * Math.PI);
-        double rightDistanceTraveled = (rightEncoderPosition / rightCountsPerRevolution)
-                        * (ABC.feet_to_meters(kWheelDiameterFeet) * Math.PI);
-        private DifferentialDriveOdometry mOdometry = new DifferentialDriveOdometry(mGyro.getRotation2d(),
-                        leftDistanceTraveled, rightDistanceTraveled);
-
         @Override
         public void periodic() { // This method will be called once per scheduler run (usually, once every 20
                                  // ms),
                 runTest(() -> {
                         mField.setRobotPose(getPose());
                         REVLibCAN.logFaults(Stream.of(mLeftMaster, mLeftFollower, mRightMaster, mRightFollower));
-
-                        var mGyroAngle = mGyro.getRotation2d();
-                        mOdometry.update(mGyroAngle, leftDistanceTraveled, rightDistanceTraveled);
+                        // sets the Odometry with the current information.
+                        mOdometry.update(Rotation2d.fromDegrees(mGyro.getAngle()), mLeftEncoder.getPosition(),
+                                        mRightEncoder.getPosition());
 
                         leftMaster.setDouble(mLeftMaster.get());
                         leftFollower.setDouble(mLeftFollower.get());
@@ -261,46 +250,36 @@ public class WestCoastDrive extends Module {
                 });
         }
 
-        public void drive(ChassisSpeeds pFieldRelativeSpeeds) {
-                ChassisSpeeds robotRelative = ChassisSpeeds.fromFieldRelativeSpeeds(pFieldRelativeSpeeds,
-                                mGyro.getRotation2d());
-                DifferentialDriveKinematics mKinematics = new DifferentialDriveKinematics(kTrackWidthFeet);
-                DifferentialDriveWheelSpeeds wheelSpeeds = mKinematics.toWheelSpeeds(robotRelative);
-                setMotorSpeed(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond);
-
+        public void drive(ChassisSpeeds pChassisSpeeds) {
+                        DifferentialDriveWheelSpeeds mWheelSpeeds = mKinematics.toWheelSpeeds(pChassisSpeeds);
+                        double mLeftVelocity = mWheelSpeeds.leftMetersPerSecond;
+                        double mRightVelocity = mWheelSpeeds.rightMetersPerSecond;
+                        setMotorSpeed(mLeftVelocity, mRightVelocity);
         }
 
         public ChassisSpeeds getCurrentSpeeds() {
-                // Create a kinematics object with a track width of 0.7 meters
-                DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.7);
+                return mChassisSpeeds;
+        }
 
-                // Get the current left and right wheel speeds from the encoders
-                double leftSpeed = leftEncoder.getRate();
-                double rightSpeed = rightEncoder.getRate();
-
-                // Create a wheel speeds object with the encoder values
-                DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(leftSpeed, rightSpeed);
-
-                // Convert the wheel speeds to chassis speeds
-                ChassisSpeeds chassisSpeeds = kinematics.toChassisSpeeds(wheelSpeeds);
-
-                // Get the robot-relative linear and angular velocities
-                double vx = chassisSpeeds.vxMetersPerSecond; // forward velocity in meters per second
-                double omega = chassisSpeeds.omegaRadiansPerSecond; // angular velocity in radians per second
-
+        public void resetEncoders() {
+                mLeftEncoder.setPosition(0);
+                mRightEncoder.setPosition(0);
         }
 
         public Pose2d getPose() {
                 return mOdometry.getPoseMeters();
+
         }
 
         public void resetPose(Pose2d pose) {
-                pose = mOdometry.getPoseMeters();
-                mOdometry.resetPosition(mGyro.getRotation2d(), leftDistanceTraveled, rightDistanceTraveled,
-                                pose);
+                resetEncoders();
+                mOdometry.resetPosition(Rotation2d.fromDegrees(mGyro.getAngle()), mLeftEncoder.getPosition(),
+                                mRightEncoder.getPosition(), pose);
         }
 
-        public void setMotorSpeed(final double leftSpeed, final double rightSpeed) {
+        public void setMotorSpeed(double leftSpeed, double rightSpeed) {
+                // set motor speed is slowed for testing
+                
                 mLeftMaster.set(leftSpeed);
                 mRightMaster.set(rightSpeed);
         }
@@ -349,107 +328,6 @@ public class WestCoastDrive extends Module {
                 mTable.getEntry("volts").setNumber(leftVolts / 12);
         }
 
-        public void modeInit(EMatchMode pMode) {
-                mGyro.reset();
-                reset();
-                // mCurrentDeg = 80;
-                if (pMode == EMatchMode.AUTONOMOUS) {
-                        // resetPose(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
-                        mLeftMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
-                        mRightMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
-                        mLeftFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
-                        mRightFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
-                } else {
-                        mLeftMaster.setIdleMode(CANSparkMax.IdleMode.kCoast);
-                        mRightMaster.setIdleMode(CANSparkMax.IdleMode.kCoast);
-                        mLeftFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
-                        mRightFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
-                }
-        }
-
-        @Override
-        public void readInputs() {
-                // mGyro.;
-                // db.drivetrain.set(EDriveData.ACTUAL_HEADING_RADIANS,
-                // -mGyro.getHeading().getRadians());
-                // db.drivetrain.set(EDriveData.ACTUAL_HEADING_DEGREES,
-                // -mGyro.getHeading().getDegrees());
-                db.drivetrain.set(EDriveData.LEFT_VOLTAGE, mLeftMaster.getVoltageCompensationNominalVoltage());
-                db.drivetrain.set(EDriveData.RIGHT_VOLTAGE, mRightMaster.getVoltageCompensationNominalVoltage());
-                db.drivetrain.set(EDriveData.LEFT_CURRENT, mLeftMaster.getOutputCurrent());
-                db.drivetrain.set(EDriveData.RIGHT_CURRENT, mRightMaster.getOutputCurrent());
-                db.drivetrain.set(EDriveData.L_ACTUAL_POS_FT, mLeftEncoder.getPosition() * kDriveNEOPositionFactor);
-                db.drivetrain.set(EDriveData.L_ACTUAL_VEL_FT_s, mLeftEncoder.getVelocity() * kDriveNEOVelocityFactor);
-                db.drivetrain.set(EDriveData.R_ACTUAL_VEL_RPM, mRightEncoder.getVelocity() * kGearboxRatio);
-                db.drivetrain.set(EDriveData.L_ACTUAL_VEL_RPM, mLeftEncoder.getVelocity() * kGearboxRatio);
-                db.drivetrain.set(EDriveData.R_ACTUAL_POS_FT, mRightEncoder.getPosition() * kDriveNEOPositionFactor);
-                db.drivetrain.set(EDriveData.R_ACTUAL_VEL_FT_s, mRightEncoder.getVelocity() * kDriveNEOVelocityFactor);
-                // db.imu.set(EGyro.ACCEL_X, mGyro.getAccelX());
-                // db.imu.set(EGyro.ACCEL_Y, mGyro.getAccelY());
-                // db.imu.set(EGyro.PITCH_DEGREES, mGyro.getPitch().getDegrees());
-                // db.imu.set(EGyro.ROLL_DEGREES, mGyro.getRoll().getDegrees());
-                // db.imu.set(EGyro.YAW_DEGREES, -mGyro.getYaw().getDegrees());
-                // db.imu.set(EGyro.YAW_OMEGA_DEGREES, -mGyro.getYawRate().getDegrees());
-                db.drivetrain.set(EDriveData.X_ACTUAL_ODOMETRY_METERS, mOdometry.getPoseMeters().getX());
-                db.drivetrain.set(EDriveData.Y_ACTUAL_ODOMETRY_METERS, mOdometry.getPoseMeters().getY());
-                // mOdometry.update(mGyro.getHeading(),
-                // ABC.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_POS_FT)),
-                // ABC.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_POS_FT)));
-                Robot.FIELD.setRobotPose(mOdometry.getPoseMeters());
-        }
-
-        @Override
-        public void setOutputs() {
-                Enums.EDriveState state = db.drivetrain.get(EDriveData.STATE, Enums.EDriveState.class);
-                double throttle = db.drivetrain.safeGet(EDriveData.DESIRED_THROTTLE_PCT, 0.0);
-                double turn = db.drivetrain.safeGet(EDriveData.DESIRED_TURN_PCT, 0.0);
-                double left = throttle + turn;
-                double right = throttle - turn;
-                ECommonNeutralMode neutralMode = db.drivetrain.get(EDriveData.NEUTRAL_MODE, ECommonNeutralMode.class);
-                if (state == null)
-                        return;
-                switch (state) {
-                        case RESET:
-                                mGyro.reset();
-                                ;
-                                reset();
-                                break;
-                        case RESET_ODOMETRY:
-                                double x = db.drivetrain.get(EDriveData.X_DESIRED_ODOMETRY_METERS);
-                                double y = db.drivetrain.get(EDriveData.X_DESIRED_ODOMETRY_METERS);
-                                mGyro.reset();
-                                // resetPose(new Pose2d(x, y, new Rotation2d(-mGyro.getYaw().getRadians())));
-                                break;
-                        case PERCENT_OUTPUT:
-                                if (db.limelight.isSet(ELimelightData.TARGET_ID)) {
-                                        // mTable.getEntry("AM I tracking idk").setString("Yippie");
-                                        double targetLockOutput = 0;
-                                        if (db.limelight.isSet(ELimelightData.TV)) {
-                                                // targetLockOutput = mTargetLockPID.calculate(
-                                                // -db.limelight.get(ELimelightData.TX),
-                                                // clock.deltaTime());
-                                                // turn = targetLockOutput;
-                                        }
-                                        turn += 0.1 * Math.signum(turn);
-                                        turn *= (1 / (1 - throttle)) * 0.5;
-                                }
-                                mLeftMaster.set(throttle + turn);
-                                mRightMaster.set(throttle - turn);
-                                break;
-                        case VELOCITY:
-                                mLeftCtrl.setReference(left * kMaxVelocityRPM, CANSparkMax.ControlType.kVelocity,
-                                                VELOCITY_PID_SLOT, 0);
-                                mRightCtrl.setReference(right * kMaxVelocityRPM, CANSparkMax.ControlType.kVelocity,
-                                                VELOCITY_PID_SLOT, 0);
-                                break;
-                        case BREAK:
-                                mLeftMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
-                                mRightMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
-                                mLeftFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
-                                mRightFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
-                }
-        }
-
         /**
          * Executes custom testing and validation methods in a controlled environment.
          * Any exceptions thrown during execution are caught and logged.
@@ -474,5 +352,4 @@ public class WestCoastDrive extends Module {
                         adam.uncaughtException(Thread.currentThread(), e);
                 }
         }
-
 }
