@@ -142,6 +142,10 @@ public class WC extends SubsystemBase {
     SmartDashboard.putNumber("Left Follower Speed", mLeftFollower.get());
     SmartDashboard.putNumber("Right Master Speed", mRightMaster.get());
     SmartDashboard.putNumber("Right Follower Speed", mRightFollower.get());
+    SmartDashboard.putNumber("Left Encoder Position", mLeftEncoder.getPosition());
+    SmartDashboard.putNumber("Left Encoder Velocity", mLeftEncoder.getVelocity());
+        SmartDashboard.putNumber("Right Encoder Position", mRightEncoder.getPosition());
+    SmartDashboard.putNumber("Right Encoder Velocity", mRightEncoder.getVelocity());
   }
 
   /**
@@ -239,11 +243,11 @@ public class WC extends SubsystemBase {
   }
 
   public double getLeftEncoderPosition() {
-    return -mLeftEncoder.getPosition();
+    return mLeftEncoder.getPosition();
   }
 
   public double getLeftEncoderVelocity() {
-    return -mLeftEncoder.getVelocity();
+    return mLeftEncoder.getVelocity();
   }
 
   /**
