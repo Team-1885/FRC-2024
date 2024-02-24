@@ -63,28 +63,25 @@ private @Getter final ADAM adam = new ADAM(null);
           });
   }
 
-
-  //i think I'm mixing up talons and CANSparkMax methods- figure out if I need these next 4
-
-  /* public void setFeederSpeed(final double feedSpeed) {
+ public void setINTAKE1Speed(final double INTAKE1Speed) {
     // Setting motor speed using the ".set()" method from the CANSparkMax class
-    INTAKE1.set(feedSpeed);
+    INTAKE1.set(INTAKE1Speed);
     }
 
-public void setRotaterSpeed(final double rotateSpeed) {
+public void setINTAKE2Speed(final double INTAKE2Speed) {
     // Setting motor speed using the ".set()" method from the CANSparkMax class
-    INTAKE2.set(rotateSpeed);
+    INTAKE2.set(INTAKE2Speed);
     }
 
-public double getFeederSpeed() {
+public double getINTAKE1Speed() {
     // Getting motor speed using the ".get()" method from the CANSparkMax class
     return INTAKE1.get();
     }
 
-public double getRotaterSpeed() {
+public double getINTAKE2Speed() {
     // Getting motor speed using the ".get()" method from the CANSparkMax class
     return INTAKE2.get();
-    } */
+    } 
 
     //intake not driving? maybe can get rid of it
     /* calculate motor outputs, utilizes a "arcade" style of driving;

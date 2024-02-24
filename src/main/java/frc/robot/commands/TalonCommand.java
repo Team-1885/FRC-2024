@@ -36,28 +36,28 @@ private final @Getter TalonIntake talonIntake;
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {runTest(() -> {
-      double feedSpeed = 0;
-      double rotateSpeed = 0;
+      double INTAKE1Speed = 0;
+      double INTAKE2Speed = 0;
 
       //input from buttons
       if(ELogitech310.A_BTN.isButton())
       {
-        feedSpeed = 0.5;
+        INTAKE1Speed = 0.5;
       }
       
       //rotate up
       if(ELogitech310.L_BTN.isButton())
       {
-        rotateSpeed = 0.5;
+        INTAKE2Speed = 0.5;
       }
       else if(ELogitech310.LEFT_TRIGGER_AXIS.isAxis())
       {
-        rotateSpeed = -0.5;
+        INTAKE2Speed = -0.5;
       }
 
       // Set motor speeds in the IntakeSubsystem
-      talonIntake.setFeederSpeed(feedSpeed);
-      talonIntake.setRotaterSpeed(rotateSpeed);
+      talonIntake.setINTAKE1Speed(INTAKE1Speed);
+      talonIntake.setINTAKE2Speed(INTAKE2Speed);
     });}
 
   // Called once the command ends or is interrupted.
