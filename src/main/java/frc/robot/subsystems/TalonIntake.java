@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import java.util.stream.Stream;
-
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -15,17 +13,13 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.ADAM;
-import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
 
 public class TalonIntake extends Module {
   
 private final ADAM adam = new ADAM(null);
 
-  //is this controller the right one? 
-  //why isn't the import working
   XboxController m_XboxController = new XboxController(0);
 
   // initialize devices on the rio can bus
