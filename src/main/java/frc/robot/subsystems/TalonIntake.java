@@ -6,8 +6,10 @@ package frc.robot.subsystems;
 
 import java.util.stream.Stream;
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.networktables.GenericEntry;
@@ -42,12 +44,28 @@ private @Getter(lazy=true) final ADAM adam = new ADAM(null);
   private GenericEntry testEntry1 = tab.add("===== SET FEEDER SPEED =====", 0).getEntry();
   private GenericEntry testEntry2 = tab.add("===== SET ROTATION SPEED =====", 0).getEntry(); 
 
+  private static final TalonIntake instance = new TalonIntake();
+
+      public static TalonIntake getInstance() {
+        return instance;
+      }
+      
   /** Creates a new TalonsIntake. */
   public TalonIntake() {
     super();
-   
-    //figure out what to put here
 
+    //borrowed this code from Katelyn because I couldn't figure out what to put there
+
+    //start with factory-default configs
+        var currentConfigs = new MotorOutputConfigs();
+
+        // The left motor is CCW+
+        currentConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
+        INTAKE1.getConfigurator().apply(currentConfigs);
+
+        // The right motor is CW+
+        currentConfigs.Inverted = InvertedValue.Clockwise_Positive;
+        INTAKE2.getConfigurator().apply(currentConfigs);
   }
 
   @Override

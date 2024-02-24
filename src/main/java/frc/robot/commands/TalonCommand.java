@@ -54,6 +54,12 @@ private final @Getter TalonIntake talonIntake;
 
   //add button code somewhere in here or in the subsystem
 
+  public void debugCommand() {
+    runTest(() -> initialize());
+    runTest(() -> execute());
+    runTest(() -> end(false));
+  }
+
   public void runTest(final Runnable code) {
     try {
       code.run();
