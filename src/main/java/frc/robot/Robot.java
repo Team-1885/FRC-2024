@@ -9,8 +9,6 @@ import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -19,18 +17,15 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
 import frc.robot.hardware.vendors.firstparties.Clock;
 import frc.robot.hardware.vendors.firstparties.Settings;
-import frc.robot.subsystems.WC;
+
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Optional;
 
 import com.flybotix.hfr.codex.CodexMetadata;
 import com.flybotix.hfr.codex.ICodexTimeProvider;
-import com.flybotix.hfr.util.log.ELevel;
-import com.flybotix.hfr.util.log.ILog;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -42,212 +37,218 @@ import com.flybotix.hfr.util.log.ILog;
 
 @SuppressWarnings("PMD.CommentSize")
 public class Robot extends TimedRobot {
-  RobotContainer mRobotContainer;
-  private Command mAutonomousCommand;
-  private final SysIdRoutineBot mRobot = new SysIdRoutineBot();
-  
-  private ILog mLogger = com.flybotix.hfr.util.log.Logger.createLog(this.getClass());
-  public static final Clock CLOCK = (RobotBase.isReal() ? new Clock() : new Clock().simulated());
-  public static final Field2d FIELD = new Field2d();
-  public static final boolean IS_SIMULATED = RobotBase.isSimulation();
-  public static String CLIMB_MODE = "";
-  private final Settings mSettings = new Settings();
-  private Timer initTimer = new Timer();
-  private WC mWestCoastDrive;
-  private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
-      .getLogger(Robot.class.getName());
-  public static String trajectoryJSON = "Paths/output/PathWeaver_Straight.wpilib.json";
-  public static Trajectory trajectory = new Trajectory();
+	RobotContainer mRobotContainer;
+	private Command mAutonomousCommand;
+	private final SysIdRoutineBot mRobot = new SysIdRoutineBot();
 
-  /**
-   * Default constructor for the Robot class. This constructor is automatically
-   * invoked when an instance of the Robot class is created.
-   * Initializes the Robot instance by calling the no-argument constructor of the
-   * superclass (TimedRobot).
-   */
-  public Robot() {
-    super();
-  }
+	public static final Clock CLOCK =
+		(RobotBase.isReal() ? new Clock() : new Clock().simulated());
+	public static final Field2d FIELD = new Field2d();
+	public static final boolean IS_SIMULATED = RobotBase.isSimulation();
+	public static String CLIMB_MODE = "";
 
-  /**
-   * This function is run when the robot is first started up and should be used
-   * for any initialization code.
-   */
-  @Override
-  public void robotInit() {
-    // Instantiate our RobotContainer.
-    // This will perform all our button bindings, and put our autonomous chooser on the dashboard.
-    mRobotContainer = new RobotContainer();
-    DataLogManager.start();
-    DriverStation.startDataLog(DataLogManager.getLog());
-    // SmartDashboard.putData("PDP", mPDP);
-  
-    mRobot.configureBindings();
+	public static String trajectoryJSON =
+		"Paths/output/PathWeaver_Straight.wpilib.json";
+	public static Trajectory trajectory = new Trajectory();
 
-    CLOCK.update();
-    mLogger.warn("===> ROBOT INIT Starting");
-    mWestCoastDrive = WC.getInstance();
+	/**
+	 * Default constructor for the Robot class. This constructor is
+	 * automatically invoked when an instance of the Robot class is created.
+	 * Initializes the Robot instance by calling the no-argument constructor of
+	 * the superclass (TimedRobot).
+	 */
+	public Robot() {
+		super();
+	}
 
-    com.flybotix.hfr.util.log.Logger.setLevel(ELevel.WARN);
-    mLogger.info("Starting Robot Initialization...");
-    ICodexTimeProvider provider = new ICodexTimeProvider() {
-      @Override
-      public double getTimestamp() {
-        return CLOCK.now();
-      }
-    };
-    CodexMetadata.overrideTimeProvider(provider);
+	/**
+	 * This function is run when the robot is first started up and should be
+	 * used for any initialization code.
+	 */
+	@Override
+	public void robotInit() {
+		// Starts recording to data log
+		DataLogManager.start();
 
-    LiveWindow.disableAllTelemetry();
+		// Record both DS control and joystick data
+		//DriverStation.startDataLog(DataLogManager.getLog());
 
-    /*
-     * Some things need to wait until after the robot connects to the DS. So keep
-     * this thread here.
-     */
-    new Thread(new DSConnectInitThread()).start();
+		// (alternatively) Record only DS control data
+		DriverStation.startDataLog(DataLogManager.getLog(), false);
 
-    initTimer.stop();
-    mLogger.warn("Robot initialization finished. Took: ", initTimer.get(), " seconds");
+		mRobot.configureBindings();
 
-    if (!Settings.kIsLogging) {
-      mLogger.warn("------------Not Logging to CSV------------");
-    }
-    sigma();
-  }
+		CLOCK.update();
+		DataLogManager.log("===> ROBOT INIT Starting");
 
-  public void sigma() {
-    try {
-      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-      trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-    } catch (IOException ex) {
-        DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
-    }
-  }
+		// Measuring Initialization Duration
+		Timer initTimer = new Timer();
+		initTimer.start();
 
-  /**
-   * These things rely on match metadata, so we need to wait for the DS to connect
-   */
-  private void initAfterConnection() {
-  }
+		DataLogManager.log("Starting Robot Initialization...");
+		ICodexTimeProvider provider = new ICodexTimeProvider() {
+			@Override
+			public double getTimestamp() {
+				return CLOCK.now();
+			}
+		};
+		CodexMetadata.overrideTimeProvider(provider);
 
-  /**
-   * This function is called every 20 ms, no matter the mode.
-   * Use this for items like diagnostics that you want ran during disabled,
-   * autonomous, teleoperated and test.
-   * This runs after the mode specific periodic functions, but before LiveWindow
-   * and SmartDashboard integrated updating.
-   */
-  @Override
-  public void robotPeriodic() {
-    // Runs the Scheduler.
-    // This is responsible for polling buttons, adding newly-scheduled commands, running already-scheduled commands, removing finished or interrupted commands, and running subsystem periodic() methods.
-    // This must be called from the robot's periodic block in order for anything in the Command-based framework to work.
-    CommandScheduler.getInstance().run();
-    SmartDashboard.putData(FIELD);
-  }
+		LiveWindow.disableAllTelemetry();
 
-  /** This function is called once each time the robot enters Disabled mode. */
-  @Override
-  public void disabledInit() {
-    mLogger.info("Disabled Initialization");
-  }
+		/*
+		 * Some things need to wait until after the robot connects to the DS. So
+		 * keep this thread here.
+		 */
+		new Thread(new DSConnectInitThread()).start();
 
-  @Override
-  public void disabledPeriodic() {
+		initTimer.stop();
+		DataLogManager.log("Robot initialization finished in " + initTimer.get() + " seconds");
 
-  }
+		if (!Settings.kIsLogging) {
+			DataLogManager.log("------------Not Logging to CSV------------");
+		}
+		sigma();
+		mRobotContainer = new RobotContainer();
+	}
 
-  /**
-   * This autonomous runs the autonomous command selected by your
-   * {@link RobotContainer} class.
-   */
-  @Override
-  public void autonomousInit() {
-    mAutonomousCommand = mRobotContainer.getAutonomousCommand();
-    if(mAutonomousCommand != null) {
-      mAutonomousCommand.schedule();
-    }
-  }
+	public void sigma() {
+		try {
+			Path trajectoryPath =
+				Filesystem.getDeployDirectory().toPath().resolve(
+					trajectoryJSON);
+			trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+		} catch (IOException ex) {
+			DriverStation.reportError(
+				"Unable to open trajectory: " + trajectoryJSON,
+				ex.getStackTrace());
+		}
+	}
 
-  /** This function is called periodically during autonomous. */
-  @Override
-  public void autonomousPeriodic() {
-    CommandScheduler.getInstance().run();
-  }
+	/**
+	 * These things rely on match metadata, so we need to wait for the DS to
+	 * connect
+	 */
+	private void initAfterConnection() {}
 
-  @Override
-  public void teleopInit() {
-    // This makes sure that the autonomous stops running when teleop starts running.
-    // If you want the autonomous to continue until interrupted by another command, remove this line or comment it out.
-    if (mAutonomousCommand != null) {
-      mAutonomousCommand.cancel();
-    }
-  }
+	/**
+	 * This function is called every 20 ms, no matter the mode.
+	 * Use this for items like diagnostics that you want ran during disabled,
+	 * autonomous, teleoperated and test.
+	 * This runs after the mode specific periodic functions, but before
+	 * LiveWindow and SmartDashboard integrated updating.
+	 */
+	@Override
+	public void robotPeriodic() {
+		// Runs the Scheduler.
+		// This is responsible for polling buttons, adding newly-scheduled
+		// commands, running already-scheduled commands, removing finished or
+		// interrupted commands, and running subsystem periodic() methods. This
+		// must be called from the robot's periodic block in order for anything
+		// in the Command-based framework to work.
+		CommandScheduler.getInstance().run();
+		SmartDashboard.putData(FIELD);
+	}
 
-  /** This function is called periodically during operator control. */
-  @Override
-  public void teleopPeriodic() {
-  }
+	/**
+	 * This function is called once each time the robot enters Disabled mode.
+	 */
+	@Override
+	public void disabledInit() {
+		DataLogManager.log("Disabled Initialization");
+	}
 
-  @Override
-  public void testInit() {
-    // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
-  }
+	@Override
+	public void disabledPeriodic() {}
 
-  /** This function is called periodically during test mode. */
-  @Override
-  public void testPeriodic() {
-  }
+	/**
+	 * This autonomous runs the autonomous command selected by your
+	 * {@link RobotContainer} class.
+	 */
+	@Override
+	public void autonomousInit() {
+		mAutonomousCommand = mRobotContainer.getAutonomousCommand();
+		if (mAutonomousCommand != null) {
+			mAutonomousCommand.schedule();
+		}
+	}
 
-  /** This function is called once when the robot is first started up. */
-  @Override
-  public void simulationInit() {
-    // ...
-  }
+	/** This function is called periodically during autonomous. */
+	@Override
+	public void autonomousPeriodic() {
+		CommandScheduler.getInstance().run();
+	}
 
-  /** This function is called periodically whilst in simulation. */
-  @Override
-  public void simulationPeriodic() {
-    // ...
-  }
+	@Override
+	public void teleopInit() {
+		// This makes sure that the autonomous stops running when teleop starts
+		// running. If you want the autonomous to continue until interrupted by
+		// another command, remove this line or comment it out.
+		if (mAutonomousCommand != null) {
+			mAutonomousCommand.cancel();
+		}
+	}
 
-  public String toString() {
+	/** This function is called periodically during operator control. */
+	@Override
+	public void teleopPeriodic() {}
 
-    String mRobotMode = "Unknown";
-    String mRobotEnabledDisabled = "Unknown";
-    double mNow = Timer.getFPGATimestamp();
+	@Override
+	public void testInit() {
+		// Cancels all running commands at the start of test mode.
+		CommandScheduler.getInstance().cancelAll();
+	}
 
-    if (this.isAutonomous()) {
-      mRobotMode = "Autonomous";
-    }
-    if (this.isTest()) {
-      mRobotEnabledDisabled = "Test";
-    }
-    if (this.isEnabled()) {
-      mRobotEnabledDisabled = "Enabled";
-    }
-    if (this.isDisabled()) {
-      mRobotEnabledDisabled = "Disabled";
-    }
+	/** This function is called periodically during test mode. */
+	@Override
+	public void testPeriodic() {}
 
-    return String.format("State: %s\tMode: %s\tTime: %s", mRobotEnabledDisabled, mRobotMode, mNow);
+	/** This function is called once when the robot is first started up. */
+	@Override
+	public void simulationInit() {
+		// ...
+	}
 
-  }
+	/** This function is called periodically whilst in simulation. */
+	@Override
+	public void simulationPeriodic() {
+		// ...
+	}
 
-  private class DSConnectInitThread implements Runnable {
+	public String toString() {
+		String mRobotMode = "Unknown";
+		String mRobotEnabledDisabled = "Unknown";
+		double mNow = Timer.getFPGATimestamp();
 
-    @Override
-    public void run() {
-      while (!DriverStation.isDSAttached()) {
-        try {
-          mLogger.error("Waiting on Robot <--> DS Connection...");
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      }
-      initAfterConnection();
-    }
-  }
+		if (this.isAutonomous()) {
+			mRobotMode = "Autonomous";
+		}
+		if (this.isTest()) {
+			mRobotEnabledDisabled = "Test";
+		}
+		if (this.isEnabled()) {
+			mRobotEnabledDisabled = "Enabled";
+		}
+		if (this.isDisabled()) {
+			mRobotEnabledDisabled = "Disabled";
+		}
+
+		return String.format("State: %s\tMode: %s\tTime: %s",
+			mRobotEnabledDisabled, mRobotMode, mNow);
+	}
+
+	private class DSConnectInitThread implements Runnable {
+		@Override
+		public void run() {
+			while (!DriverStation.isDSAttached()) {
+				try {
+					DataLogManager.log("Waiting on Robot <--> DS Connection...");
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			initAfterConnection();
+		}
+	}
 }
