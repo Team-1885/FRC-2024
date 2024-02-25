@@ -22,7 +22,7 @@ public class SysIdRoutineBot {
 
   // The driver's controller
   CommandXboxController m_driverController =
-      new CommandXboxController(3);
+        new CommandXboxController(3);
 
   /**
    * Use this method to define bindings between conditions and commands. These are useful for

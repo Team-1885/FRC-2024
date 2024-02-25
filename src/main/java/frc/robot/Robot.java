@@ -71,7 +71,7 @@ public class Robot extends TimedRobot {
 		DataLogManager.start();
 
 		// Record both DS control and joystick data
-		//DriverStation.startDataLog(DataLogManager.getLog());
+		DriverStation.startDataLog(DataLogManager.getLog());
 
 		// (alternatively) Record only DS control data
 		DriverStation.startDataLog(DataLogManager.getLog(), false);
@@ -169,7 +169,7 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		mAutonomousCommand = mRobotContainer.getAutonomousCommand();
 		if (mAutonomousCommand != null) {
-			mAutonomousCommand.schedule();
+		  mAutonomousCommand.schedule();
 		}
 	}
 
@@ -185,7 +185,7 @@ public class Robot extends TimedRobot {
 		// running. If you want the autonomous to continue until interrupted by
 		// another command, remove this line or comment it out.
 		if (mAutonomousCommand != null) {
-			mAutonomousCommand.cancel();
+		 	mAutonomousCommand.cancel();
 		}
 	}
 

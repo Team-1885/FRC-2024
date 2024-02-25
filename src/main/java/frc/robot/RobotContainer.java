@@ -51,8 +51,6 @@ public class RobotContainer {
   private @Getter final WC mWestCoastDrive = WC.getInstance();
   private @Getter final DriveCommand mDriveCommand;
   private @Getter final CANLauncher mLauncher = new CANLauncher();
-  public @Getter final static Joystick mDriverController = new Joystick(1); // 1 is the USB Port to be used as indicated on the Driver Station
-  CommandGenericHID controller = new CommandGenericHID(5);
   private final Field2d mField;
   SendableChooser<Command> mChooser = new SendableChooser<>();
   public @Getter final static Joystick mOperatorController = new Joystick(2); // 2 is the USB Port to be used as indicated on the Driver Station
@@ -102,7 +100,7 @@ public class RobotContainer {
     new JoystickButton(mOperatorController, 1)
         .whileTrue(
            new PrepareLaunch(mLauncher)
-                .withTimeout(1)
+               .withTimeout(1)
                .andThen(new LaunchNote(mLauncher))
                .handleInterrupt(() -> mLauncher.stop()));
     
