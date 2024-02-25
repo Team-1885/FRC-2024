@@ -23,13 +23,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.DriveConstants;
 import frc.robot.RobotMap;
 import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
 import static edu.wpi.first.units.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-
 import java.util.function.DoubleSupplier;
 
 public class WC extends SubsystemBase {
@@ -70,16 +70,12 @@ public class WC extends SubsystemBase {
               // Tell SysId how to record a frame of data for each motor on the mechanism being
               // characterized.
               log -> {
-                // Calculate average values for voltage, linear position, and linear velocity
-                double averageVoltage = 0.5 * (mLeftMaster.get() + mRightMaster.get()) * RobotController.getBatteryVoltage();
-                double averageLinearPosition = 0.5 * (getLeftEncoderPosition() + getRightEncoderPosition());
-                double averageLinearVelocity = 0.5 * (getLeftEncoderVelocity() + getRightEncoderVelocity());
 
                 // Record a frame for the average values
                 log.motor("drive-average")
-                    .voltage(mAppliedVoltage.mut_replace(averageVoltage, Volts))
-                    .linearPosition(mDistance.mut_replace(averageLinearPosition, Meters))
-                    .linearVelocity(mVelocity.mut_replace(averageLinearVelocity, MetersPerSecond));
+                    .voltage(mAppliedVoltage.mut_replace(0.5 * ((mLeftMaster.get() + mRightMaster.get()) * RobotController.getBatteryVoltage()), Volts))
+                    .linearPosition(mDistance.mut_replace(0.5 * (getLeftEncoderPosition() + getRightEncoderPosition()), Meters))
+                    .linearVelocity(mVelocity.mut_replace(0.5 * (getLeftEncoderVelocity() + getRightEncoderVelocity()), MetersPerSecond));
               },
               // Tell SysId to make generated commands require this subsystem, suffix test state in
               // WPILog with this subsystem's name ("drive")
@@ -102,16 +98,17 @@ public class WC extends SubsystemBase {
     mRightMaster.restoreFactoryDefaults();
     mRightFollower.restoreFactoryDefaults();
 
-    // Sets the distance per pulse for the encoders
-    // mLeftEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
-    // mRightEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
+    //Sets the distance per pulse for the encoders
+    mLeftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+    mRightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+
     mLeftEncoder.setPosition(0.0);
     mRightEncoder.setPosition(0.0);
 
-    mLeftEncoder.setPositionConversionFactor(RobotMap.DriveConstants.kLinearDistanceConversionFactor);
-    mRightEncoder.setPositionConversionFactor(RobotMap.DriveConstants.kLinearDistanceConversionFactor);
-    mLeftEncoder.setVelocityConversionFactor(RobotMap.DriveConstants.kLinearDistanceConversionFactor / 60);
-    mRightEncoder.setVelocityConversionFactor(RobotMap.DriveConstants.kLinearDistanceConversionFactor / 60);
+    mLeftEncoder.setPositionConversionFactor(DriveConstants.kLinearDistanceConversionFactor);
+    mRightEncoder.setPositionConversionFactor(DriveConstants.kLinearDistanceConversionFactor);
+    mLeftEncoder.setVelocityConversionFactor(DriveConstants.kLinearDistanceConversionFactor / 60);
+    mRightEncoder.setVelocityConversionFactor(DriveConstants.kLinearDistanceConversionFactor / 60);
     
     mLeftFollower.follow(mLeftMaster);
     mRightFollower.follow(mRightMaster);
