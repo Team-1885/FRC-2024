@@ -67,11 +67,12 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
+		mRobotContainer = new RobotContainer();
 		// Starts recording to data log
 		DataLogManager.start();
 
 		// Record both DS control and joystick data
-		//DriverStation.startDataLog(DataLogManager.getLog());
+		DriverStation.startDataLog(DataLogManager.getLog());
 
 		// (alternatively) Record only DS control data
 		DriverStation.startDataLog(DataLogManager.getLog(), false);
@@ -109,7 +110,6 @@ public class Robot extends TimedRobot {
 			DataLogManager.log("------------Not Logging to CSV------------");
 		}
 		sigma();
-		mRobotContainer = new RobotContainer();
 	}
 
 	public void sigma() {

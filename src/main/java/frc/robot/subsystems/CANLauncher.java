@@ -21,7 +21,7 @@ public class CANLauncher extends SubsystemBase {
   /** Creates a new Launcher. */
   public CANLauncher() {
     mLaunchWheel = new CANSparkMax(1, MotorType.kBrushless);
-    mFeedWheel = new CANSparkMax(3, MotorType.kBrushless);
+    mFeedWheel = new CANSparkMax(2, MotorType.kBrushless);
 
     mLaunchWheel.setSmartCurrentLimit(kLauncherCurrentLimit);
     mFeedWheel.setSmartCurrentLimit(kFeedCurrentLimit);
@@ -35,7 +35,7 @@ public class CANLauncher extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setFeedWheel(-1);
+          setFeedWheel(-0.2);
           setLaunchWheel(-1);
         },
         // When the command stops, stop the wheels
@@ -71,7 +71,7 @@ public class CANLauncher extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setLaunchWheel(-1 * 5);
+          setLaunchWheel(-1);
           setFeedWheel(-1);
         },
         // When the command stops, stop the wheels

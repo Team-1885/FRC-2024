@@ -33,10 +33,10 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.function.DoubleSupplier;
 
 public class WC extends SubsystemBase {
-  private final CANSparkMax mLeftMaster = new CANSparkMax(10, REVLibCAN.MOTOR_TYPE);
-  private final CANSparkMax mLeftFollower = new CANSparkMax(9, REVLibCAN.MOTOR_TYPE);
-  private final CANSparkMax mRightMaster = new CANSparkMax(4, REVLibCAN.MOTOR_TYPE);
-  private final CANSparkMax mRightFollower = new CANSparkMax(2, REVLibCAN.MOTOR_TYPE);
+  private final CANSparkMax mLeftMaster = new CANSparkMax(6, REVLibCAN.MOTOR_TYPE);
+  private final CANSparkMax mLeftFollower = new CANSparkMax(7, REVLibCAN.MOTOR_TYPE);
+  private final CANSparkMax mRightMaster = new CANSparkMax(8, REVLibCAN.MOTOR_TYPE);
+  private final CANSparkMax mRightFollower = new CANSparkMax(9, REVLibCAN.MOTOR_TYPE);
   
   private final RelativeEncoder mLeftEncoder = mLeftMaster.getEncoder();
   private final RelativeEncoder mRightEncoder = mLeftMaster.getEncoder();

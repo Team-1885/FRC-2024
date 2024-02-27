@@ -1,37 +1,29 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands;
 
-
-
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.CANLauncher;
-import static frc.robot.ShooterConstants.LauncherConstants.*;
+import frc.robot.subsystems.TalonIntake;
+import static frc.robot.Constants.IntakeConstants;
 
 /*
  * This is an example of creating a command as a class. The base Command class provides a set of methods that your command will override.
  */
-public class LaunchNote extends Command {
-  CANLauncher mLauncher;
+public class TalonShoot extends Command {
+  TalonIntake mFeeder;
 
-  /** Creates a new LaunchNote. */
-  public LaunchNote(CANLauncher pLauncher) {
-    // save the launcher system internally
-    mLauncher = pLauncher;
+  /** Creates a new TalonFeed. */
+  public TalonShoot(TalonIntake pFeeder) {
+    // save the feeding system internally
+    mFeeder = pFeeder;
 
     // indicate that this command requires the launcher system
-    addRequirements(mLauncher);
+    addRequirements(mFeeder);
   }
 
   // The initialize method is called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // TODO: Check for correct vals
     // Set the wheels to launching speed
-    mLauncher.setLaunchWheel(0.75);
-    mLauncher.setFeedWheel(0.75);
+    mFeeder.setIntakeFeeder(-1);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -50,7 +42,8 @@ public class LaunchNote extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    // Stop the wheels when the command ends.
-    mLauncher.stop();
+    // Stop the feeder motor when the command ends.
+    mFeeder.stop();
   }
 }
+

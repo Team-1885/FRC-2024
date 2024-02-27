@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.util.List;
 
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
@@ -36,7 +37,11 @@ import frc.robot.RobotMap.DriveConstants;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.LaunchNote;
 import frc.robot.commands.PrepareLaunch;
+import frc.robot.commands.TalonFeed;
+import frc.robot.commands.TalonRotate;
+import frc.robot.commands.TalonShoot;
 import frc.robot.subsystems.CANLauncher;
+import frc.robot.subsystems.TalonIntake;
 import frc.robot.subsystems.WC;
 import lombok.Getter;
 
@@ -51,6 +56,8 @@ public class RobotContainer {
   private @Getter final WC mWestCoastDrive = WC.getInstance();
   private @Getter final DriveCommand mDriveCommand;
   private @Getter final CANLauncher mLauncher = new CANLauncher();
+  private final TalonIntake mIntake = new TalonIntake();
+  private final TalonRotate mRotate;
   public @Getter final static Joystick mDriverController = new Joystick(1); // 1 is the USB Port to be used as indicated on the Driver Station
   CommandGenericHID controller = new CommandGenericHID(5);
   private final Field2d mField;
@@ -66,10 +73,12 @@ public class RobotContainer {
 
     // Command Initialization
     mDriveCommand = new DriveCommand(mWestCoastDrive);
+    mRotate = new TalonRotate(mIntake);
 
 
     // Another option that allows you to specify the default auto by its name
     mWestCoastDrive.setDefaultCommand(mDriveCommand);
+    mIntake.setDefaultCommand(mRotate);
 
     mField = new Field2d();
 
@@ -99,14 +108,26 @@ public class RobotContainer {
    * Triggers can be created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
-    new JoystickButton(mOperatorController, 1)
+    new JoystickButton(mOperatorController, 2)
         .whileTrue(
            new PrepareLaunch(mLauncher)
-                .withTimeout(1)
+               .withTimeout(1)
                .andThen(new LaunchNote(mLauncher))
                .handleInterrupt(() -> mLauncher.stop()));
+
+    new JoystickButton(mOperatorController, 7)
+        .whileTrue(
+           new TalonFeed(mIntake)
+               .handleInterrupt(() -> mIntake.stop()));
+
+    new JoystickButton(mOperatorController, 8)
+        .whileTrue(
+           new TalonShoot(mIntake)
+               .handleInterrupt(() -> mIntake.stop()));
     
-    new JoystickButton(mOperatorController, 2).whileTrue(mLauncher.feedlaunchWheel()).onFalse(new InstantCommand(mLauncher::stop));
+
+
+    new JoystickButton(mOperatorController, 3).whileTrue(mLauncher.feedlaunchWheel()).onFalse(new InstantCommand(mLauncher::stop));
   }
 
 /**
@@ -170,4 +191,3 @@ public class RobotContainer {
         .andThen(Commands.runOnce(() -> mWestCoastDrive.tankDriveVolts(0, 0)));
   }
 }
-

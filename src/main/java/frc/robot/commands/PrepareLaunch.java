@@ -20,7 +20,6 @@ public class PrepareLaunch extends Command {
   public PrepareLaunch(CANLauncher pLauncher) {
     // save the launcher system internally
     mLauncher = pLauncher;
-    System.out.println("PrepareLaunch object is made");
 
     // indicate that this command requires the launcher system
     addRequirements(mLauncher);
@@ -29,22 +28,19 @@ public class PrepareLaunch extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.println("Prepare Launch Initialized");
     // Set launch wheel to speed, keep feed wheel at 0 to let launch wheel spin up.
-    mLauncher.setLaunchWheel(kLauncherSpeed);
+    mLauncher.setLaunchWheel(1.0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    System.out.println("Prepare launch is executed");
     // There is nothing we need this command to do on each iteration. You could remove this method and the default blank method of the base class will run.
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    System.out.println("Prepare launch is ended");
     // Do nothing when the command ends. The launch wheel needs to keep spinning in order to launch
   }
 
