@@ -31,7 +31,7 @@ public class PrepareLaunch extends Command {
   public void initialize() {
     System.out.println("Prepare Launch Initialized");
     // Set launch wheel to speed, keep feed wheel at 0 to let launch wheel spin up.
-    mLauncher.setLaunchWheel(kLauncherSpeed);
+    mLauncher.setLaunchWheel(0.7);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

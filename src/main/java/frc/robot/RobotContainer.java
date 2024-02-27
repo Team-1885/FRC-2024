@@ -27,11 +27,16 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotMap.AutoConstants;
 import frc.robot.RobotMap.DriveConstants;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.LaunchNote;
+import frc.robot.commands.PrepareLaunch;
+import frc.robot.subsystems.CANLauncher;
 import frc.robot.subsystems.WC;
 import lombok.Getter;
 
@@ -45,11 +50,9 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private @Getter final WC mWestCoastDrive = WC.getInstance();
   private @Getter final DriveCommand mDriveCommand;
-  // private @Getter final CANLauncher mLauncher = new CANLauncher();
-  public @Getter final static Joystick mDriverController = new Joystick(1); // 1 is the USB Port to be used as indicated on the Driver Station
+  private @Getter final CANLauncher mLauncher = new CANLauncher();
   private final Field2d mField;
   SendableChooser<Command> mChooser = new SendableChooser<>();
-
   public @Getter final static Joystick mOperatorController = new Joystick(2); // 2 is the USB Port to be used as indicated on the Driver Station
 
   /**
@@ -94,15 +97,14 @@ public class RobotContainer {
    * Triggers can be created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
-    // controller.button(0).onTrue(mDriveCommand);
-    //     new JoystickButton(mOperatorController, 1)
-    //     .whileTrue(
-    //         new PrepareLaunch(mLauncher)
-    //             .withTimeout(1)
-    //             .andThen(new LaunchNote(mLauncher))
-    //             .handleInterrupt(() -> mLauncher.stop()));
-    //
-    // new JoystickButton(mOperatorController, 2).whileTrue(mLauncher.feedlaunchWheel()).onFalse(new InstantCommand(mLauncher::stop));
+    new JoystickButton(mOperatorController, 1)
+        .whileTrue(
+           new PrepareLaunch(mLauncher)
+               .withTimeout(1)
+               .andThen(new LaunchNote(mLauncher))
+               .handleInterrupt(() -> mLauncher.stop()));
+    
+    new JoystickButton(mOperatorController, 2).whileTrue(mLauncher.feedlaunchWheel()).onFalse(new InstantCommand(mLauncher::stop));
   }
 
 /**

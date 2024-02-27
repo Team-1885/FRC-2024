@@ -126,10 +126,6 @@ public class WC extends SubsystemBase {
           mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
     mOdometry.resetPosition(mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition(), getPose());
     
-    mLeftMaster.setSmartCurrentLimit(25);
-    mLeftFollower.setSmartCurrentLimit(25);
-    mRightMaster.setSmartCurrentLimit(25);
-    mRightFollower.setSmartCurrentLimit(25);
     mDrive.setSafetyEnabled(true);
   }
 

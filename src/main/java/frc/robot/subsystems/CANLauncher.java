@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.ShooterConstants.LauncherConstants.kFeedCurrentLimit;
+import static frc.robot.ShooterConstants.LauncherConstants.kLauncherCurrentLimit;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -17,11 +20,11 @@ public class CANLauncher extends SubsystemBase {
 
   /** Creates a new Launcher. */
   public CANLauncher() {
-    mLaunchWheel = new CANSparkMax(1, MotorType.kBrushed);
-    mFeedWheel = new CANSparkMax(3, MotorType.kBrushed);
+    mLaunchWheel = new CANSparkMax(1, MotorType.kBrushless);
+    mFeedWheel = new CANSparkMax(3, MotorType.kBrushless);
 
-    // mLaunchWheel.setSmartCurrentLimit(kLauncherCurrentLimit);
-    // mFeedWheel.setSmartCurrentLimit(kFeedCurrentLimit);
+    mLaunchWheel.setSmartCurrentLimit(70);
+    mFeedWheel.setSmartCurrentLimit(70);
   }
 
   /**
@@ -32,8 +35,8 @@ public class CANLauncher extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setFeedWheel(-1);
-          setLaunchWheel(-1);
+          setFeedWheel(-0.7);
+          setLaunchWheel(-0.7);
         },
         // When the command stops, stop the wheels
         () -> {});
@@ -44,7 +47,7 @@ public class CANLauncher extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setFeedWheel(-1);
+          setFeedWheel(-0.7);
         },
         // When the command stops, stop the wheels
         () -> {});
@@ -55,7 +58,7 @@ public class CANLauncher extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setLaunchWheel(-1);
+          setLaunchWheel(-0.7);
         },
         // When the command stops, stop the wheels
         () -> {
@@ -68,8 +71,21 @@ public class CANLauncher extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setLaunchWheel(-1 * 5);
-          setFeedWheel(-1);
+          setLaunchWheel(-0.7);
+          setFeedWheel(-0.7);
+        },
+        // When the command stops, stop the wheels
+        () -> {
+        });
+  }
+
+    public Command amp() {
+    // The startEnd helper method takes a method to call when the command is initialized and one to call when it ends
+    return this.startEnd(
+        // When the command is initialized, set the wheels to the intake speed values
+        () -> {
+          setLaunchWheel(-0.4);
+          setFeedWheel(-0.4);
         },
         // When the command stops, stop the wheels
         () -> {

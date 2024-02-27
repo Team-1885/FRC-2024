@@ -7,9 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.hardware.vendors.firstparties.ABC;
 
 @SuppressWarnings({ "PMD.CommentSize", "PMD.LongVariable" })
 public final class RobotMap {

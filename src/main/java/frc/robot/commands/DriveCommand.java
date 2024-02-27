@@ -45,10 +45,10 @@ public class DriveCommand extends Command {
   @Override
   public void execute() {
     runTest(() -> {
-      double mFwd = RobotContainer.mDriverController.getRawAxis(1);
-      double mRot = -RobotContainer.mDriverController.getRawAxis(4);
+      // double mFwd = RobotContainer.mDriverController.getRawAxis(1);
+      // double mRot = -RobotContainer.mDriverController.getRawAxis(4);
 
-      westCoastDrive.arcadeDrive(mFwd, mRot);
+      // westCoastDrive.arcadeDrive(mFwd, mRot);
     });
   }
 
