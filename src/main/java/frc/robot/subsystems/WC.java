@@ -99,8 +99,8 @@ public class WC extends SubsystemBase {
     mRightFollower.restoreFactoryDefaults();
 
     //Sets the distance per pulse for the encoders
-    mLeftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
-    mRightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+    //mLeftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+    //mRightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
 
     mLeftEncoder.setPosition(0.0);
     mRightEncoder.setPosition(0.0);
