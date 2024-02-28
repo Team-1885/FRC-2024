@@ -32,7 +32,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.DoubleSupplier;
 
-public class WC extends SubsystemBase {
+public class CANDrivetrain extends SubsystemBase {
   private final CANSparkMax mLeftMaster = new CANSparkMax(6, REVLibCAN.MOTOR_TYPE);
   private final CANSparkMax mLeftFollower = new CANSparkMax(7, REVLibCAN.MOTOR_TYPE);
   private final CANSparkMax mRightMaster = new CANSparkMax(8, REVLibCAN.MOTOR_TYPE);
@@ -86,14 +86,14 @@ public class WC extends SubsystemBase {
               this));
 
 
-  private static final WC instance = new WC();
+  private static final CANDrivetrain instance = new CANDrivetrain();
 
-  public static WC getInstance() {
+  public static CANDrivetrain getInstance() {
     return instance;
   }
 
   /** Creates a new DriveSubsystem. */
-  public WC() {
+  public CANDrivetrain() {
     SendableRegistry.addChild(mDrive, mLeftMaster);
     SendableRegistry.addChild(mDrive, mRightMaster);
 
@@ -135,7 +135,6 @@ public class WC extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Update the odometry in the periodic block
     mOdometry.update(
       mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
     SmartDashboard.putNumber("Left Master Speed", mLeftMaster.get());

@@ -9,7 +9,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.ADAM;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.WC;
+import frc.robot.subsystems.CANDrivetrain;
 import lombok.Getter;
 
 /**
@@ -22,10 +22,10 @@ public class DriveCommand extends Command {
   private @Getter ADAM adam = new ADAM(null);
 
 
-  private final @Getter WC westCoastDrive;
+  private final @Getter CANDrivetrain westCoastDrive;
 
   /** Creates a new ExampleCommand. */
-  public DriveCommand(final WC westCoastDrive) {
+  public DriveCommand(final CANDrivetrain westCoastDrive) {
     super();
     // Use addRequirements() here to declare subsystem dependencies.
     this.westCoastDrive = westCoastDrive;

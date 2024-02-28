@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.hardware.vendors.firstparties.Clock;
 import frc.robot.hardware.vendors.firstparties.Settings;
+import frc.robot.subsystems.CANDrivetrain;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -39,8 +40,9 @@ import com.flybotix.hfr.codex.ICodexTimeProvider;
 public class Robot extends TimedRobot {
 	RobotContainer mRobotContainer;
 	private Command mAutonomousCommand;
-	private final SysIdRoutineBot mRobot = new SysIdRoutineBot();
+	// private final SysIdRoutineBot mRobot = new SysIdRoutineBot();
 
+	private CANDrivetrain mWestCoastDrive;
 	public static final Clock CLOCK =
 		(RobotBase.isReal() ? new Clock() : new Clock().simulated());
 	public static final Field2d FIELD = new Field2d();
@@ -74,13 +76,12 @@ public class Robot extends TimedRobot {
 		// Record both DS control and joystick data
 		DriverStation.startDataLog(DataLogManager.getLog());
 
-		// (alternatively) Record only DS control data
-		DriverStation.startDataLog(DataLogManager.getLog(), false);
-
-		mRobot.configureBindings();
+		// mRobot.configureBindings();
 
 		CLOCK.update();
 		DataLogManager.log("===> ROBOT INIT Starting");
+
+		mWestCoastDrive = CANDrivetrain.getInstance();
 
 		// Measuring Initialization Duration
 		Timer initTimer = new Timer();
@@ -109,10 +110,10 @@ public class Robot extends TimedRobot {
 		if (!Settings.kIsLogging) {
 			DataLogManager.log("------------Not Logging to CSV------------");
 		}
-		sigma();
+		sigmaSkibidiRizz();
 	}
-
-	public void sigma() {
+ 
+	public void sigmaSkibidiRizz() {
 		try {
 			Path trajectoryPath =
 				Filesystem.getDeployDirectory().toPath().resolve(

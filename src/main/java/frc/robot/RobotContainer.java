@@ -6,8 +6,6 @@ package frc.robot;
 
 import java.util.List;
 
-import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -34,7 +32,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotMap.AutoConstants;
 import frc.robot.RobotMap.DriveConstants;
-import frc.robot.commands.DriveCommand;
 import frc.robot.commands.LaunchNote;
 import frc.robot.commands.PrepareLaunch;
 import frc.robot.commands.TalonFeed;
@@ -42,8 +39,7 @@ import frc.robot.commands.TalonRotate;
 import frc.robot.commands.TalonShoot;
 import frc.robot.subsystems.CANLauncher;
 import frc.robot.subsystems.TalonIntake;
-import frc.robot.subsystems.WC;
-import lombok.Getter;
+import frc.robot.subsystems.CANDrivetrain;
 
 /**
  * This class is where the bulk of the robot should be declared.
@@ -53,31 +49,30 @@ import lombok.Getter;
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
-  private @Getter final WC mWestCoastDrive = WC.getInstance();
-  private @Getter final DriveCommand mDriveCommand;
-  private @Getter final CANLauncher mLauncher = new CANLauncher();
+  private final CANDrivetrain mDrive = CANDrivetrain.getInstance();
+  private final CANLauncher mLauncher = new CANLauncher();
   private final TalonIntake mIntake = new TalonIntake();
+
   private final TalonRotate mRotate;
-  public @Getter final static Joystick mDriverController = new Joystick(1); // 1 is the USB Port to be used as indicated on the Driver Station
+  
+  public final static CommandXboxController mDriverController = new CommandXboxController(1); // 1 is the USB Port to be used as indicated on the Driver Station
+  public final static Joystick mOperatorController = new Joystick(2); // 2 is the USB Port to be used as indicated on the Driver Station
   CommandGenericHID controller = new CommandGenericHID(5);
+  
   private final Field2d mField;
   SendableChooser<Command> mChooser = new SendableChooser<>();
-  public @Getter final static Joystick mOperatorController = new Joystick(2); // 2 is the USB Port to be used as indicated on the Driver Station
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    // Register Named Commands
-    NamedCommands.registerCommand("DriveCommand", new DriveCommand(mWestCoastDrive));
 
     // Command Initialization
-    mDriveCommand = new DriveCommand(mWestCoastDrive);
     mRotate = new TalonRotate(mIntake);
 
-
-    // Another option that allows you to specify the default auto by its name
-    mWestCoastDrive.setDefaultCommand(mDriveCommand);
+    mDrive.setDefaultCommand(
+        mDrive.arcadeDriveCommand(
+            () -> -mDriverController.getLeftY(), () -> -mDriverController.getRightX()));
     mIntake.setDefaultCommand(mRotate);
 
     mField = new Field2d();
@@ -94,9 +89,9 @@ public class RobotContainer {
   }
 
   public Command loadTrajectory(String pFilename, boolean pResetOdometry) {
-    RamseteCommand ramseteCommand = new RamseteCommand(Robot.trajectory, mWestCoastDrive::getPose, new RamseteController(RobotMap.AutoConstants.kRamseteB, RobotMap.AutoConstants.kRamseteZeta), new SimpleMotorFeedforward(RobotMap.DriveConstants.ksVolts, RobotMap.DriveConstants.kvVoltSecondsPerMeter, RobotMap.DriveConstants.kaVoltSecondsSquaredPerMeter), RobotMap.DriveConstants.kDriveKinematics, mWestCoastDrive::getWheelSpeeds, new PIDController(RobotMap.DriveConstants.kPDriveVel, 0, 0), new PIDController(RobotMap.DriveConstants.kPDriveVel, 0, 0), mWestCoastDrive::tankDriveVolts, mWestCoastDrive);
+    RamseteCommand ramseteCommand = new RamseteCommand(Robot.trajectory, mDrive::getPose, new RamseteController(RobotMap.AutoConstants.kRamseteB, RobotMap.AutoConstants.kRamseteZeta), new SimpleMotorFeedforward(RobotMap.DriveConstants.ksVolts, RobotMap.DriveConstants.kvVoltSecondsPerMeter, RobotMap.DriveConstants.kaVoltSecondsSquaredPerMeter), RobotMap.DriveConstants.kDriveKinematics, mDrive::getWheelSpeeds, new PIDController(RobotMap.DriveConstants.kPDriveVel, 0, 0), new PIDController(RobotMap.DriveConstants.kPDriveVel, 0, 0), mDrive::tankDriveVolts, mDrive);
     if(pResetOdometry) {
-        return new SequentialCommandGroup(new InstantCommand(()->mWestCoastDrive.resetOdometry(Robot.trajectory.getInitialPose())), ramseteCommand);
+        return new SequentialCommandGroup(new InstantCommand(()->mDrive.resetOdometry(Robot.trajectory.getInitialPose())), ramseteCommand);
     }
     else {
         return ramseteCommand;
@@ -114,6 +109,8 @@ public class RobotContainer {
                .withTimeout(1)
                .andThen(new LaunchNote(mLauncher))
                .handleInterrupt(() -> mLauncher.stop()));
+    
+    new JoystickButton(mOperatorController, 3).whileTrue(mLauncher.feedlaunchWheel()).onFalse(new InstantCommand(mLauncher::stop));
 
     new JoystickButton(mOperatorController, 7)
         .whileTrue(
@@ -124,10 +121,7 @@ public class RobotContainer {
         .whileTrue(
            new TalonShoot(mIntake)
                .handleInterrupt(() -> mIntake.stop()));
-    
 
-
-    new JoystickButton(mOperatorController, 3).whileTrue(mLauncher.feedlaunchWheel()).onFalse(new InstantCommand(mLauncher::stop));
   }
 
 /**
@@ -171,23 +165,24 @@ public class RobotContainer {
     RamseteCommand ramseteCommand =
         new RamseteCommand(
             Robot.trajectory,
-            mWestCoastDrive::getPose,
+            mDrive::getPose,
             new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
             new SimpleMotorFeedforward(
                 DriveConstants.ksVolts,
                 DriveConstants.kvVoltSecondsPerMeter,
                 DriveConstants.kaVoltSecondsSquaredPerMeter),
             DriveConstants.kDriveKinematics,
-            mWestCoastDrive::getWheelSpeeds,
+            mDrive::getWheelSpeeds,
             new PIDController(DriveConstants.kPDriveVel, 0, 0),
             new PIDController(DriveConstants.kPDriveVel, 0, 0),
             // RamseteCommand passes volts to the callback
-            mWestCoastDrive::tankDriveVolts,
-            mWestCoastDrive);
+            mDrive::tankDriveVolts,
+            mDrive);
 
     // Reset odometry to the initial pose of the trajectory, run path following command, then stop at the end.
-    return Commands.runOnce(() -> mWestCoastDrive.resetOdometry(Robot.trajectory.getInitialPose()))
+    return Commands.runOnce(() -> mDrive.resetOdometry(Robot.trajectory.getInitialPose()))
         .andThen(ramseteCommand)
-        .andThen(Commands.runOnce(() -> mWestCoastDrive.tankDriveVolts(0, 0)));
+        .andThen(Commands.runOnce(() -> mDrive.tankDriveVolts(0, 0)))
+        .andThen(Commands.runOnce(() -> mLauncher.feedlaunchWheel()));
   }
 }

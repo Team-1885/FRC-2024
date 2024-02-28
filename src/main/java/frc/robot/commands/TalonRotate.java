@@ -30,20 +30,13 @@ public class TalonRotate extends Command {
   @Override
   public void initialize() {
     // Set the wheels to launching speed
-    System.out.println("TalonRotate.initialize() IS CALLED");
-    mRotater.setIntakeRotater(-RobotContainer.mOperatorController.getRawAxis(1) * 0.5);
-    System.out.println("SPEED IS SET TO (INITIALIZE METHOD): " + mRotater.getMasterSpeed());
-    System.out.println("SPEED IS SET TO (INITIALIZE METHOD): " + mRotater.getMasterSpeed());
+    mRotater.setIntakeRotater(-RobotContainer.mOperatorController.getRawAxis(1) * 0.2);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    System.out.println("TalonRotate.execute() IS CALLED");
-    mRotater.setIntakeRotater(-RobotContainer.mOperatorController.getRawAxis(1) * 0.5);
-    System.out.println("SPEED IS SET TO (EXECUTE METHOD): " + mRotater.getMasterSpeed());
-    System.out.println("SPEED IS SET TO (EXECUTE METHOD): " + mRotater.getMasterSpeed());
-    // There is nothing we need this command to do on each iteration. You could remove this method and the default blank method of the base class will run.
+    mRotater.setIntakeRotater(-RobotContainer.mOperatorController.getRawAxis(1) * 0.2);
   }
 
   // Returns true when the command should end.

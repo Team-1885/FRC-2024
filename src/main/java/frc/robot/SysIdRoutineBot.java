@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.subsystems.WC;
+import frc.robot.subsystems.CANDrivetrain;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -17,7 +17,7 @@ import frc.robot.subsystems.WC;
  */
 public class SysIdRoutineBot {
   // The robot's subsystems
-  private final WC m_drive = WC.getInstance();
+  private final CANDrivetrain m_drive = CANDrivetrain.getInstance();
   
 
   // The driver's controller
