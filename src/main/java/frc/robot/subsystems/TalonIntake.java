@@ -5,13 +5,19 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class TalonIntake extends SubsystemBase {
   CANSparkMax mIntakeFeeder = new CANSparkMax(3, MotorType.kBrushless);
   TalonFX mRotateMaster = new TalonFX(1);
   TalonFX mRotateFollower = new TalonFX(2);
+
+  ShuffleboardTab mTab = Shuffleboard.getTab("Intake");
 
   /** Creates a new Launcher. */
   public TalonIntake() {
@@ -34,6 +40,20 @@ public class TalonIntake extends SubsystemBase {
         () -> {
           setIntakeFeeder(0.7);
           setIntakeRotater(0.5);
+
+          double pos = mRotateMaster.getPosition().getValueAsDouble() * 360.0 / 2048.0;
+          
+        
+
+          double d1 = 0.75;
+
+          SmartDashboard.putNumber("Master position: ", pos);
+
+          
+          if(pos == d1) {
+            stop();
+          }
+
         },
         // When the command stops, stop the wheels
         () -> {
