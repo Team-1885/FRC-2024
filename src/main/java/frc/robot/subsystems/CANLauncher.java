@@ -10,6 +10,7 @@ import static frc.robot.ShooterConstants.LauncherConstants.kLauncherCurrentLimit
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -87,6 +88,16 @@ public class CANLauncher extends SubsystemBase {
   // An accessor method to set the speed (technically the output percentage) of the feed wheel
   public void setFeedWheel(double speed) {
     mFeedWheel.set(speed);
+  }
+
+  public void shootVolts(double pLaunchVolts, double pFeedVolts) {
+    mLaunchWheel.setVoltage(pLaunchVolts);
+    mFeedWheel.setVoltage(pFeedVolts);
+
+    // if (Math.abs(pLeftVolts / 12) < 1 && Math.abs(pRightVolts / 12) < 1) {
+    //   mLeftMaster.set(pLeftVolts / 12);
+    //   mRightMaster.set(pRightVolts / 12);
+    // }
   }
 
   // A helper method to stop both wheels. You could skip having a method like this and call the

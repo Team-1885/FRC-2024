@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -103,21 +104,21 @@ public class RobotContainer {
    * Triggers can be created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
-    new JoystickButton(mOperatorController, 2)
+    new JoystickButton(mOperatorController, 1)
         .whileTrue(
            new PrepareLaunch(mLauncher)
                .withTimeout(1)
                .andThen(new LaunchNote(mLauncher))
                .handleInterrupt(() -> mLauncher.stop()));
     
-    new JoystickButton(mOperatorController, 3).whileTrue(mLauncher.feedlaunchWheel()).onFalse(new InstantCommand(mLauncher::stop));
+    new JoystickButton(mOperatorController, 2).whileTrue(mLauncher.feedlaunchWheel()).onFalse(new InstantCommand(mLauncher::stop));
 
-    new JoystickButton(mOperatorController, 7)
+    new JoystickButton(mOperatorController, 5)
         .whileTrue(
            new TalonFeed(mIntake)
                .handleInterrupt(() -> mIntake.stop()));
 
-    new JoystickButton(mOperatorController, 8)
+    new JoystickButton(mOperatorController, 6)
         .whileTrue(
            new TalonShoot(mIntake)
                .handleInterrupt(() -> mIntake.stop()));
@@ -129,7 +130,7 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
+  public Command getAutonomousCommand() { // the code needs to do stuff
     // Create a voltage constraint to ensure we don't accelerate too fast
     var autoVoltageConstraint =
         new DifferentialDriveVoltageConstraint(
@@ -183,6 +184,8 @@ public class RobotContainer {
     return Commands.runOnce(() -> mDrive.resetOdometry(Robot.trajectory.getInitialPose()))
         .andThen(ramseteCommand)
         .andThen(Commands.runOnce(() -> mDrive.tankDriveVolts(0, 0)))
-        .andThen(Commands.runOnce(() -> mLauncher.feedlaunchWheel()));
+        .andThen(Commands.runOnce(() -> mLauncher.shootVolts(9, 9)))
+        .andThen(new WaitCommand(2))
+        .andThen(Commands.runOnce(() -> mLauncher.shootVolts(0, 0)));
   }
 }
