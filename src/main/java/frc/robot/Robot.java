@@ -38,9 +38,9 @@ import com.flybotix.hfr.codex.ICodexTimeProvider;
 
 @SuppressWarnings("PMD.CommentSize")
 public class Robot extends TimedRobot {
-	RobotContainer mRobotContainer;
+	//RobotContainer mRobotContainer;
 	private Command mAutonomousCommand;
-	// private final SysIdRoutineBot mRobot = new SysIdRoutineBot();
+	private final SysIdRoutineBot mRobot = new SysIdRoutineBot();
 
 	private CANDrivetrain mWestCoastDrive;
 	public static final Clock CLOCK =
@@ -69,14 +69,14 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
-		mRobotContainer = new RobotContainer();
+		//mRobotContainer = new RobotContainer();
 		// Starts recording to data log
 		DataLogManager.start();
 
 		// Record both DS control and joystick data
 		DriverStation.startDataLog(DataLogManager.getLog());
 
-		// mRobot.configureBindings();
+		mRobot.configureBindings();
 
 		CLOCK.update();
 		DataLogManager.log("===> ROBOT INIT Starting");
@@ -168,7 +168,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		mAutonomousCommand = mRobotContainer.getAutonomousCommand();
+		mAutonomousCommand = mRobot.getAutonomousCommand();
 		if (mAutonomousCommand != null) {
 			mAutonomousCommand.schedule();
 		}
