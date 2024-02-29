@@ -71,7 +71,7 @@ public class WC extends SubsystemBase {
               // characterized.
               log -> {
                 // Calculate average values for voltage, linear position, and linear velocity
-                double averageVoltage = 0.5 * (mLeftMaster.get() + mRightMaster.get()) * RobotController.getBatteryVoltage();
+                double averageVoltage = 0.5 * (mLeftMaster.getVoltageCompensationNominalVoltage() + mRightMaster.getVoltageCompensationNominalVoltage()) * RobotController.getBatteryVoltage();
                 double averageLinearPosition = 0.5 * (getLeftEncoderPosition() + getRightEncoderPosition());
                 double averageLinearVelocity = 0.5 * (getLeftEncoderVelocity() + getRightEncoderVelocity());
 
@@ -122,8 +122,7 @@ public class WC extends SubsystemBase {
     mGyro.calibrate();
     resetEncoders();
 
-    mOdometry = new DifferentialDriveOdometry(
-          mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
+    mOdometry = new DifferentialDriveOdometry(mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
     mOdometry.resetPosition(mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition(), getPose());
     
     mLeftMaster.setSmartCurrentLimit(25);
@@ -239,11 +238,11 @@ public class WC extends SubsystemBase {
   }
 
   public double getLeftEncoderPosition() {
-    return -mLeftEncoder.getPosition();
+    return mLeftEncoder.getPosition();
   }
 
   public double getLeftEncoderVelocity() {
-    return -mLeftEncoder.getVelocity();
+    return mLeftEncoder.getVelocity();
   }
 
   /**
