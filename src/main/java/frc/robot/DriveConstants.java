@@ -23,6 +23,7 @@ public class DriveConstants {
     public static final double kMaxMpsVelocity = kRpmToMpsFactor * kMaxVelocityRPM;
     public static final int kEncoderCPR = 1024;
     public static final double kEncoderDistancePerPulse = (kTrackWidthMeters * Math.PI) / (double) kEncoderCPR;
+    public static final double kLinearDistanceConversionFactor = (Units.inchesToMeters(kWheelDiameterInches) * Math.PI) / kGearboxRatio;
     // ========================================
     // DO NOT MODIFY THESE CONSTANTS
     // ========================================

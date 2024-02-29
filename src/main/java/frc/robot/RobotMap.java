@@ -34,8 +34,6 @@ public final class RobotMap {
 
     public static final double kGearRatio = 8.46;
     public static final double kWheelRadiusInches = 3;
-
-    public static final double kLinearDistanceConversionFactor = (Units.inchesToMeters(1 / (kGearRatio * 2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches)) * 10));
   }
 
   public static final class OIConstants {

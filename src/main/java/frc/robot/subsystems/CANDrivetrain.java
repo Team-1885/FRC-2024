@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.DriveConstants;
 import frc.robot.RobotMap;
 import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
 import static edu.wpi.first.units.MutableMeasure.mutable;
@@ -116,10 +117,10 @@ public class CANDrivetrain extends SubsystemBase {
     mLeftEncoder.setPosition(0.0);
     mRightEncoder.setPosition(0.0);
 
-    mLeftEncoder.setPositionConversionFactor(RobotMap.DriveConstants.kLinearDistanceConversionFactor);
-    mRightEncoder.setPositionConversionFactor(RobotMap.DriveConstants.kLinearDistanceConversionFactor);
-    mLeftEncoder.setVelocityConversionFactor(RobotMap.DriveConstants.kLinearDistanceConversionFactor / 60);
-    mRightEncoder.setVelocityConversionFactor(RobotMap.DriveConstants.kLinearDistanceConversionFactor / 60);
+    mLeftEncoder.setPositionConversionFactor(DriveConstants.kLinearDistanceConversionFactor);
+    mRightEncoder.setPositionConversionFactor(DriveConstants.kLinearDistanceConversionFactor);
+    mLeftEncoder.setVelocityConversionFactor(DriveConstants.kLinearDistanceConversionFactor / 60);
+    mRightEncoder.setVelocityConversionFactor(DriveConstants.kLinearDistanceConversionFactor / 60);
     
     mLeftFollower.follow(mLeftMaster);
     mRightFollower.follow(mRightMaster);
@@ -134,10 +135,10 @@ public class CANDrivetrain extends SubsystemBase {
           mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
     mOdometry.resetPosition(mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition(), getPose());
     
-    mLeftMaster.setSmartCurrentLimit(60);
-    mLeftFollower.setSmartCurrentLimit(60);
-    mRightMaster.setSmartCurrentLimit(60);
-    mRightFollower.setSmartCurrentLimit(60);
+    mLeftMaster.setSmartCurrentLimit(25);
+    mLeftFollower.setSmartCurrentLimit(25);
+    mRightMaster.setSmartCurrentLimit(25);
+    mRightFollower.setSmartCurrentLimit(25);
     mDrive.setSafetyEnabled(true);
   }
 
