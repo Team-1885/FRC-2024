@@ -38,7 +38,7 @@ public class TalonIntake extends SubsystemBase {
         // When the command stops, stop the wheels
         () -> {
           stop();
-        });
+        }); 
   }
 
   // An accessor method to set the speed (technically the output percentage) of the launch wheel

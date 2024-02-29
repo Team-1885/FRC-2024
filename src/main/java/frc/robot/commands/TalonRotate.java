@@ -25,7 +25,7 @@ public class TalonRotate extends Command {
     // indicate that this command requires the launcher system
     addRequirements(mRotater);
   }
-
+ 
   // The initialize method is called when the command is initially scheduled.
   @Override
   public void initialize() {

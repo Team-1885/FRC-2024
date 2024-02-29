@@ -14,7 +14,7 @@ public class TalonShoot extends Command {
   public TalonShoot(TalonIntake pFeeder) {
     // save the feeding system internally
     mFeeder = pFeeder;
-
+ 
     // indicate that this command requires the launcher system
     addRequirements(mFeeder);
   }

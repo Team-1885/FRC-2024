@@ -29,7 +29,8 @@ public class TalonFeed extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // There is nothing we need this command to do on each iteration. You could remove this method and the default blank method of the base class will run.
+    
+    mFeeder.setIntakeFeeder(0.3);
   }
 
   // Returns true when the command should end.
