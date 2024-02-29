@@ -70,16 +70,24 @@ public class CANDrivetrain extends SubsystemBase {
               // Tell SysId how to record a frame of data for each motor on the mechanism being
               // characterized.
               log -> {
-                // Calculate average values for voltage, linear position, and linear velocity
-                double averageVoltage = 0.5 * (mLeftMaster.get() + mRightMaster.get()) * RobotController.getBatteryVoltage();
-                double averageLinearPosition = 0.5 * (getLeftEncoderPosition() + getRightEncoderPosition());
-                double averageLinearVelocity = 0.5 * (getLeftEncoderVelocity() + getRightEncoderVelocity());
-
-                // Record a frame for the average values
-                log.motor("drive-average")
-                    .voltage(mAppliedVoltage.mut_replace(averageVoltage, Volts))
-                    .linearPosition(mDistance.mut_replace(averageLinearPosition, Meters))
-                    .linearVelocity(mVelocity.mut_replace(averageLinearVelocity, MetersPerSecond));
+                // Record a frame for the left motors.  Since these share an encoder, we consider
+                // the entire group to be one motor.
+                log.motor("drive-left")
+                    .voltage(
+                        mAppliedVoltage.mut_replace(
+                            mLeftMaster.getAppliedOutput() * mLeftMaster.getBusVoltage(), Volts))
+                    .linearPosition(mDistance.mut_replace(mLeftEncoder.getPosition(), Meters))
+                    .linearVelocity(
+                        mVelocity.mut_replace(mLeftEncoder.getVelocity(), MetersPerSecond));
+                // Record a frame for the right motors.  Since these share an encoder, we consider
+                // the entire group to be one motor.
+                log.motor("drive-right")
+                    .voltage(
+                        mAppliedVoltage.mut_replace(
+                            mRightMaster.getAppliedOutput() * mRightMaster.getBusVoltage(), Volts))
+                    .linearPosition(mDistance.mut_replace(mRightEncoder.getPosition(), Meters))
+                    .linearVelocity(
+                        mVelocity.mut_replace(mRightEncoder.getVelocity(), MetersPerSecond));
               },
               // Tell SysId to make generated commands require this subsystem, suffix test state in
               // WPILog with this subsystem's name ("drive")
