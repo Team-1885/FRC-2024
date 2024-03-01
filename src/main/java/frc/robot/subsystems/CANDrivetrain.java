@@ -117,10 +117,10 @@ public class CANDrivetrain extends SubsystemBase {
     mLeftEncoder.setPosition(0.0);
     mRightEncoder.setPosition(0.0);
 
-    mLeftEncoder.setPositionConversionFactor(DriveConstants.kLinearDistanceConversionFactor);
-    mRightEncoder.setPositionConversionFactor(DriveConstants.kLinearDistanceConversionFactor);
-    mLeftEncoder.setVelocityConversionFactor(DriveConstants.kLinearDistanceConversionFactor / 60);
-    mRightEncoder.setVelocityConversionFactor(DriveConstants.kLinearDistanceConversionFactor / 60);
+    mLeftEncoder.setPositionConversionFactor(DriveConstants.kDriveNEOPositionFactor);
+    mRightEncoder.setPositionConversionFactor(DriveConstants.kDriveNEOPositionFactor);
+    mLeftEncoder.setVelocityConversionFactor(DriveConstants.kDriveNEOVelocityFactor / 60);
+    mRightEncoder.setVelocityConversionFactor(DriveConstants.kDriveNEOVelocityFactor / 60);
     
     mLeftFollower.follow(mLeftMaster);
     mRightFollower.follow(mRightMaster);

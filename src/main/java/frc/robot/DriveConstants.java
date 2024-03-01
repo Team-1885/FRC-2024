@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
 import frc.robot.hardware.vendors.firstparties.ABC;
 
 public class DriveConstants {
@@ -27,7 +28,11 @@ public class DriveConstants {
     // ========================================
     // DO NOT MODIFY THESE CONSTANTS
     // ========================================
-
+    public static final double gearboxRatio = 1/8.46;
+    public static final double WheelDiameterMeters = Units.feetToMeters(0.5);
+    public static final double WheelCircumferenceMeters = WheelDiameterMeters * Math.PI;
+    public static final double kDriveNEOPositionFactor = kGearboxRatio * kWheelCircumferenceFeet;
+    public static final double kDriveNEOVelocityFactor = kDriveNEOPositionFactor / 60.0;
 
     //ALL PLACE HOLDER VALUES FROM WIPLIB
     //TODO: PUT IN REAL VALUES BY TESTING USING SYSIS
