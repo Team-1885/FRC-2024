@@ -38,9 +38,9 @@ import com.flybotix.hfr.codex.ICodexTimeProvider;
 
 @SuppressWarnings("PMD.CommentSize")
 public class Robot extends TimedRobot {
-	//RobotContainer mRobotContainer;
+	RobotContainer mRobotContainer;
 	private Command mAutonomousCommand;
-	private final SysIdRoutineBot mRobot = new SysIdRoutineBot();
+	// private final SysIdRoutineBot mRobot = new SysIdRoutineBot();
 
 	private CANDrivetrain mWestCoastDrive;
 	public static final Clock CLOCK =
@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
 	public static String CLIMB_MODE = "";
 
 	public static String trajectoryJSON =
-		"Paths/output/PathWeaver_Curvy.wpilib.json";
+		"Paths/output/PathWeaver_Straight.wpilib.json";
 	public static Trajectory trajectory = new Trajectory();
 
 	/**
@@ -69,14 +69,14 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
-		//mRobotContainer = new RobotContainer();
+		mRobotContainer = new RobotContainer();
 		// Starts recording to data log
 		DataLogManager.start();
 
 		// Record both DS control and joystick data
 		DriverStation.startDataLog(DataLogManager.getLog());
 
-		mRobot.configureBindings();
+		// mRobot.configureBindings();
 
 		CLOCK.update();
 		DataLogManager.log("===> ROBOT INIT Starting");
@@ -149,6 +149,12 @@ public class Robot extends TimedRobot {
 		// in the Command-based framework to work.
 		CommandScheduler.getInstance().run();
 		SmartDashboard.putData(FIELD);
+
+		final Field2d mField = new Field2d();
+		SmartDashboard.putData("Field", mField);
+		mField.setRobotPose(mWestCoastDrive.getPose());
+		// Push the trajectory to Field2d.
+		mField.getObject("traj").setTrajectory(trajectory);
 	}
 
 	/**
@@ -168,7 +174,10 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		mAutonomousCommand = mRobot.getAutonomousCommand();
+		mAutonomousCommand = mRobotContainer.getAutonomousCommand();
+		// mWestCoastDrive.resetOdometry(null);
+		mWestCoastDrive.zeroHeading();
+		mWestCoastDrive.resetEncoders();
 		if (mAutonomousCommand != null) {
 			mAutonomousCommand.schedule();
 		}
@@ -182,9 +191,9 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
-		// This makes sure that the autonomous stops running when teleop starts
-		// running. If you want the autonomous to continue until interrupted by
-		// another command, remove this line or comment it out.
+		mWestCoastDrive.zeroHeading();
+		mWestCoastDrive.resetEncoders();
+		// This makes sure that the autonomous stops running when teleop starts running. If you want the autonomous to continue until interrupted by another command, remove this line or comment it out.
 		if (mAutonomousCommand != null) {
 			mAutonomousCommand.cancel();
 		}

@@ -18,9 +18,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -60,7 +58,6 @@ public class RobotContainer {
   public final static Joystick mOperatorController = new Joystick(2); // 2 is the USB Port to be used as indicated on the Driver Station
   CommandGenericHID controller = new CommandGenericHID(5);
   
-  private final Field2d mField;
   SendableChooser<Command> mChooser = new SendableChooser<>();
 
   /**
@@ -76,14 +73,10 @@ public class RobotContainer {
             () -> -mDriverController.getLeftY(), () -> -mDriverController.getRightX()));
     mIntake.setDefaultCommand(mRotate);
 
-    mField = new Field2d();
-
     mChooser.addOption("Curvy", loadTrajectory(Robot.trajectoryJSON, true));
     mChooser.addOption("Straight", loadTrajectory(Robot.trajectoryJSON, true));
 
     Shuffleboard.getTab("Autonomous").add(mChooser);
-
-    SmartDashboard.putData("Field", mField);
 
     // Configure the trigger bindings
     configureBindings();
