@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
 	public static String CLIMB_MODE = "";
 
 	public static String trajectoryJSON =
-		"Paths/output/PathWeaver_Straight.wpilib.json";
+		"Paths/output/PathWeaver_Curvy.wpilib.json";
 	public static Trajectory trajectory = new Trajectory();
 
 	/**
