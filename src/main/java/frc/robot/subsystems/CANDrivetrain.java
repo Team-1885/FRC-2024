@@ -30,6 +30,8 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.DoubleSupplier;
 
+import org.opencv.features2d.FlannBasedMatcher;
+
 public class CANDrivetrain extends SubsystemBase {
   private final CANSparkMax mLeftMaster = new CANSparkMax(6, REVLibCAN.MOTOR_TYPE);
   private final CANSparkMax mLeftFollower = new CANSparkMax(7, REVLibCAN.MOTOR_TYPE);
@@ -122,7 +124,7 @@ public class CANDrivetrain extends SubsystemBase {
     mLeftFollower.follow(mLeftMaster);
     mRightFollower.follow(mRightMaster);
 
-    mRightMaster.setInverted(true);
+    mRightMaster.setInverted(false);
 
     mGyro.reset();
     mGyro.calibrate();
@@ -136,7 +138,7 @@ public class CANDrivetrain extends SubsystemBase {
     mLeftFollower.setSmartCurrentLimit(25);
     mRightMaster.setSmartCurrentLimit(25);
     mRightFollower.setSmartCurrentLimit(25);
-    mDrive.setSafetyEnabled(true);
+    mDrive.setSafetyEnabled(false);
 
     mLeftMaster.burnFlash();
     mLeftFollower.burnFlash();
@@ -206,7 +208,7 @@ public class CANDrivetrain extends SubsystemBase {
   public void tankDriveVolts(double pLeftVolts, double pRightVolts) {
     mLeftMaster.setVoltage(pLeftVolts);
     mRightMaster.setVoltage(pRightVolts);
-    mDrive.feed();
+    //mDrive.feed();
 
     // if (Math.abs(pLeftVolts / 12) < 1 && Math.abs(pRightVolts / 12) < 1) {
     //   mLeftMaster.set(pLeftVolts / 12);

@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -45,7 +44,7 @@ public class Robot extends TimedRobot {
 	private CANDrivetrain mWestCoastDrive;
 	public static final Clock CLOCK =
 		(RobotBase.isReal() ? new Clock() : new Clock().simulated());
-	public static final Field2d FIELD = new Field2d();
+	//public static final Field2d FIELD = new Field2d();
 	public static final boolean IS_SIMULATED = RobotBase.isSimulation();
 	public static String CLIMB_MODE = "";
 
@@ -148,13 +147,13 @@ public class Robot extends TimedRobot {
 		// must be called from the robot's periodic block in order for anything
 		// in the Command-based framework to work.
 		CommandScheduler.getInstance().run();
-		SmartDashboard.putData(FIELD);
+		//SmartDashboard.putData(FIELD);
 
-		final Field2d mField = new Field2d();
-		SmartDashboard.putData("Field", mField);
-		mField.setRobotPose(mWestCoastDrive.getPose());
+		//final Field2d mField = new Field2d();
+		//SmartDashboard.putData("Field", mField);
+		//mField.setRobotPose(mWestCoastDrive.getPose());
 		// Push the trajectory to Field2d.
-		mField.getObject("traj").setTrajectory(trajectory);
+		//mField.getObject("traj").setTrajectory(trajectory);
 	}
 
 	/**
@@ -174,13 +173,13 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		mAutonomousCommand = mRobotContainer.getAutonomousCommand();
+		// mAutonomousCommand = mRobotContainer.getAutonomousCommand();
 		// mWestCoastDrive.resetOdometry(null);
-		mWestCoastDrive.zeroHeading();
-		mWestCoastDrive.resetEncoders();
-		if (mAutonomousCommand != null) {
-			mAutonomousCommand.schedule();
-		}
+		// mWestCoastDrive.zeroHeading();
+		// mWestCoastDrive.resetEncoders();
+		// if (mAutonomousCommand != null) {
+		// 	mAutonomousCommand.schedule();
+		// }
 	}
 
 	/** This function is called periodically during autonomous. */

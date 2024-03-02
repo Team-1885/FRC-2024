@@ -70,7 +70,7 @@ public class RobotContainer {
 
     mDrive.setDefaultCommand(
         mDrive.arcadeDriveCommand(
-            () -> -mDriverController.getLeftY(), () -> -mDriverController.getRightX()));
+            () -> -mDriverController.getRightX(), () -> -mDriverController.getLeftY()));
     mIntake.setDefaultCommand(mRotate);
 
     mChooser.addOption("Curvy", loadTrajectory(Robot.trajectoryJSON, true));
@@ -97,7 +97,7 @@ public class RobotContainer {
    * Triggers can be created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
-    new JoystickButton(mOperatorController, 1)
+    new JoystickButton(mOperatorController, 3)
         .whileTrue(
            new PrepareLaunch(mLauncher)
                .withTimeout(1)
@@ -174,10 +174,7 @@ public class RobotContainer {
             mDrive);
 
     // Reset odometry to the initial pose of the trajectory, run path following command, then stop at the end.
-    return Commands.runOnce(() -> mDrive.resetOdometry(Robot.trajectory.getInitialPose()))
-        .andThen(ramseteCommand)
-        .andThen(Commands.runOnce(() -> mDrive.tankDriveVolts(0, 0)))
-        .andThen(Commands.runOnce(() -> mLauncher.shootVolts(9, 9)))
+    return Commands.runOnce(() -> mLauncher.shootVolts(9, 9))
         .andThen(new WaitCommand(2))
         .andThen(Commands.runOnce(() -> mLauncher.shootVolts(0, 0)));
   }
