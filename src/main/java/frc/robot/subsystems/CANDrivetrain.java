@@ -154,7 +154,7 @@ public class CANDrivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Right Follower Speed", mRightFollower.get());
     SmartDashboard.putNumber("Left Encoder Position", mLeftEncoder.getPosition());
     SmartDashboard.putNumber("Left Encoder Velocity", mLeftEncoder.getVelocity());
-        SmartDashboard.putNumber("Right Encoder Position", mRightEncoder.getPosition());
+    SmartDashboard.putNumber("Right Encoder Position", mRightEncoder.getPosition());
     SmartDashboard.putNumber("Right Encoder Velocity", mRightEncoder.getVelocity());
   }
 
