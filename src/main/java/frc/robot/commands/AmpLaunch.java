@@ -4,39 +4,40 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
-import frc.robot.subsystems.TalonIntake;
-import static frc.robot.Constants.IntakeConstants.*;
 
+
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.CANLauncher;
+import static frc.robot.ShooterConstants.LauncherConstants.*;
 
 /*
  * This is an example of creating a command as a class. The base Command class provides a set of methods that your command will override.
  */
-public class TalonRotate extends Command {
-  TalonIntake mRotater;
+public class AmpLaunch extends Command {
+  CANLauncher mLauncher;
 
   /** Creates a new LaunchNote. */
-  public TalonRotate(TalonIntake pRotater) {
-    System.out.println("TalonRotate CONSTRUCTOR CALLED");
+  public AmpLaunch(CANLauncher pLauncher) {
     // save the launcher system internally
-    mRotater = pRotater;
+    mLauncher = pLauncher;
 
     // indicate that this command requires the launcher system
-    addRequirements(mRotater);
+    addRequirements(mLauncher);
   }
 
   // The initialize method is called when the command is initially scheduled.
   @Override
   public void initialize() {
+    // TODO: Check for correct vals
     // Set the wheels to launching speed
-    mRotater.setIntakeRotater(-RobotContainer.mOperatorController.getRawAxis(1) * 0.125);
+    mLauncher.setLaunchWheel(0.24);
+    mLauncher.setFeedWheel(0.24);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    mRotater.setIntakeRotater(-RobotContainer.mOperatorController.getRawAxis(1) * 0.125);
+    // There is nothing we need this command to do on each iteration. You could remove this method and the default blank method of the base class will run.
   }
 
   // Returns true when the command should end.
@@ -50,6 +51,6 @@ public class TalonRotate extends Command {
   @Override
   public void end(boolean interrupted) {
     // Stop the wheels when the command ends.
-    mRotater.stop();
+    mLauncher.stop();
   }
 }

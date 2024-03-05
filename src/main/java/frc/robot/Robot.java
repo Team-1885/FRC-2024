@@ -11,21 +11,15 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.hardware.vendors.firstparties.Clock;
-import frc.robot.hardware.vendors.firstparties.Settings;
 import frc.robot.subsystems.CANDrivetrain;
 
 import java.io.IOException;
 import java.nio.file.Path;
-
-import com.flybotix.hfr.codex.CodexMetadata;
-import com.flybotix.hfr.codex.ICodexTimeProvider;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -77,38 +71,18 @@ public class Robot extends TimedRobot {
 
 		// mRobot.configureBindings();
 
-		CLOCK.update();
 		DataLogManager.log("===> ROBOT INIT Starting");
 
 		mWestCoastDrive = CANDrivetrain.getInstance();
 
-		// Measuring Initialization Duration
-		Timer initTimer = new Timer();
-		initTimer.start();
-
 		DataLogManager.log("Starting Robot Initialization...");
-		ICodexTimeProvider provider = new ICodexTimeProvider() {
-			@Override
-			public double getTimestamp() {
-				return CLOCK.now();
-			}
-		};
-		CodexMetadata.overrideTimeProvider(provider);
 
 		LiveWindow.disableAllTelemetry();
 
-		/*
-		 * Some things need to wait until after the robot connects to the DS. So
-		 * keep this thread here.
-		 */
-		new Thread(new DSConnectInitThread()).start();
+		// mWestCoastDrive.resetOdometry(null);
+		mWestCoastDrive.zeroHeading();
+		mWestCoastDrive.resetEncoders();
 
-		initTimer.stop();
-		DataLogManager.log("Robot initialization finished in " + initTimer.get() + " seconds");
-
-		if (!Settings.kIsLogging) {
-			DataLogManager.log("------------Not Logging to CSV------------");
-		}
 		sigmaSkibidiRizz();
 	}
  
@@ -126,12 +100,6 @@ public class Robot extends TimedRobot {
 	}
 
 	/**
-	 * These things rely on match metadata, so we need to wait for the DS to
-	 * connect
-	 */
-	private void initAfterConnection() {}
-
-	/**
 	 * This function is called every 20 ms, no matter the mode.
 	 * Use this for items like diagnostics that you want ran during disabled,
 	 * autonomous, teleoperated and test.
@@ -147,13 +115,6 @@ public class Robot extends TimedRobot {
 		// must be called from the robot's periodic block in order for anything
 		// in the Command-based framework to work.
 		CommandScheduler.getInstance().run();
-		//SmartDashboard.putData(FIELD);
-
-		//final Field2d mField = new Field2d();
-		//SmartDashboard.putData("Field", mField);
-		//mField.setRobotPose(mWestCoastDrive.getPose());
-		// Push the trajectory to Field2d.
-		//mField.getObject("traj").setTrajectory(trajectory);
 	}
 
 	/**
@@ -173,13 +134,10 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		// mAutonomousCommand = mRobotContainer.getAutonomousCommand();
-		// mWestCoastDrive.resetOdometry(null);
-		// mWestCoastDrive.zeroHeading();
-		// mWestCoastDrive.resetEncoders();
-		// if (mAutonomousCommand != null) {
-		// 	mAutonomousCommand.schedule();
-		// }
+		mAutonomousCommand = mRobotContainer.getAutonomousCommand();
+		if (mAutonomousCommand != null) {
+		mAutonomousCommand.schedule();
+		}
 	}
 
 	/** This function is called periodically during autonomous. */
@@ -190,8 +148,8 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
-		mWestCoastDrive.zeroHeading();
-		mWestCoastDrive.resetEncoders();
+		// mWestCoastDrive.zeroHeading();
+		// mWestCoastDrive.resetEncoders();
 		// This makes sure that the autonomous stops running when teleop starts running. If you want the autonomous to continue until interrupted by another command, remove this line or comment it out.
 		if (mAutonomousCommand != null) {
 			mAutonomousCommand.cancel();
@@ -222,42 +180,5 @@ public class Robot extends TimedRobot {
 	@Override
 	public void simulationPeriodic() {
 		// ...
-	}
-
-	public String toString() {
-		String mRobotMode = "Unknown";
-		String mRobotEnabledDisabled = "Unknown";
-		double mNow = Timer.getFPGATimestamp();
-
-		if (this.isAutonomous()) {
-			mRobotMode = "Autonomous";
-		}
-		if (this.isTest()) {
-			mRobotEnabledDisabled = "Test";
-		}
-		if (this.isEnabled()) {
-			mRobotEnabledDisabled = "Enabled";
-		}
-		if (this.isDisabled()) {
-			mRobotEnabledDisabled = "Disabled";
-		}
-
-		return String.format("State: %s\tMode: %s\tTime: %s",
-			mRobotEnabledDisabled, mRobotMode, mNow);
-	}
-
-	private class DSConnectInitThread implements Runnable {
-		@Override
-		public void run() {
-			while (!DriverStation.isDSAttached()) {
-				try {
-					DataLogManager.log("Waiting on Robot <--> DS Connection...");
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			initAfterConnection();
-		}
 	}
 }

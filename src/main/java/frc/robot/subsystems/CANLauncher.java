@@ -71,8 +71,8 @@ public class CANLauncher extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setLaunchWheel(-1);
-          setFeedWheel(-1);
+          setLaunchWheel(-0.5);
+          setFeedWheel(-0.5);
         },
         // When the command stops, stop the wheels
         () -> {
@@ -91,6 +91,14 @@ public class CANLauncher extends SubsystemBase {
 
   public void shootVolts(double pLaunchVolts, double pFeedVolts) {
     mLaunchWheel.setVoltage(pLaunchVolts);
+    mFeedWheel.setVoltage(pFeedVolts);
+  }
+
+  public void setLaunchVolts(double pLaunchVolts) {
+    mLaunchWheel.setVoltage(pLaunchVolts);
+  }
+
+  public void setFeedVolts(double pFeedVolts) {
     mFeedWheel.setVoltage(pFeedVolts);
   }
 

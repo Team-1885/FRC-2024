@@ -1,42 +1,35 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.TalonIntake;
-import static frc.robot.Constants.IntakeConstants.*;
-
+import static frc.robot.Constants.IntakeConstants;
 
 /*
  * This is an example of creating a command as a class. The base Command class provides a set of methods that your command will override.
  */
-public class TalonRotate extends Command {
-  TalonIntake mRotater;
+public class TalonShootSlow extends Command {
+  TalonIntake mFeeder;
 
-  /** Creates a new LaunchNote. */
-  public TalonRotate(TalonIntake pRotater) {
-    System.out.println("TalonRotate CONSTRUCTOR CALLED");
-    // save the launcher system internally
-    mRotater = pRotater;
+  /** Creates a new TalonFeed. */
+  public TalonShootSlow(TalonIntake pFeeder) {
+    // save the feeding system internally
+    mFeeder = pFeeder;
 
     // indicate that this command requires the launcher system
-    addRequirements(mRotater);
+    addRequirements(mFeeder);
   }
 
   // The initialize method is called when the command is initially scheduled.
   @Override
   public void initialize() {
     // Set the wheels to launching speed
-    mRotater.setIntakeRotater(-RobotContainer.mOperatorController.getRawAxis(1) * 0.125);
+    mFeeder.setIntakeFeeder(-0.8);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    mRotater.setIntakeRotater(-RobotContainer.mOperatorController.getRawAxis(1) * 0.125);
+    // There is nothing we need this command to do on each iteration. You could remove this method and the default blank method of the base class will run.
   }
 
   // Returns true when the command should end.
@@ -49,7 +42,8 @@ public class TalonRotate extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    // Stop the wheels when the command ends.
-    mRotater.stop();
+    // Stop the feeder motor when the command ends.
+    mFeeder.stop();
   }
 }
+

@@ -134,10 +134,10 @@ public class CANDrivetrain extends SubsystemBase {
           mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
     mOdometry.resetPosition(mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition(), getPose());
     
-    mLeftMaster.setSmartCurrentLimit(25);
-    mLeftFollower.setSmartCurrentLimit(25);
-    mRightMaster.setSmartCurrentLimit(25);
-    mRightFollower.setSmartCurrentLimit(25);
+    mLeftMaster.setSmartCurrentLimit(40);
+    mLeftFollower.setSmartCurrentLimit(40);
+    mRightMaster.setSmartCurrentLimit(40);
+    mRightFollower.setSmartCurrentLimit(40);
     mDrive.setSafetyEnabled(false);
 
     mLeftMaster.burnFlash();
@@ -150,14 +150,6 @@ public class CANDrivetrain extends SubsystemBase {
   public void periodic() {
     mOdometry.update(
       mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
-    SmartDashboard.putNumber("Left Master Speed", mLeftMaster.get());
-    SmartDashboard.putNumber("Left Follower Speed", mLeftFollower.get());
-    SmartDashboard.putNumber("Right Master Speed", mRightMaster.get());
-    SmartDashboard.putNumber("Right Follower Speed", mRightFollower.get());
-    SmartDashboard.putNumber("Left Encoder Position", mLeftEncoder.getPosition());
-    SmartDashboard.putNumber("Left Encoder Velocity", mLeftEncoder.getVelocity());
-    SmartDashboard.putNumber("Right Encoder Position", mRightEncoder.getPosition());
-    SmartDashboard.putNumber("Right Encoder Velocity", mRightEncoder.getVelocity());
   }
 
   /**
@@ -325,7 +317,7 @@ public class CANDrivetrain extends SubsystemBase {
   public Command arcadeDriveCommand(DoubleSupplier fwd, DoubleSupplier rot) {
     // A split-stick arcade command, with forward/backward controlled by the left
     // hand, and turning controlled by the right.
-    return run(() -> mDrive.arcadeDrive(fwd.getAsDouble(), rot.getAsDouble()))
+    return run(() -> mDrive.arcadeDrive(rot.getAsDouble(), -fwd.getAsDouble()))
         .withName("arcadeDrive");
   }
 

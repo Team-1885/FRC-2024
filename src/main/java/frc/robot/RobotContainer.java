@@ -31,11 +31,13 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotMap.AutoConstants;
 import frc.robot.RobotMap.DriveConstants;
+import frc.robot.commands.AmpLaunch;
 import frc.robot.commands.LaunchNote;
 import frc.robot.commands.PrepareLaunch;
 import frc.robot.commands.TalonFeed;
 import frc.robot.commands.TalonRotate;
 import frc.robot.commands.TalonShoot;
+import frc.robot.commands.TalonShootSlow;
 import frc.robot.subsystems.CANLauncher;
 import frc.robot.subsystems.TalonIntake;
 import frc.robot.subsystems.CANDrivetrain;
@@ -70,7 +72,7 @@ public class RobotContainer {
 
     mDrive.setDefaultCommand(
         mDrive.arcadeDriveCommand(
-            () -> -mDriverController.getRightX(), () -> -mDriverController.getLeftY()));
+            () -> mDriverController.getLeftY(), () -> mDriverController.getRightX()));
     mIntake.setDefaultCommand(mRotate);
 
     mChooser.addOption("Curvy", loadTrajectory(Robot.trajectoryJSON, true));
@@ -97,14 +99,14 @@ public class RobotContainer {
    * Triggers can be created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
-    new JoystickButton(mOperatorController, 3)
+    new JoystickButton(mOperatorController,2)
         .whileTrue(
            new PrepareLaunch(mLauncher)
                .withTimeout(1)
                .andThen(new LaunchNote(mLauncher))
                .handleInterrupt(() -> mLauncher.stop()));
     
-    new JoystickButton(mOperatorController, 2).whileTrue(mLauncher.feedlaunchWheel()).onFalse(new InstantCommand(mLauncher::stop));
+    new JoystickButton(mOperatorController, 3).whileTrue(mLauncher.feedlaunchWheel()).onFalse(new InstantCommand(mLauncher::stop));
 
     new JoystickButton(mOperatorController, 5)
         .whileTrue(
@@ -116,7 +118,21 @@ public class RobotContainer {
            new TalonShoot(mIntake)
                .handleInterrupt(() -> mIntake.stop()));
 
+    new JoystickButton(mOperatorController, 4)
+        .whileTrue(
+           new TalonShootSlow(mIntake)
+               .handleInterrupt(() -> mIntake.stop()));
+    /*new JoystickButton(mOperatorController, 7)
+        .whileTrue(
+           new PrepareLaunch(mLauncher)
+               .withTimeout(1)
+               .andThen(new AmpLaunch(mLauncher))
+               .handleInterrupt(() -> mLauncher.stop()));*/
+
+    
   }
+
+
 
 /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -174,7 +190,11 @@ public class RobotContainer {
             mDrive);
 
     // Reset odometry to the initial pose of the trajectory, run path following command, then stop at the end.
-    return Commands.runOnce(() -> mLauncher.shootVolts(9, 9))
+    return new WaitCommand(2)
+        .andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
+        .andThen(new WaitCommand(2))
+        .andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))
+        //.andThen(Commands.runOnce(() -> mLauncher.shootVolts(12, 12)))
         .andThen(new WaitCommand(2))
         .andThen(Commands.runOnce(() -> mLauncher.shootVolts(0, 0)));
   }
