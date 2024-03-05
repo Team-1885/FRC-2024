@@ -39,6 +39,7 @@ import frc.robot.commands.TalonRotate;
 import frc.robot.commands.TalonShoot;
 import frc.robot.commands.TalonShootSlow;
 import frc.robot.subsystems.CANLauncher;
+import frc.robot.subsystems.NEOFeeder;
 import frc.robot.subsystems.TalonIntake;
 import frc.robot.subsystems.CANDrivetrain;
 
@@ -53,6 +54,7 @@ public class RobotContainer {
   private final CANDrivetrain mDrive = CANDrivetrain.getInstance();
   private final CANLauncher mLauncher = new CANLauncher();
   private final TalonIntake mIntake = new TalonIntake();
+  private final NEOFeeder mFeeder = new NEOFeeder();
 
   private final TalonRotate mRotate;
   
@@ -110,17 +112,17 @@ public class RobotContainer {
 
     new JoystickButton(mOperatorController, 5)
         .whileTrue(
-           new TalonFeed(mIntake)
+           new TalonFeed(mFeeder)
                .handleInterrupt(() -> mIntake.stop()));
 
     new JoystickButton(mOperatorController, 6)
         .whileTrue(
-           new TalonShoot(mIntake)
+           new TalonShoot(mFeeder)
                .handleInterrupt(() -> mIntake.stop()));
 
     new JoystickButton(mOperatorController, 4)
         .whileTrue(
-           new TalonShootSlow(mIntake)
+           new TalonShootSlow(mFeeder)
                .handleInterrupt(() -> mIntake.stop()));
     /*new JoystickButton(mOperatorController, 7)
         .whileTrue(

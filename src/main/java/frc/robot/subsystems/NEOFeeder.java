@@ -1,20 +1,19 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class TalonIntake extends SubsystemBase {
-  TalonFX mRotateMaster = new TalonFX(1);
-  TalonFX mRotateFollower = new TalonFX(2);
+public class NEOFeeder extends SubsystemBase {
+  CANSparkMax mIntakeFeeder = new CANSparkMax(3, MotorType.kBrushless);
 
   /** Creates a new Launcher. */
-  public TalonIntake() {
-    mRotateFollower.setControl(new Follower(mRotateMaster.getDeviceID(), false));
+  public NEOFeeder() {
+    mIntakeFeeder.setSmartCurrentLimit(70);
+   
   }
 
   /**
@@ -30,7 +29,8 @@ public class TalonIntake extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setIntakeRotater(0.5);
+          setIntakeFeeder(0.7);
+          
         },
         // When the command stops, stop the wheels
         () -> {
@@ -38,24 +38,16 @@ public class TalonIntake extends SubsystemBase {
         });
   }
 
-  // An accessor method to set the speed (technically the output percentage) of the feed wheel
-  public void setIntakeRotater(double speed) {
-    mRotateMaster.set(speed);
-    mRotateFollower.set(-speed);
+  // An accessor method to set the speed (technically the output percentage) of the launch wheel
+  public void setIntakeFeeder(double speed) {
+    mIntakeFeeder.set(speed);
   }
 
-  public double getMasterSpeed() {
-    return mRotateMaster.get();
-  }
-
-  public double getFollowerSpeed() {
-    return mRotateFollower.get();
-  }
 
   // A helper method to stop both wheels. You could skip having a method like this and call the
   // individual accessors with speed = 0 instead
   public void stop() {
-    mRotateMaster.set(0);
-    mRotateFollower.set(0);
+    mIntakeFeeder.set(0);
+    
   }
 }
