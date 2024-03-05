@@ -31,15 +31,15 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotMap.AutoConstants;
 import frc.robot.RobotMap.DriveConstants;
-import frc.robot.commands.AmpLaunch;
+//import frc.robot.commands.AmpLaunch;
 import frc.robot.commands.LaunchNote;
 import frc.robot.commands.PrepareLaunch;
-import frc.robot.commands.TalonFeed;
 import frc.robot.commands.TalonRotate;
-import frc.robot.commands.TalonShoot;
-import frc.robot.commands.TalonShootSlow;
+import frc.robot.commands.CANFeed;
+import frc.robot.commands.CANShoot;
+import frc.robot.commands.CANShootSlow;
 import frc.robot.subsystems.CANLauncher;
-import frc.robot.subsystems.NEOFeeder;
+import frc.robot.subsystems.CANFeeder;
 import frc.robot.subsystems.TalonIntake;
 import frc.robot.subsystems.CANDrivetrain;
 
@@ -54,7 +54,7 @@ public class RobotContainer {
   private final CANDrivetrain mDrive = CANDrivetrain.getInstance();
   private final CANLauncher mLauncher = new CANLauncher();
   private final TalonIntake mIntake = new TalonIntake();
-  private final NEOFeeder mFeeder = new NEOFeeder();
+  private final CANFeeder mFeeder = new CANFeeder();
 
   private final TalonRotate mRotate;
   
@@ -112,17 +112,17 @@ public class RobotContainer {
 
     new JoystickButton(mOperatorController, 5)
         .whileTrue(
-           new TalonFeed(mFeeder)
+           new CANFeed(mFeeder)
                .handleInterrupt(() -> mIntake.stop()));
 
     new JoystickButton(mOperatorController, 6)
         .whileTrue(
-           new TalonShoot(mFeeder)
+           new CANShoot(mFeeder)
                .handleInterrupt(() -> mIntake.stop()));
 
     new JoystickButton(mOperatorController, 4)
         .whileTrue(
-           new TalonShootSlow(mFeeder)
+           new CANShootSlow(mFeeder)
                .handleInterrupt(() -> mIntake.stop()));
     /*new JoystickButton(mOperatorController, 7)
         .whileTrue(

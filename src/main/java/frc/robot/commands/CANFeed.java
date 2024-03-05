@@ -1,18 +1,19 @@
+
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.NEOFeeder;
+import frc.robot.subsystems.CANFeeder;
 import frc.robot.subsystems.TalonIntake;
 import static frc.robot.Constants.IntakeConstants;
 
 /*
- * This is an example of creating a command as a class. The base Command class provides a set of methods that your command will override.
+ * The intake feeder
  */
-public class TalonFeed extends Command {
-  NEOFeeder mFeeder;
+public class CANFeed extends Command {
+  CANFeeder mFeeder;
 
   /** Creates a new TalonFeed. */
-  public TalonFeed(NEOFeeder pFeeder) {
+  public CANFeed(CANFeeder pFeeder) {
     // save the feeding system internally
     mFeeder = pFeeder;
 

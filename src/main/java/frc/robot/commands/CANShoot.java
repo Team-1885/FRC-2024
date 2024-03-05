@@ -1,18 +1,20 @@
+
+
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.NEOFeeder;
+import frc.robot.subsystems.CANFeeder;
 import frc.robot.subsystems.TalonIntake;
 import static frc.robot.Constants.IntakeConstants;
 
 /*
- * This is an example of creating a command as a class. The base Command class provides a set of methods that your command will override.
+ * The intake shooter
  */
-public class TalonShootSlow extends Command {
-  NEOFeeder mFeeder;
+public class CANShoot extends Command {
+  CANFeeder mFeeder;
 
   /** Creates a new TalonFeed. */
-  public TalonShootSlow(NEOFeeder pFeeder) {
+  public CANShoot(CANFeeder pFeeder) {
     // save the feeding system internally
     mFeeder = pFeeder;
 
@@ -24,7 +26,7 @@ public class TalonShootSlow extends Command {
   @Override
   public void initialize() {
     // Set the wheels to launching speed
-    mFeeder.setIntakeFeeder(-0.8);
+    mFeeder.setIntakeFeeder(-1);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

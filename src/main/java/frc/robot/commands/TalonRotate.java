@@ -11,7 +11,7 @@ import static frc.robot.Constants.IntakeConstants.*;
 
 
 /*
- * This is an example of creating a command as a class. The base Command class provides a set of methods that your command will override.
+ * The intake rotator
  */
 public class TalonRotate extends Command {
   TalonIntake mRotater;

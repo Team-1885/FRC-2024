@@ -13,7 +13,7 @@ import frc.robot.subsystems.CANDrivetrain;
 import lombok.Getter;
 
 /**
- * An example command for use as a template.
+ * Drive Command
  */
 
 @SuppressWarnings("PMD.CommentSize")
