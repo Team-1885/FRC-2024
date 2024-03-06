@@ -9,17 +9,25 @@ import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.hardware.vendors.firstparties.Clock;
-import frc.robot.subsystems.CANDrivetrain;
+import frc.robot.subsystems.drivetrain.CANDrivetrain;
 
 import java.io.IOException;
 import java.nio.file.Path;
+
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -30,12 +38,11 @@ import java.nio.file.Path;
  */
 
 @SuppressWarnings("PMD.CommentSize")
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
 	RobotContainer mRobotContainer;
 	private Command mAutonomousCommand;
 	// private final SysIdRoutineBot mRobot = new SysIdRoutineBot();
 
-	private CANDrivetrain mWestCoastDrive;
 	public static final Clock CLOCK =
 		(RobotBase.isReal() ? new Clock() : new Clock().simulated());
 	//public static final Field2d FIELD = new Field2d();
@@ -62,26 +69,32 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
+
+		/*
+		AdvantageKit Initialization Start
+		*/
+
+		Logger.recordMetadata("ProjectName", "Comet2024"); // Set a metadata value
+
+		if (isReal()) {
+			//Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+			Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+			new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+		} else {
+			setUseTiming(false); // Run as fast as possible
+			String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+			Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+			Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+		}
+
+		// Logger.disableDeterministicTimestamps() // See "Deterministic Timestamps" in the "Understanding Data Flow" page
+		Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+
+		/*
+		AdvantageKit Initialization Complete
+		*/
+
 		mRobotContainer = new RobotContainer();
-		// Starts recording to data log
-		DataLogManager.start();
-
-		// Record both DS control and joystick data
-		DriverStation.startDataLog(DataLogManager.getLog());
-
-		// mRobot.configureBindings();
-
-		DataLogManager.log("===> ROBOT INIT Starting");
-
-		mWestCoastDrive = CANDrivetrain.getInstance();
-
-		DataLogManager.log("Starting Robot Initialization...");
-
-		LiveWindow.disableAllTelemetry();
-
-		// mWestCoastDrive.resetOdometry(null);
-		mWestCoastDrive.zeroHeading();
-		mWestCoastDrive.resetEncoders();
 
 		sigmaSkibidiRizz();
 	}

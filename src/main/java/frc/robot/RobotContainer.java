@@ -38,9 +38,10 @@ import frc.robot.commands.TalonFeed;
 import frc.robot.commands.TalonRotate;
 import frc.robot.commands.TalonShoot;
 import frc.robot.commands.TalonShootSlow;
-import frc.robot.subsystems.CANLauncher;
-import frc.robot.subsystems.TalonIntake;
-import frc.robot.subsystems.CANDrivetrain;
+import frc.robot.subsystems.intake.TalonIntake;
+import frc.robot.subsystems.drivetrain.CANDrivetrain;
+import frc.robot.subsystems.launcher.CANLauncher;
+import lombok.Getter;
 
 /**
  * This class is where the bulk of the robot should be declared.
@@ -50,9 +51,9 @@ import frc.robot.subsystems.CANDrivetrain;
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
-  private final CANDrivetrain mDrive = CANDrivetrain.getInstance();
-  private final CANLauncher mLauncher = new CANLauncher();
-  private final TalonIntake mIntake = new TalonIntake();
+  @Getter private final CANDrivetrain mDrive;
+  private final CANLauncher mLauncher;
+  private final TalonIntake mIntake;
 
   private final TalonRotate mRotate;
   
@@ -66,6 +67,33 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    switch (Constants.currentMode) {
+      case REAL:
+        // Real robot, instantiate hardware IO implementations
+        mDrive =
+          new CANDrivetrain(new DriveIOSparkMaxBrushed());
+          // we need to make a 
+
+        mLauncher =
+            new CANLauncher(
+                new LauncherIOSparkMaxBrushed()); // Spark Max/Spark Flex + brushed, no encoders
+        break;
+
+      case SIM:
+        // Sim robot, instantiate physics sim IO implementations
+        mDrive = new CANDrivetrain(new DriveIOSim());
+        mLauncher = new CANLauncher(new LauncherIOSim());
+        break;
+
+      default:
+        // Replayed robot, disable IO implementations
+        mDrive = new CANDrivetrain(new CANDrivetrainIO() {});
+        mLauncher = new CANLauncher(new CANLauncherIO() {});
+        break;
+    }
+
+    // Set up note visualizer
+    NoteVisualizer.setRobotPoseSupplier(drive::getPose);
 
     // Command Initialization
     mRotate = new TalonRotate(mIntake);
@@ -197,5 +225,9 @@ public class RobotContainer {
         //.andThen(Commands.runOnce(() -> mLauncher.shootVolts(12, 12)))
         .andThen(new WaitCommand(2))
         .andThen(Commands.runOnce(() -> mLauncher.shootVolts(0, 0)));
+  }
+
+  public static CANDrivetrain getDrive() {
+    return mDrive;
   }
 }

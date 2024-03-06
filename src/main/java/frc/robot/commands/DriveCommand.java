@@ -9,7 +9,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.ADAM;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.CANDrivetrain;
+import frc.robot.subsystems.drivetrain.CANDrivetrain;
 import lombok.Getter;
 
 /**

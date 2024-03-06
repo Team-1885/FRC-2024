@@ -1,7 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.TalonIntake;
+import frc.robot.subsystems.intake.TalonIntake;
 import static frc.robot.Constants.IntakeConstants;
 
 /*

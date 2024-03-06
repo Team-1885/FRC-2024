@@ -2,13 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.launcher;
 
 import static frc.robot.ShooterConstants.LauncherConstants.kFeedCurrentLimit;
 import static frc.robot.ShooterConstants.LauncherConstants.kLauncherCurrentLimit;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,14 +19,30 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class CANLauncher extends SubsystemBase {
   CANSparkMax mLaunchWheel;
   CANSparkMax mFeedWheel;
-
+  private final CANLauncherIO io;
+  private final CANLauncherIOInputsAutoLogged inputs = new LauncherIOInputsAutoLogged();
   /** Creates a new Launcher. */
-  public CANLauncher() {
+  public CANLauncher(CANLauncherIO io){
+    // code for advantage kit
+    this.io = io;
+    setDefaultCommand(
+        run(
+            () -> {
+              io.setLaunchVoltage(0.0);
+              io.setFeedVoltage(0.0);
+            }));
+
+
     mLaunchWheel = new CANSparkMax(1, MotorType.kBrushless);
     mFeedWheel = new CANSparkMax(2, MotorType.kBrushless);
 
     mLaunchWheel.setSmartCurrentLimit(kLauncherCurrentLimit);
     mFeedWheel.setSmartCurrentLimit(kFeedCurrentLimit);
+  }
+  @Override
+  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs("Launcher", inputs);
   }
 
   /**
@@ -48,9 +66,12 @@ public class CANLauncher extends SubsystemBase {
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
           setFeedWheel(-1);
+          
         },
         // When the command stops, stop the wheels
-        () -> {});
+        () -> {
+          
+        });
   }
 
   public Command launchWheel() {
@@ -67,6 +88,7 @@ public class CANLauncher extends SubsystemBase {
   }
 
   public Command feedlaunchWheel() {
+
     // The startEnd helper method takes a method to call when the command is initialized and one to call when it ends
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
@@ -90,16 +112,29 @@ public class CANLauncher extends SubsystemBase {
   }
 
   public void shootVolts(double pLaunchVolts, double pFeedVolts) {
-    mLaunchWheel.setVoltage(pLaunchVolts);
-    mFeedWheel.setVoltage(pFeedVolts);
+    // reset the logging values because the last scheduled command is over
+     io.setLaunchVoltage(0.0);
+     io.setFeedVoltage(0.0);
+     mLaunchWheel.setVoltage(pLaunchVolts);
+     mFeedWheel.setVoltage(pFeedVolts);
+     io.setLaunchVoltage(pLaunchVolts);
+     io.setFeedVoltage(pFeedVolts);
+    
   }
 
   public void setLaunchVolts(double pLaunchVolts) {
+     io.setLaunchVoltage(0.0);
+      io.setFeedVoltage(0.0);
     mLaunchWheel.setVoltage(pLaunchVolts);
+    
+    io.setLaunchVoltage(pLaunchVolts);
   }
 
   public void setFeedVolts(double pFeedVolts) {
-    mFeedWheel.setVoltage(pFeedVolts);
+     io.setLaunchVoltage(0.0);
+     io.setFeedVoltage(0.0);
+     mFeedWheel.setVoltage(pFeedVolts);
+     io.setFeedVoltage(pFeedVolts);
   }
 
   // A helper method to stop both wheels. You could skip having a method like this and call the
