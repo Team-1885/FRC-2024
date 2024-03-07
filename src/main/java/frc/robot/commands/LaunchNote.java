@@ -8,7 +8,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CANLauncher;
-import static frc.robot.ShooterConstants.LauncherConstants.*;
 
 /*
  * This is an example of creating a command as a class. The base Command class provides a set of methods that your command will override.

@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
-import frc.robot.ADAM;
 import lombok.Getter;
 
 /**
@@ -55,34 +54,27 @@ public class REVLibCAN {
   public static @Getter double SECONDARY_CURRENT_LIMIT = 40.0;
   public static @Getter final CANSparkLowLevel.MotorType MOTOR_TYPE = CANSparkLowLevel.MotorType.kBrushless;
 
-  private @Getter static ADAM adam = new ADAM(null);
   private static final Logger logger = Logger.getLogger(REVLibCAN.class.getName());
 
   public static void logFaults(Stream<CANSparkMax> REVLibCAN) {
-    runTest(() -> {
-      REVLibCAN.forEach(motor -> {
-        reportFaults(motor);
-        reportStickyFaults(motor);
-      });
+    REVLibCAN.forEach(motor -> {
+      reportFaults(motor);
+      reportStickyFaults(motor);
     });
   }
 
   public static void reportFaults(CANSparkMax REVLibCAN) {
-    runTest(() -> {
-      if (hasFaults(REVLibCAN)) {
-        getFaultList(REVLibCAN, fault -> logger.log(Level.SEVERE,
-            "Fault " + fault.name() + " detected on Spark MAX ID " + REVLibCAN.getDeviceId()));
-      }
-    });
+    if (hasFaults(REVLibCAN)) {
+      getFaultList(REVLibCAN, fault -> logger.log(Level.SEVERE,
+          "Fault " + fault.name() + " detected on Spark MAX ID " + REVLibCAN.getDeviceId()));
+    }
   }
 
   public static void reportStickyFaults(CANSparkMax REVLibCAN) {
-    runTest(() -> {
-      if (hasFaults(REVLibCAN)) {
-        getStickyFaultList(REVLibCAN, fault -> logger.log(Level.SEVERE,
-            "Sticky Fault " + fault.name() + " detected on Spark MAX ID " + REVLibCAN.getDeviceId()));
-      }
-    });
+    if (hasFaults(REVLibCAN)) {
+      getStickyFaultList(REVLibCAN, fault -> logger.log(Level.SEVERE,
+          "Sticky Fault " + fault.name() + " detected on Spark MAX ID " + REVLibCAN.getDeviceId()));
+    }
   }
 
   public static List<CANSparkMax.FaultID> getFaultList(CANSparkMax REVLibCAN,
@@ -131,25 +123,5 @@ public class REVLibCAN {
 
   public static boolean hasStickyFaults(CANSparkMax REVLibCAN) {
     return REVLibCAN.getStickyFaults() != 0;
-  }
-
-  /**
-   * ...
-   */
-  public void debugClass() {
-    // ...
-  }
-
-  /**
-   * Runs the provided code as a runnable task. If the code throws an exception, it is caught, and an uncaught exception is passed to the default uncaught exception handler for the current thread.
-   *
-   * @param code The runnable task to be executed.
-   */
-  public static void runTest(final Runnable code) {
-    try {
-      code.run();
-    } catch (Exception e) {
-      adam.uncaughtException(Thread.currentThread(), e);
-    }
   }
 }

@@ -6,18 +6,17 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.TalonIntake;
-import static frc.robot.Constants.IntakeConstants.*;
+import frc.robot.subsystems.Rotator;
 
 
 /*
  * This is an example of creating a command as a class. The base Command class provides a set of methods that your command will override.
  */
 public class TalonRotate extends Command {
-  TalonIntake mRotater;
+  Rotator mRotater;
 
   /** Creates a new LaunchNote. */
-  public TalonRotate(TalonIntake pRotater) {
+  public TalonRotate(Rotator pRotater) {
     System.out.println("TalonRotate CONSTRUCTOR CALLED");
     // save the launcher system internally
     mRotater = pRotater;

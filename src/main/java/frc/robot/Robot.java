@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -33,7 +35,6 @@ import java.nio.file.Path;
 public class Robot extends TimedRobot {
 	RobotContainer mRobotContainer;
 	private Command mAutonomousCommand;
-	// private final SysIdRoutineBot mRobot = new SysIdRoutineBot();
 
 	private CANDrivetrain mWestCoastDrive;
 	public static final Clock CLOCK =
@@ -41,9 +42,10 @@ public class Robot extends TimedRobot {
 	//public static final Field2d FIELD = new Field2d();
 	public static final boolean IS_SIMULATED = RobotBase.isSimulation();
 	public static String CLIMB_MODE = "";
+	// private final Field2d mField = new Field2d();
 
 	public static String trajectoryJSON =
-		"Paths/output/PathWeaver_Straight.wpilib.json";
+		"Paths/output/B_PathWeaver_Curve.wpilib.json";
 	public static Trajectory trajectory = new Trajectory();
 
 	/**
@@ -63,19 +65,14 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		mRobotContainer = new RobotContainer();
+		//SmartDashboard.putData("Field", mField);
 		// Starts recording to data log
 		DataLogManager.start();
 
 		// Record both DS control and joystick data
 		DriverStation.startDataLog(DataLogManager.getLog());
 
-		// mRobot.configureBindings();
-
-		DataLogManager.log("===> ROBOT INIT Starting");
-
 		mWestCoastDrive = CANDrivetrain.getInstance();
-
-		DataLogManager.log("Starting Robot Initialization...");
 
 		LiveWindow.disableAllTelemetry();
 
@@ -83,10 +80,10 @@ public class Robot extends TimedRobot {
 		mWestCoastDrive.zeroHeading();
 		mWestCoastDrive.resetEncoders();
 
-		sigmaSkibidiRizz();
+		loadTrajectory();
 	}
  
-	public void sigmaSkibidiRizz() {
+	public void loadTrajectory() {
 		try {
 			Path trajectoryPath =
 				Filesystem.getDeployDirectory().toPath().resolve(
@@ -115,6 +112,8 @@ public class Robot extends TimedRobot {
 		// must be called from the robot's periodic block in order for anything
 		// in the Command-based framework to work.
 		CommandScheduler.getInstance().run();
+		//mField.setRobotPose(mWestCoastDrive.getPose());
+		//mField.getObject("traj").setTrajectory(trajectory);
 	}
 
 	/**
@@ -122,7 +121,6 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void disabledInit() {
-		DataLogManager.log("Disabled Initialization");
 	}
 
 	@Override
@@ -136,7 +134,7 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		mAutonomousCommand = mRobotContainer.getAutonomousCommand();
 		if (mAutonomousCommand != null) {
-		mAutonomousCommand.schedule();
+			mAutonomousCommand.schedule();
 		}
 	}
 
@@ -148,8 +146,6 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
-		// mWestCoastDrive.zeroHeading();
-		// mWestCoastDrive.resetEncoders();
 		// This makes sure that the autonomous stops running when teleop starts running. If you want the autonomous to continue until interrupted by another command, remove this line or comment it out.
 		if (mAutonomousCommand != null) {
 			mAutonomousCommand.cancel();

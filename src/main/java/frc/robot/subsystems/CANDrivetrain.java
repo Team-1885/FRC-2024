@@ -21,23 +21,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.DriveConstants;
+import frc.robot.Constants;
 import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
 import static edu.wpi.first.units.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-
 import java.util.function.DoubleSupplier;
-
-import org.opencv.features2d.FlannBasedMatcher;
 
 public class CANDrivetrain extends SubsystemBase {
   private final CANSparkMax mLeftMaster = new CANSparkMax(6, REVLibCAN.MOTOR_TYPE);
   private final CANSparkMax mLeftFollower = new CANSparkMax(7, REVLibCAN.MOTOR_TYPE);
   private final CANSparkMax mRightMaster = new CANSparkMax(8, REVLibCAN.MOTOR_TYPE);
   private final CANSparkMax mRightFollower = new CANSparkMax(9, REVLibCAN.MOTOR_TYPE);
-  
+
   private final RelativeEncoder mLeftEncoder = mLeftMaster.getEncoder();
   private final RelativeEncoder mRightEncoder = mLeftMaster.getEncoder();
 
@@ -51,48 +48,51 @@ public class CANDrivetrain extends SubsystemBase {
 
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutableMeasure<Voltage> mAppliedVoltage = mutable(Volts.of(0));
-  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+  // Mutable holder for unit-safe linear distance values, persisted to avoid
+  // reallocation.
   private final MutableMeasure<Distance> mDistance = mutable(Meters.of(0));
-  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+  // Mutable holder for unit-safe linear velocity values, persisted to avoid
+  // reallocation.
   private final MutableMeasure<Velocity<Distance>> mVelocity = mutable(MetersPerSecond.of(0));
 
   // Create a new SysId routine for characterizing the drive.
-  private final SysIdRoutine mSysIdRoutine =
-      new SysIdRoutine(
-          // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-          new SysIdRoutine.Config(),
-          new SysIdRoutine.Mechanism(
-              // Tell SysId how to plumb the driving voltage to the motors.
-              (Measure<Voltage> volts) -> {
-                mLeftMaster.setVoltage(volts.in(Volts));
-                mRightMaster.setVoltage(volts.in(Volts));
-              },
-              // Tell SysId how to record a frame of data for each motor on the mechanism being
-              // characterized.
-              log -> {
-                // Record a frame for the left motors.  Since these share an encoder, we consider
-                // the entire group to be one motor.
-                log.motor("drive-left")
-                    .voltage(
-                        mAppliedVoltage.mut_replace(
-                            mLeftMaster.getAppliedOutput() * mLeftMaster.getBusVoltage(), Volts))
-                    .linearPosition(mDistance.mut_replace(mLeftEncoder.getPosition(), Meters))
-                    .linearVelocity(
-                        mVelocity.mut_replace(mLeftEncoder.getVelocity(), MetersPerSecond));
-                // Record a frame for the right motors.  Since these share an encoder, we consider
-                // the entire group to be one motor.
-                log.motor("drive-right")
-                    .voltage(
-                        mAppliedVoltage.mut_replace(
-                            mRightMaster.getAppliedOutput() * mRightMaster.getBusVoltage(), Volts))
-                    .linearPosition(mDistance.mut_replace(mRightEncoder.getPosition(), Meters))
-                    .linearVelocity(
-                        mVelocity.mut_replace(mRightEncoder.getVelocity(), MetersPerSecond));
-              },
-              // Tell SysId to make generated commands require this subsystem, suffix test state in
-              // WPILog with this subsystem's name ("drive")
-              this));
-
+  private final SysIdRoutine mSysIdRoutine = new SysIdRoutine(
+      // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+      new SysIdRoutine.Config(),
+      new SysIdRoutine.Mechanism(
+          // Tell SysId how to plumb the driving voltage to the motors.
+          (Measure<Voltage> volts) -> {
+            mLeftMaster.setVoltage(volts.in(Volts));
+            mRightMaster.setVoltage(volts.in(Volts));
+          },
+          // Tell SysId how to record a frame of data for each motor on the mechanism
+          // being
+          // characterized.
+          log -> {
+            // Record a frame for the left motors. Since these share an encoder, we consider
+            // the entire group to be one motor.
+            log.motor("drive-left")
+                .voltage(
+                    mAppliedVoltage.mut_replace(
+                        mLeftMaster.getAppliedOutput() * mLeftMaster.getBusVoltage(), Volts))
+                .linearPosition(mDistance.mut_replace(mLeftEncoder.getPosition(), Meters))
+                .linearVelocity(
+                    mVelocity.mut_replace(mLeftEncoder.getVelocity(), MetersPerSecond));
+            // Record a frame for the right motors. Since these share an encoder, we
+            // consider
+            // the entire group to be one motor.
+            log.motor("drive-right")
+                .voltage(
+                    mAppliedVoltage.mut_replace(
+                        mRightMaster.getAppliedOutput() * mRightMaster.getBusVoltage(), Volts))
+                .linearPosition(mDistance.mut_replace(mRightEncoder.getPosition(), Meters))
+                .linearVelocity(
+                    mVelocity.mut_replace(mRightEncoder.getVelocity(), MetersPerSecond));
+          },
+          // Tell SysId to make generated commands require this subsystem, suffix test
+          // state in
+          // WPILog with this subsystem's name ("drive")
+          this));
 
   private static final CANDrivetrain instance = new CANDrivetrain();
 
@@ -116,28 +116,28 @@ public class CANDrivetrain extends SubsystemBase {
     mLeftEncoder.setPosition(0.0);
     mRightEncoder.setPosition(0.0);
 
-    mLeftEncoder.setPositionConversionFactor(DriveConstants.kLinearDistanceConversionFactor);
-    mRightEncoder.setPositionConversionFactor(DriveConstants.kLinearDistanceConversionFactor);
-    mLeftEncoder.setVelocityConversionFactor(DriveConstants.kLinearDistanceConversionFactor / 60);
-    mRightEncoder.setVelocityConversionFactor(DriveConstants.kLinearDistanceConversionFactor / 60);
-    
+    mLeftEncoder.setPositionConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor);
+    mRightEncoder.setPositionConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor);
+    mLeftEncoder.setVelocityConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor / 60);
+    mRightEncoder.setVelocityConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor / 60);
+
     mLeftFollower.follow(mLeftMaster);
     mRightFollower.follow(mRightMaster);
 
-    mRightMaster.setInverted(false);
+    mRightMaster.setInverted(true);
 
     mGyro.reset();
     mGyro.calibrate();
     resetEncoders();
 
     mOdometry = new DifferentialDriveOdometry(
-          mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
+        mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
     mOdometry.resetPosition(mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition(), getPose());
-    
-    mLeftMaster.setSmartCurrentLimit(40);
-    mLeftFollower.setSmartCurrentLimit(40);
-    mRightMaster.setSmartCurrentLimit(40);
-    mRightFollower.setSmartCurrentLimit(40);
+
+    mLeftMaster.setSmartCurrentLimit(10);
+    mLeftFollower.setSmartCurrentLimit(10);
+    mRightMaster.setSmartCurrentLimit(10);
+    mRightFollower.setSmartCurrentLimit(10);
     mDrive.setSafetyEnabled(false);
 
     mLeftMaster.burnFlash();
@@ -149,7 +149,12 @@ public class CANDrivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     mOdometry.update(
-      mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
+        mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
+
+    SmartDashboard.putNumber("Left Master Speed", mLeftMaster.get());
+    SmartDashboard.putNumber("Left Follower Speed", mLeftFollower.get());
+    SmartDashboard.putNumber("Right Master Speed", mRightMaster.get());
+    SmartDashboard.putNumber("Right Follower Speed", mRightFollower.get());
   }
 
   /**
@@ -176,7 +181,6 @@ public class CANDrivetrain extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pPose) {
-    resetEncoders();
     mOdometry.resetPosition(
         mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition(), pPose);
   }
@@ -194,18 +198,13 @@ public class CANDrivetrain extends SubsystemBase {
   /**
    * Controls the left and right sides of the drive directly with voltages.
    *
-   * @param leftVolts the commanded left output
+   * @param leftVolts  the commanded left output
    * @param rightVolts the commanded right output
    */
   public void tankDriveVolts(double pLeftVolts, double pRightVolts) {
     mLeftMaster.setVoltage(pLeftVolts);
     mRightMaster.setVoltage(pRightVolts);
-    //mDrive.feed();
-
-    // if (Math.abs(pLeftVolts / 12) < 1 && Math.abs(pRightVolts / 12) < 1) {
-    //   mLeftMaster.set(pLeftVolts / 12);
-    //   mRightMaster.set(pRightVolts / 12);
-    // }
+    mDrive.feed();
   }
 
   public void setCoastMode() {
@@ -234,7 +233,7 @@ public class CANDrivetrain extends SubsystemBase {
    * @return the average of the two encoder readings
    */
   public double getAverageEncoderDistance() {
-    return ((getLeftEncoderPosition() + getRightEncoderPosition()) / 2.0);
+    return (getLeftEncoderPosition() + getRightEncoderPosition()) / 2.0;
   }
 
   /**
@@ -276,7 +275,8 @@ public class CANDrivetrain extends SubsystemBase {
   }
 
   /**
-   * Sets the max output of the drive. Useful for scaling the drive to drive more slowly.
+   * Sets the max output of the drive. Useful for scaling the drive to drive more
+   * slowly.
    *
    * @param maxOutput the maximum output to which the drive will be constrained
    */
@@ -286,7 +286,6 @@ public class CANDrivetrain extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    mGyro.calibrate();
     mGyro.reset();
   }
 
@@ -308,7 +307,7 @@ public class CANDrivetrain extends SubsystemBase {
     return -mGyro.getRate();
   }
 
-    /**
+  /**
    * Returns a command that drives the robot with arcade controls.
    *
    * @param fwd the commanded forward movement
@@ -317,12 +316,13 @@ public class CANDrivetrain extends SubsystemBase {
   public Command arcadeDriveCommand(DoubleSupplier fwd, DoubleSupplier rot) {
     // A split-stick arcade command, with forward/backward controlled by the left
     // hand, and turning controlled by the right.
-    return run(() -> mDrive.arcadeDrive(rot.getAsDouble(), -fwd.getAsDouble()))
+    return run(() -> mDrive.arcadeDrive(fwd.getAsDouble(), rot.getAsDouble()))
         .withName("arcadeDrive");
   }
 
   /**
-   * Returns a command that will execute a quasistatic test in the given direction.
+   * Returns a command that will execute a quasistatic test in the given
+   * direction.
    *
    * @param direction The direction (forward or reverse) to run the test in
    */

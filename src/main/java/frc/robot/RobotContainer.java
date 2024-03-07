@@ -4,34 +4,22 @@
 
 package frc.robot;
 
-import java.util.List;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotMap.AutoConstants;
 import frc.robot.RobotMap.DriveConstants;
-import frc.robot.commands.AmpLaunch;
 import frc.robot.commands.LaunchNote;
 import frc.robot.commands.PrepareLaunch;
 import frc.robot.commands.TalonFeed;
@@ -39,7 +27,8 @@ import frc.robot.commands.TalonRotate;
 import frc.robot.commands.TalonShoot;
 import frc.robot.commands.TalonShootSlow;
 import frc.robot.subsystems.CANLauncher;
-import frc.robot.subsystems.TalonIntake;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Rotator;
 import frc.robot.subsystems.CANDrivetrain;
 
 /**
@@ -52,15 +41,13 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final CANDrivetrain mDrive = CANDrivetrain.getInstance();
   private final CANLauncher mLauncher = new CANLauncher();
-  private final TalonIntake mIntake = new TalonIntake();
+  private final Rotator mRotator = new Rotator();
+  private final Intake mIntake = new Intake();
 
   private final TalonRotate mRotate;
   
   public final static CommandXboxController mDriverController = new CommandXboxController(1); // 1 is the USB Port to be used as indicated on the Driver Station
   public final static Joystick mOperatorController = new Joystick(2); // 2 is the USB Port to be used as indicated on the Driver Station
-  CommandGenericHID controller = new CommandGenericHID(5);
-  
-  SendableChooser<Command> mChooser = new SendableChooser<>();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -68,17 +55,12 @@ public class RobotContainer {
   public RobotContainer() {
 
     // Command Initialization
-    mRotate = new TalonRotate(mIntake);
+    mRotate = new TalonRotate(mRotator);
 
     mDrive.setDefaultCommand(
         mDrive.arcadeDriveCommand(
-            () -> mDriverController.getLeftY(), () -> mDriverController.getRightX()));
-    mIntake.setDefaultCommand(mRotate);
-
-    mChooser.addOption("Curvy", loadTrajectory(Robot.trajectoryJSON, true));
-    mChooser.addOption("Straight", loadTrajectory(Robot.trajectoryJSON, true));
-
-    Shuffleboard.getTab("Autonomous").add(mChooser);
+            () -> -mDriverController.getLeftY(), () -> -mDriverController.getRightX()));
+    mRotator.setDefaultCommand(mRotate);
 
     // Configure the trigger bindings
     configureBindings();
@@ -132,8 +114,6 @@ public class RobotContainer {
     
   }
 
-
-
 /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -160,18 +140,6 @@ public class RobotContainer {
             // Apply the voltage constraint
             .addConstraint(autoVoltageConstraint);
 
- // An example trajectory to follow. All units in meters.
-    Trajectory exampleTrajectory =
-        TrajectoryGenerator.generateTrajectory(
-            // Start at the origin facing the +X direction
-            new Pose2d(0, 0, new Rotation2d(0)),
-            // Pass through these two interior waypoints, making an 's' curve path
-            List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-            // End 3 meters straight ahead of where we started, facing forward
-            new Pose2d(3, 0, new Rotation2d(0)),
-            // Pass config
-            config);
-
     RamseteCommand ramseteCommand =
         new RamseteCommand(
             Robot.trajectory,
@@ -190,12 +158,10 @@ public class RobotContainer {
             mDrive);
 
     // Reset odometry to the initial pose of the trajectory, run path following command, then stop at the end.
-    return new WaitCommand(2)
+    return Commands.runOnce(() -> mDrive.resetOdometry(Robot.trajectory.getInitialPose()))
         .andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
-        .andThen(new WaitCommand(2))
-        .andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))
-        //.andThen(Commands.runOnce(() -> mLauncher.shootVolts(12, 12)))
-        .andThen(new WaitCommand(2))
-        .andThen(Commands.runOnce(() -> mLauncher.shootVolts(0, 0)));
+        .andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)));
+        //.andThen(ramseteCommand)
+        //.andThen(Commands.runOnce(() -> mDrive.tankDriveVolts(0, 0)));
   }
 }
