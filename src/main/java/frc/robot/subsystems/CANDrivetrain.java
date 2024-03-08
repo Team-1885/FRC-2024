@@ -134,10 +134,10 @@ public class CANDrivetrain extends SubsystemBase {
         mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
     mOdometry.resetPosition(mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition(), getPose());
 
-    mLeftMaster.setSmartCurrentLimit(10);
-    mLeftFollower.setSmartCurrentLimit(10);
-    mRightMaster.setSmartCurrentLimit(10);
-    mRightFollower.setSmartCurrentLimit(10);
+    mLeftMaster.setSmartCurrentLimit(40);
+    mLeftFollower.setSmartCurrentLimit(40);
+    mRightMaster.setSmartCurrentLimit(40);
+    mRightFollower.setSmartCurrentLimit(40);
     mDrive.setSafetyEnabled(false);
 
     mLeftMaster.burnFlash();
