@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants;
+import frc.robot.RobotMap;
 import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
 import static edu.wpi.first.units.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.Meters;
@@ -30,17 +30,17 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.function.DoubleSupplier;
 
 public class CANDrivetrain extends SubsystemBase {
-  private final CANSparkMax mLeftMaster = new CANSparkMax(6, REVLibCAN.MOTOR_TYPE);
-  private final CANSparkMax mLeftFollower = new CANSparkMax(7, REVLibCAN.MOTOR_TYPE);
-  private final CANSparkMax mRightMaster = new CANSparkMax(8, REVLibCAN.MOTOR_TYPE);
-  private final CANSparkMax mRightFollower = new CANSparkMax(9, REVLibCAN.MOTOR_TYPE);
+  private final static CANSparkMax mLeftMaster = new CANSparkMax(4, REVLibCAN.MOTOR_TYPE);
+  private final static CANSparkMax mLeftFollower = new CANSparkMax(3, REVLibCAN.MOTOR_TYPE);
+  private final static CANSparkMax mRightMaster = new CANSparkMax(2, REVLibCAN.MOTOR_TYPE);
+  private final static CANSparkMax mRightFollower = new CANSparkMax(1, REVLibCAN.MOTOR_TYPE);
 
   private final RelativeEncoder mLeftEncoder = mLeftMaster.getEncoder();
   private final RelativeEncoder mRightEncoder = mLeftMaster.getEncoder();
 
-  private final DifferentialDrive mDrive = new DifferentialDrive(mLeftMaster::set, mRightMaster::set);
+  public final static DifferentialDrive mDrive = new DifferentialDrive(mLeftMaster::set, mRightMaster::set);
 
-  private final ADXRS450_Gyro mGyro = new ADXRS450_Gyro();
+  public static final ADXRS450_Gyro mGyro = new ADXRS450_Gyro();
 
   private final DifferentialDriveOdometry mOdometry;
 
@@ -54,7 +54,6 @@ public class CANDrivetrain extends SubsystemBase {
   // Mutable holder for unit-safe linear velocity values, persisted to avoid
   // reallocation.
   private final MutableMeasure<Velocity<Distance>> mVelocity = mutable(MetersPerSecond.of(0));
-
   // Create a new SysId routine for characterizing the drive.
   private final SysIdRoutine mSysIdRoutine = new SysIdRoutine(
       // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
@@ -116,10 +115,10 @@ public class CANDrivetrain extends SubsystemBase {
     mLeftEncoder.setPosition(0.0);
     mRightEncoder.setPosition(0.0);
 
-    mLeftEncoder.setPositionConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor);
-    mRightEncoder.setPositionConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor);
-    mLeftEncoder.setVelocityConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor / 60);
-    mRightEncoder.setVelocityConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor / 60);
+    mLeftEncoder.setPositionConversionFactor(RobotMap.DrivetrainConstants.kLinearDistanceConversionFactor);
+    mRightEncoder.setPositionConversionFactor(RobotMap.DrivetrainConstants.kLinearDistanceConversionFactor);
+    mLeftEncoder.setVelocityConversionFactor(RobotMap.DrivetrainConstants.kLinearDistanceConversionFactor / 60);
+    mRightEncoder.setVelocityConversionFactor(RobotMap.DrivetrainConstants.kLinearDistanceConversionFactor / 60);
 
     mLeftFollower.follow(mLeftMaster);
     mRightFollower.follow(mRightMaster);
@@ -134,10 +133,10 @@ public class CANDrivetrain extends SubsystemBase {
         mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
     mOdometry.resetPosition(mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition(), getPose());
 
-    mLeftMaster.setSmartCurrentLimit(40);
-    mLeftFollower.setSmartCurrentLimit(40);
-    mRightMaster.setSmartCurrentLimit(40);
-    mRightFollower.setSmartCurrentLimit(40);
+    mLeftMaster.setSmartCurrentLimit(50);
+    mLeftFollower.setSmartCurrentLimit(50);
+    mRightMaster.setSmartCurrentLimit(50);
+    mRightFollower.setSmartCurrentLimit(50);
     mDrive.setSafetyEnabled(false);
 
     mLeftMaster.burnFlash();
@@ -150,11 +149,7 @@ public class CANDrivetrain extends SubsystemBase {
   public void periodic() {
     mOdometry.update(
         mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
-
-    SmartDashboard.putNumber("Left Master Speed", mLeftMaster.get());
-    SmartDashboard.putNumber("Left Follower Speed", mLeftFollower.get());
-    SmartDashboard.putNumber("Right Master Speed", mRightMaster.get());
-    SmartDashboard.putNumber("Right Follower Speed", mRightFollower.get());
+        SmartDashboard.putNumber("Gyro Angle", getAngle());
   }
 
   /**
@@ -298,6 +293,16 @@ public class CANDrivetrain extends SubsystemBase {
     return mGyro.getRotation2d().getDegrees();
   }
 
+
+  /**
+   * Returns the angle of the robot.
+   *
+   * @return the robot's angle in degrees, from -180 to 180
+   */
+  public static double getAngle() {
+    return mGyro.getAngle();
+  }
+
   /**
    * Returns the turn rate of the robot.
    *
@@ -338,4 +343,10 @@ public class CANDrivetrain extends SubsystemBase {
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
     return mSysIdRoutine.dynamic(direction);
   }
+
+  public void tankDrive(double left, double right) {
+        mDrive.tankDrive(left, right);
+    }
+
+
 }

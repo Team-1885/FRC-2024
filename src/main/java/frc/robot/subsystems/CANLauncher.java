@@ -18,8 +18,8 @@ public class CANLauncher extends SubsystemBase {
 
   /** Creates a new Launcher. */
   public CANLauncher() {
-    mLaunchWheel = new CANSparkMax(1, MotorType.kBrushless);
-    mFeedWheel = new CANSparkMax(2, MotorType.kBrushless);
+    mLaunchWheel = new CANSparkMax(18, MotorType.kBrushless);
+    mFeedWheel = new CANSparkMax(12, MotorType.kBrushless);
 
     mLaunchWheel.setSmartCurrentLimit(Constants.LauncherConstants.kLauncherCurrentLimit);
     mFeedWheel.setSmartCurrentLimit(Constants.LauncherConstants.kFeedCurrentLimit);

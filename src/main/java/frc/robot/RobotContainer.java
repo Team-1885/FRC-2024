@@ -39,10 +39,11 @@ import frc.robot.subsystems.CANDrivetrain;
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
-  private final CANDrivetrain mDrive = CANDrivetrain.getInstance();
+  public final CANDrivetrain mDrive = CANDrivetrain.getInstance();
   private final CANLauncher mLauncher = new CANLauncher();
   private final Rotator mRotator = new Rotator();
   private final Intake mIntake = new Intake();
+
 
   private final TalonRotate mRotate;
   
@@ -158,9 +159,10 @@ public class RobotContainer {
             mDrive);
 
     // Reset odometry to the initial pose of the trajectory, run path following command, then stop at the end.
-    return Commands.runOnce(() -> mDrive.resetOdometry(Robot.trajectory.getInitialPose()))
-        .andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
-        .andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)));
+    return Commands.runOnce(() -> mDrive.resetOdometry(Robot.trajectory.getInitialPose()));
+        //.andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
+        //.andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))
+        //.andThen(Commands.runOnce(() -> mDrive.tankDriveVolts( kP * Robot.error, -kP * Robot.error)));
         //.andThen(ramseteCommand)
         //.andThen(Commands.runOnce(() -> mDrive.tankDriveVolts(0, 0)));
   }

@@ -6,18 +6,14 @@ package frc.robot;
 
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryUtil;
-import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-import frc.robot.hardware.vendors.firstparties.Clock;
 import frc.robot.subsystems.CANDrivetrain;
 
 import java.io.IOException;
@@ -35,13 +31,10 @@ import java.nio.file.Path;
 public class Robot extends TimedRobot {
 	RobotContainer mRobotContainer;
 	private Command mAutonomousCommand;
+	private final double kP = 0.012;
 
 	private CANDrivetrain mWestCoastDrive;
-	public static final Clock CLOCK =
-		(RobotBase.isReal() ? new Clock() : new Clock().simulated());
 	//public static final Field2d FIELD = new Field2d();
-	public static final boolean IS_SIMULATED = RobotBase.isSimulation();
-	public static String CLIMB_MODE = "";
 	// private final Field2d mField = new Field2d();
 
 	public static String trajectoryJSON =
@@ -67,10 +60,7 @@ public class Robot extends TimedRobot {
 		mRobotContainer = new RobotContainer();
 		//SmartDashboard.putData("Field", mField);
 		// Starts recording to data log
-		DataLogManager.start();
-
-		// Record both DS control and joystick data
-		DriverStation.startDataLog(DataLogManager.getLog());
+		//DataLogManager.start();
 
 		mWestCoastDrive = CANDrivetrain.getInstance();
 
@@ -106,12 +96,8 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotPeriodic() {
 		// Runs the Scheduler.
-		// This is responsible for polling buttons, adding newly-scheduled
-		// commands, running already-scheduled commands, removing finished or
-		// interrupted commands, and running subsystem periodic() methods. This
-		// must be called from the robot's periodic block in order for anything
-		// in the Command-based framework to work.
-		CommandScheduler.getInstance().run();
+		// This is responsible for polling buttons, adding newly-scheduled commands, running already-scheduled commands, removing finished or interrupted commands, and running subsystem periodic() methods. This must be called from the robot's periodic block in order for anything in the Command-based framework to work.
+		// CommandScheduler.getInstance().run();
 		//mField.setRobotPose(mWestCoastDrive.getPose());
 		//mField.getObject("traj").setTrajectory(trajectory);
 	}
@@ -141,7 +127,11 @@ public class Robot extends TimedRobot {
 	/** This function is called periodically during autonomous. */
 	@Override
 	public void autonomousPeriodic() {
-		CommandScheduler.getInstance().run();
+		// CommandScheduler.getInstance().run();
+		double error = 90 - CANDrivetrain.mGyro.getAngle();
+		CANDrivetrain.mDrive.tankDrive(kP*error, -kP*error);
+
+
 	}
 
 	@Override

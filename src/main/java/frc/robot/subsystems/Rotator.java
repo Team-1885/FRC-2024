@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Rotator extends SubsystemBase {
-    TalonFX mRotateMaster = new TalonFX(1);
-    TalonFX mRotateFollower = new TalonFX(2);
+    TalonFX mRotateMaster = new TalonFX(11);
+    TalonFX mRotateFollower = new TalonFX(24);
 
     public Rotator() {
         mRotateFollower.setControl(new Follower(mRotateMaster.getDeviceID(), false));
