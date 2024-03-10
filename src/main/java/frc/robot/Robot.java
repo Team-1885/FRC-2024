@@ -6,7 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryUtil;
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -31,14 +30,14 @@ import java.nio.file.Path;
 public class Robot extends TimedRobot {
 	RobotContainer mRobotContainer;
 	private Command mAutonomousCommand;
-	private final double kP = 0.012;
+	public static double error;
 
 	private CANDrivetrain mWestCoastDrive;
 	//public static final Field2d FIELD = new Field2d();
 	// private final Field2d mField = new Field2d();
 
 	public static String trajectoryJSON =
-		"Paths/output/B_PathWeaver_Curve.wpilib.json";
+		"Paths/output/B_PathWeaver_Straight.wpilib.json";
 	public static Trajectory trajectory = new Trajectory();
 
 	/**
@@ -59,8 +58,6 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		mRobotContainer = new RobotContainer();
 		//SmartDashboard.putData("Field", mField);
-		// Starts recording to data log
-		//DataLogManager.start();
 
 		mWestCoastDrive = CANDrivetrain.getInstance();
 
@@ -97,7 +94,7 @@ public class Robot extends TimedRobot {
 	public void robotPeriodic() {
 		// Runs the Scheduler.
 		// This is responsible for polling buttons, adding newly-scheduled commands, running already-scheduled commands, removing finished or interrupted commands, and running subsystem periodic() methods. This must be called from the robot's periodic block in order for anything in the Command-based framework to work.
-		// CommandScheduler.getInstance().run();
+		CommandScheduler.getInstance().run();
 		//mField.setRobotPose(mWestCoastDrive.getPose());
 		//mField.getObject("traj").setTrajectory(trajectory);
 	}
@@ -128,9 +125,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousPeriodic() {
 		// CommandScheduler.getInstance().run();
-		double error = 90 - CANDrivetrain.mGyro.getAngle();
-		CANDrivetrain.mDrive.tankDrive(kP*error, -kP*error);
-
+		error = 90 - CANDrivetrain.getAngle();
 
 	}
 

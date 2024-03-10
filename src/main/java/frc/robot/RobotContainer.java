@@ -39,14 +39,15 @@ import frc.robot.subsystems.CANDrivetrain;
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
-  public final CANDrivetrain mDrive = CANDrivetrain.getInstance();
+  public static final CANDrivetrain mDrive = CANDrivetrain.getInstance();
   private final CANLauncher mLauncher = new CANLauncher();
   private final Rotator mRotator = new Rotator();
   private final Intake mIntake = new Intake();
 
 
   private final TalonRotate mRotate;
-  
+  private final double kP = 0.012;
+
   public final static CommandXboxController mDriverController = new CommandXboxController(1); // 1 is the USB Port to be used as indicated on the Driver Station
   public final static Joystick mOperatorController = new Joystick(2); // 2 is the USB Port to be used as indicated on the Driver Station
 
@@ -159,11 +160,13 @@ public class RobotContainer {
             mDrive);
 
     // Reset odometry to the initial pose of the trajectory, run path following command, then stop at the end.
-    return Commands.runOnce(() -> mDrive.resetOdometry(Robot.trajectory.getInitialPose()));
+    return Commands.runOnce(() -> mDrive.resetOdometry(Robot.trajectory.getInitialPose()))
         //.andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
         //.andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))
-        //.andThen(Commands.runOnce(() -> mDrive.tankDriveVolts( kP * Robot.error, -kP * Robot.error)));
-        //.andThen(ramseteCommand)
+        //.andThen(Commands.runOnce(() -> mDrive.tankDrive( kP * Robot.error, -kP * Robot.error)));
+        .andThen(ramseteCommand);
+
+
         //.andThen(Commands.runOnce(() -> mDrive.tankDriveVolts(0, 0)));
   }
 }
