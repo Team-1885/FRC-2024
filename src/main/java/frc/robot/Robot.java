@@ -1,6 +1,5 @@
 // Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Open Source Software; you can modify and/or share it under the terms of the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
 
@@ -19,51 +18,40 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * The VM is configured to automatically run this class, and to call the
- * functions corresponding to each mode, as described in the TimedRobot
- * documentation.
- * If you change the name of this class or the package after creating this
- * project, you must also update the build.gradle file in the project.
+ * The VM is configured to automatically run this class, and to call the functions corresponding to each mode, as described in the TimedRobot documentation. If you change the name of this class or the package after creating this project, you must also update the build.gradle file in the project.
  */
 
 @SuppressWarnings("PMD.CommentSize")
 public class Robot extends TimedRobot {
-	RobotContainer mRobotContainer;
 	private Command mAutonomousCommand;
+
+	RobotContainer mRobotContainer;
 	public static double error;
 
-	private CANDrivetrain mWestCoastDrive;
-	//public static final Field2d FIELD = new Field2d();
-	// private final Field2d mField = new Field2d();
+	private CANDrivetrain mWestCoastDrive = CANDrivetrain.getInstance();
 
 	public static String trajectoryJSON =
-		"Paths/output/B_PathWeaver_Straight.wpilib.json";
+		"Paths/output/UnnameAAAd.wpilib.json";
 	public static Trajectory trajectory = new Trajectory();
 
 	/**
-	 * Default constructor for the Robot class. This constructor is
-	 * automatically invoked when an instance of the Robot class is created.
-	 * Initializes the Robot instance by calling the no-argument constructor of
-	 * the superclass (TimedRobot).
+	 * Default constructor for the Robot class. This constructor is automatically invoked when an instance of the Robot class is created.
+	 * 
+	 * Initializes the Robot instance by calling the no-argument constructor of the superclass (TimedRobot).
 	 */
 	public Robot() {
 		super();
 	}
 
 	/**
-	 * This function is run when the robot is first started up and should be
-	 * used for any initialization code.
+	 * This function is run when the robot is first started up and should be used for any initialization code.
 	 */
 	@Override
 	public void robotInit() {
 		mRobotContainer = new RobotContainer();
-		//SmartDashboard.putData("Field", mField);
-
-		mWestCoastDrive = CANDrivetrain.getInstance();
 
 		LiveWindow.disableAllTelemetry();
 
-		// mWestCoastDrive.resetOdometry(null);
 		mWestCoastDrive.zeroHeading();
 		mWestCoastDrive.resetEncoders();
 
@@ -84,19 +72,14 @@ public class Robot extends TimedRobot {
 	}
 
 	/**
-	 * This function is called every 20 ms, no matter the mode.
-	 * Use this for items like diagnostics that you want ran during disabled,
-	 * autonomous, teleoperated and test.
-	 * This runs after the mode specific periodic functions, but before
-	 * LiveWindow and SmartDashboard integrated updating.
+	 * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics that you want ran during disabled, autonomous, teleoperated and test.
+	 * 
+	 * This runs after the mode specific periodic functions, but beforecLiveWindow and SmartDashboard integrated updating.
 	 */
 	@Override
 	public void robotPeriodic() {
-		// Runs the Scheduler.
-		// This is responsible for polling buttons, adding newly-scheduled commands, running already-scheduled commands, removing finished or interrupted commands, and running subsystem periodic() methods. This must be called from the robot's periodic block in order for anything in the Command-based framework to work.
+		// Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled commands, running already-scheduled commands, removing finished or interrupted commands, and running subsystem periodic() methods. This must be called from the robot's periodic block in order for anything in the Command-based framework to work.
 		CommandScheduler.getInstance().run();
-		//mField.setRobotPose(mWestCoastDrive.getPose());
-		//mField.getObject("traj").setTrajectory(trajectory);
 	}
 
 	/**
@@ -110,12 +93,13 @@ public class Robot extends TimedRobot {
 	public void disabledPeriodic() {}
 
 	/**
-	 * This autonomous runs the autonomous command selected by your
-	 * {@link RobotContainer} class.
+	 * This autonomous runs the autonomous command selected by your {@link RobotContainer} class.
 	 */
 	@Override
 	public void autonomousInit() {
 		mAutonomousCommand = mRobotContainer.getAutonomousCommand();
+
+		// schedule the autonomous command
 		if (mAutonomousCommand != null) {
 			mAutonomousCommand.schedule();
 		}
@@ -124,7 +108,6 @@ public class Robot extends TimedRobot {
 	/** This function is called periodically during autonomous. */
 	@Override
 	public void autonomousPeriodic() {
-		// CommandScheduler.getInstance().run();
 		error = 90 - CANDrivetrain.getAngle();
 
 	}
@@ -153,13 +136,9 @@ public class Robot extends TimedRobot {
 
 	/** This function is called once when the robot is first started up. */
 	@Override
-	public void simulationInit() {
-		// ...
-	}
+	public void simulationInit() {}
 
 	/** This function is called periodically whilst in simulation. */
 	@Override
-	public void simulationPeriodic() {
-		// ...
-	}
+	public void simulationPeriodic() {}
 }
