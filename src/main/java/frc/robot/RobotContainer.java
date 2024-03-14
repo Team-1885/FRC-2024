@@ -19,8 +19,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.RobotMap.AutoConstants;
-import frc.robot.RobotMap.DriveConstants;
 import frc.robot.commands.LaunchNote;
 import frc.robot.commands.PrepareLaunch;
 import frc.robot.commands.TalonFeed;
@@ -63,9 +61,9 @@ public class RobotContainer {
     mDrive.setDefaultCommand(
         mDrive.arcadeDriveCommand(
             () -> -mDriverController.getLeftY(), () -> -mDriverController.getRightX()));
-    mDrive.setDefaultCommand(new RunCommand(() -> {
-        mDrive.arcadeDrive(-mDriverController.getLeftY(), -mDriverController.getRightX());
-    }, mDrive));
+    // mDrive.setDefaultCommand(new RunCommand(() -> {
+    //     mDrive.arcadeDrive(-mDriverController.getLeftY(), -mDriverController.getRightX());
+    // }, mDrive));
     mRotator.setDefaultCommand(mRotate);
 
     // Configure the trigger bindings
@@ -73,7 +71,7 @@ public class RobotContainer {
   }
 
   public Command loadTrajectory(String pFilename, boolean pResetOdometry) {
-    RamseteCommand ramseteCommand =  new RamseteCommand(Robot.trajectory, mDrive::getPose, new RamseteController(RobotMap.AutoConstants.kRamseteB, RobotMap.AutoConstants.kRamseteZeta), new SimpleMotorFeedforward(RobotMap.DriveConstants.ksVolts, RobotMap.DriveConstants.kvVoltSecondsPerMeter, RobotMap.DriveConstants.kaVoltSecondsSquaredPerMeter), RobotMap.DriveConstants.kDriveKinematics, mDrive::getWheelSpeeds, new PIDController(RobotMap.DriveConstants.kPDriveVel, 0, 0), new PIDController(RobotMap.DriveConstants.kPDriveVel, 0, 0), mDrive::tankDriveVolts, mDrive);
+    RamseteCommand ramseteCommand =  new RamseteCommand(Robot.trajectory, mDrive::getPose, new RamseteController(Constants.DrivetrainConstants.kRamseteB, Constants.DrivetrainConstants.kRamseteZeta), new SimpleMotorFeedforward(Constants.DrivetrainConstants.ksVolts, Constants.DrivetrainConstants.kvVoltSecondsPerMeter, Constants.DrivetrainConstants.kaVoltSecondsSquaredPerMeter), Constants.DrivetrainConstants.kDriveKinematics, mDrive::getWheelSpeeds, new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0), new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0), mDrive::tankDriveVolts, mDrive);
     if(pResetOdometry) {
         return new SequentialCommandGroup(new InstantCommand(()->mDrive.resetOdometry(Robot.trajectory.getInitialPose())), ramseteCommand);
     }
@@ -131,19 +129,19 @@ public class RobotContainer {
     var autoVoltageConstraint =
         new DifferentialDriveVoltageConstraint(
             new SimpleMotorFeedforward(
-                DriveConstants.ksVolts,
-                DriveConstants.kvVoltSecondsPerMeter,
-                DriveConstants.kaVoltSecondsSquaredPerMeter),
-            DriveConstants.kDriveKinematics,
+                Constants.DrivetrainConstants.ksVolts,
+                Constants.DrivetrainConstants.kvVoltSecondsPerMeter,
+                Constants.DrivetrainConstants.kaVoltSecondsSquaredPerMeter),
+            Constants.DrivetrainConstants.kDriveKinematics,
             10);
 
     // Create config for trajectory
     TrajectoryConfig config =
         new TrajectoryConfig(
-                AutoConstants.kMaxSpeedMetersPerSecond,
-                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+                Constants.DrivetrainConstants.kMaxSpeedMetersPerSecond,
+                Constants.DrivetrainConstants.kMaxAccelerationMetersPerSecondSquared)
             // Add kinematics to ensure max speed is actually obeyed
-            .setKinematics(DriveConstants.kDriveKinematics)
+            .setKinematics(Constants.DrivetrainConstants.kDriveKinematics)
             // Apply the voltage constraint
             .addConstraint(autoVoltageConstraint);
 
@@ -151,15 +149,15 @@ public class RobotContainer {
         new RamseteCommand(
             Robot.trajectory,
             mDrive::getPose,
-            new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
+            new RamseteController(Constants.DrivetrainConstants.kRamseteB, Constants.DrivetrainConstants.kRamseteZeta),
             new SimpleMotorFeedforward(
-                DriveConstants.ksVolts,
-                DriveConstants.kvVoltSecondsPerMeter,
-                DriveConstants.kaVoltSecondsSquaredPerMeter),
-            DriveConstants.kDriveKinematics,
+                Constants.DrivetrainConstants.ksVolts,
+                Constants.DrivetrainConstants.kvVoltSecondsPerMeter,
+                Constants.DrivetrainConstants.kaVoltSecondsSquaredPerMeter),
+            Constants.DrivetrainConstants.kDriveKinematics,
             mDrive::getWheelSpeeds,
-            new PIDController(DriveConstants.kPDriveVel, 0, 0),
-            new PIDController(DriveConstants.kPDriveVel, 0, 0),
+            new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0),
+            new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0),
             // RamseteCommand passes volts to the callback
             mDrive::tankDriveVolts,
             mDrive);

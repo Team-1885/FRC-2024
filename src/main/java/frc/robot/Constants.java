@@ -61,7 +61,7 @@ public final class Constants {
     public static final double ksVolts = 0.25;
     public static final double kvVoltSecondsPerMeter = 2.16;
     public static final double kaVoltSecondsSquaredPerMeter = 0.48;
-    public static final double kPDriveVel = 8.5;
+    public static final double kPDriveVel = 8.5; // Before was 8.5
 
 
     // DifferentialDriveKinematics
@@ -103,5 +103,14 @@ public final class Constants {
   {
     public static final double kTrueIntakeFeederSpeed = 1;
     public static final double kIntakeRotaterSpeed = 1;
+  }
+
+  public static final class AutoConstants {
+    public static final double kMaxSpeedMetersPerSecond = 1;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+
+    // Reasonable baseline values for a RAMSETE follower in units of meters and seconds
+    public static final double kRamseteB = 2;
+    public static final double kRamseteZeta = 0.7;
   }
 }

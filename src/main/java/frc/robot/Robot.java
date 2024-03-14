@@ -31,7 +31,7 @@ public class Robot extends TimedRobot {
 	private CANDrivetrain mWestCoastDrive = CANDrivetrain.getInstance();
 
 	public static String trajectoryJSON =
-		"Paths/output/UnnameAAAd.wpilib.json";
+		"Paths/output/StraightCenter.wpilib.json";
 	public static Trajectory trajectory = new Trajectory();
 
 	/**
