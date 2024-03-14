@@ -3,6 +3,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -12,7 +13,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-import frc.robot.subsystems.CANDrivetrain;
+import frc.robot.subsystems.DriveSubsystem;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -28,11 +29,13 @@ public class Robot extends TimedRobot {
 	RobotContainer mRobotContainer;
 	public static double error;
 
-	private CANDrivetrain mWestCoastDrive = CANDrivetrain.getInstance();
+	private DriveSubsystem mWestCoastDrive = DriveSubsystem.getInstance();
 
-	public static String trajectoryJSON =
-		"Paths/output/StraightCenter.wpilib.json";
-	public static Trajectory trajectory = new Trajectory();
+	public static String moveToNote =
+		"Paths/output/MoveToNote.wpilib.json";
+	public static String returnToSpeaker = "Paths/output/StraightCenter.wpilib.json";
+	public static Trajectory toNoteTraj = new Trajectory();
+	public static Trajectory toSpeakerTraj = new Trajectory();
 
 	/**
 	 * Default constructor for the Robot class. This constructor is automatically invoked when an instance of the Robot class is created.
@@ -55,18 +58,31 @@ public class Robot extends TimedRobot {
 		mWestCoastDrive.zeroHeading();
 		mWestCoastDrive.resetEncoders();
 
-		loadTrajectory();
+		loadMoveToNote();
 	}
  
-	public void loadTrajectory() {
+	public void loadMoveToNote() {
 		try {
 			Path trajectoryPath =
 				Filesystem.getDeployDirectory().toPath().resolve(
-					trajectoryJSON);
-			trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+					moveToNote);
+			toNoteTraj = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
 		} catch (IOException ex) {
 			DriverStation.reportError(
-				"Unable to open trajectory: " + trajectoryJSON,
+				"Unable to open trajectory: " + moveToNote,
+				ex.getStackTrace());
+		}
+	}
+
+	public void loadReturnToSpeaker() {
+		try {
+			Path trajectoryPath =
+				Filesystem.getDeployDirectory().toPath().resolve(
+					returnToSpeaker);
+			toSpeakerTraj = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+		} catch (IOException ex) {
+			DriverStation.reportError(
+				"Unable to open trajectory: " + returnToSpeaker,
 				ex.getStackTrace());
 		}
 	}
@@ -108,7 +124,7 @@ public class Robot extends TimedRobot {
 	/** This function is called periodically during autonomous. */
 	@Override
 	public void autonomousPeriodic() {
-		error = 90 - CANDrivetrain.getAngle();
+		error = 90 - DriveSubsystem.getAngle();
 
 	}
 

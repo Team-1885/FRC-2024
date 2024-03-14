@@ -27,20 +27,23 @@ import static edu.wpi.first.units.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
+
 import java.util.function.DoubleSupplier;
 
-public class DriveSubsystem extends SubsystemBase {
-  private final static CANSparkMax mLeftMaster = new CANSparkMax(6, REVLibCAN.MOTOR_TYPE);
-  private final static CANSparkMax mLeftFollower = new CANSparkMax(7, REVLibCAN.MOTOR_TYPE);
-  private final static CANSparkMax mRightMaster = new CANSparkMax(8, REVLibCAN.MOTOR_TYPE);
-  private final static CANSparkMax mRightFollower = new CANSparkMax(9, REVLibCAN.MOTOR_TYPE);
+import org.opencv.features2d.FlannBasedMatcher;
 
+public class DriveSubsystem extends SubsystemBase {
+  private final CANSparkMax mLeftMaster = new CANSparkMax(6, REVLibCAN.MOTOR_TYPE);
+  private final CANSparkMax mLeftFollower = new CANSparkMax(7, REVLibCAN.MOTOR_TYPE);
+  private final CANSparkMax mRightMaster = new CANSparkMax(8, REVLibCAN.MOTOR_TYPE);
+  private final CANSparkMax mRightFollower = new CANSparkMax(9, REVLibCAN.MOTOR_TYPE);
+  
   private final RelativeEncoder mLeftEncoder = mLeftMaster.getEncoder();
   private final RelativeEncoder mRightEncoder = mLeftMaster.getEncoder();
 
-  public final static DifferentialDrive mDrive = new DifferentialDrive(mLeftMaster::set, mRightMaster::set);
+  private final DifferentialDrive mDrive = new DifferentialDrive(mLeftMaster::set, mRightMaster::set);
 
-  public static final ADXRS450_Gyro mGyro = new ADXRS450_Gyro();
+  private final static ADXRS450_Gyro mGyro = new ADXRS450_Gyro();
 
   private final DifferentialDriveOdometry mOdometry;
 
@@ -48,14 +51,12 @@ public class DriveSubsystem extends SubsystemBase {
 
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutableMeasure<Voltage> mAppliedVoltage = mutable(Volts.of(0));
-  // Mutable holder for unit-safe linear distance values, persisted to avoid
-  // reallocation.
+  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
   private final MutableMeasure<Distance> mDistance = mutable(Meters.of(0));
-  // Mutable holder for unit-safe linear velocity values, persisted to avoid
-  // reallocation.
+  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
   private final MutableMeasure<Velocity<Distance>> mVelocity = mutable(MetersPerSecond.of(0));
-  // Create a new SysId routine for characterizing the drive.
-  
+
+
 
   private static final DriveSubsystem instance = new DriveSubsystem();
 
@@ -79,28 +80,28 @@ public class DriveSubsystem extends SubsystemBase {
     mLeftEncoder.setPosition(0.0);
     mRightEncoder.setPosition(0.0);
 
-    mLeftEncoder.setPositionConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor);
-    mRightEncoder.setPositionConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor);
-    mLeftEncoder.setVelocityConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor / 60);
-    mRightEncoder.setVelocityConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor / 60);
-
+    mLeftEncoder.setPositionConversionFactor(Constants.kLinearDistanceConversionFactor);
+    mRightEncoder.setPositionConversionFactor(Constants.kLinearDistanceConversionFactor);
+    mLeftEncoder.setVelocityConversionFactor(Constants.kLinearDistanceConversionFactor / 60);
+    mRightEncoder.setVelocityConversionFactor(Constants.kLinearDistanceConversionFactor / 60);
+    
     mLeftFollower.follow(mLeftMaster);
     mRightFollower.follow(mRightMaster);
 
-    mRightMaster.setInverted(true);
+    mRightMaster.setInverted(false);
 
     mGyro.reset();
     mGyro.calibrate();
     resetEncoders();
 
     mOdometry = new DifferentialDriveOdometry(
-        mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
+          mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
     mOdometry.resetPosition(mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition(), getPose());
-
-    mLeftMaster.setSmartCurrentLimit(30);
-    mLeftFollower.setSmartCurrentLimit(30);
-    mRightMaster.setSmartCurrentLimit(30);
-    mRightFollower.setSmartCurrentLimit(30);
+    
+    mLeftMaster.setSmartCurrentLimit(40);
+    mLeftFollower.setSmartCurrentLimit(40);
+    mRightMaster.setSmartCurrentLimit(40);
+    mRightFollower.setSmartCurrentLimit(40);
     mDrive.setSafetyEnabled(false);
 
     mLeftMaster.burnFlash();
@@ -112,13 +113,7 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     mOdometry.update(
-        mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
-        SmartDashboard.putNumber("Gyro Angle", getAngle());
-
-    SmartDashboard.putNumber("Left Encoder Distance", mLeftEncoder.getPosition());
-    SmartDashboard.putNumber("Right Encoder Distance", mRightEncoder.getPosition());
-    SmartDashboard.putNumber("Left Encoder Velocity", mLeftEncoder.getVelocity());
-    SmartDashboard.putNumber("Right Encoder Velocity", mRightEncoder.getVelocity());
+      mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
   }
 
   /**
@@ -145,6 +140,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pPose) {
+    resetEncoders();
     mOdometry.resetPosition(
         mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition(), pPose);
   }
@@ -162,13 +158,18 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Controls the left and right sides of the drive directly with voltages.
    *
-   * @param leftVolts  the commanded left output
+   * @param leftVolts the commanded left output
    * @param rightVolts the commanded right output
    */
   public void tankDriveVolts(double pLeftVolts, double pRightVolts) {
     mLeftMaster.setVoltage(pLeftVolts);
     mRightMaster.setVoltage(pRightVolts);
-    mDrive.feed();
+    //mDrive.feed();
+
+    // if (Math.abs(pLeftVolts / 12) < 1 && Math.abs(pRightVolts / 12) < 1) {
+    //   mLeftMaster.set(pLeftVolts / 12);
+    //   mRightMaster.set(pRightVolts / 12);
+    // }
   }
 
   public void setCoastMode() {
@@ -197,7 +198,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the average of the two encoder readings
    */
   public double getAverageEncoderDistance() {
-    return (getLeftEncoderPosition() + getRightEncoderPosition()) / 2.0;
+    return ((getLeftEncoderPosition() + getRightEncoderPosition()) / 2.0);
   }
 
   /**
@@ -239,8 +240,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Sets the max output of the drive. Useful for scaling the drive to drive more
-   * slowly.
+   * Sets the max output of the drive. Useful for scaling the drive to drive more slowly.
    *
    * @param maxOutput the maximum output to which the drive will be constrained
    */
@@ -250,7 +250,12 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
+    mGyro.calibrate();
     mGyro.reset();
+  }
+
+  public static double getAngle() {
+    return mGyro.getAngle();
   }
 
   /**
@@ -262,16 +267,6 @@ public class DriveSubsystem extends SubsystemBase {
     return mGyro.getRotation2d().getDegrees();
   }
 
-
-  /**
-   * Returns the angle of the robot.
-   *
-   * @return the robot's angle in degrees, from -180 to 180
-   */
-  public static double getAngle() {
-    return mGyro.getAngle();
-  }
-
   /**
    * Returns the turn rate of the robot.
    *
@@ -281,7 +276,7 @@ public class DriveSubsystem extends SubsystemBase {
     return -mGyro.getRate();
   }
 
-  /**
+    /**
    * Returns a command that drives the robot with arcade controls.
    *
    * @param fwd the commanded forward movement
@@ -290,13 +285,8 @@ public class DriveSubsystem extends SubsystemBase {
   public Command arcadeDriveCommand(DoubleSupplier fwd, DoubleSupplier rot) {
     // A split-stick arcade command, with forward/backward controlled by the left
     // hand, and turning controlled by the right.
-    return run(() -> mDrive.arcadeDrive(fwd.getAsDouble(), rot.getAsDouble()))
+    return run(() -> mDrive.arcadeDrive(rot.getAsDouble(), -fwd.getAsDouble()))
         .withName("arcadeDrive");
   }
-
-  public void tankDrive(double left, double right) {
-        mDrive.tankDrive(left, right);
-    }
-
 
 }

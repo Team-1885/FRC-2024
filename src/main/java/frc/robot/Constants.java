@@ -55,9 +55,12 @@ public final class Constants {
     // DO NOT MODIFY THESE CONSTANTS
     // ========================================
 
-
-    //ALL PLACE HOLDER VALUES FROM WIPLIB
-    // TODO: PUT IN REAL VALUES BY TESTING USING SYSIS
+    public static final double kTurnP = 1;
+    public static final double kTurnI = 0;
+    public static final double kTurnD = 0;
+    public static final double kMaxTurnRateDegPerS = 100;
+    public static final double kMaxTurnAccelerationDegPerSSquared = 300;
+    
     public static final double ksVolts = 0.25;
     public static final double kvVoltSecondsPerMeter = 2.16;
     public static final double kaVoltSecondsSquaredPerMeter = 0.48;
@@ -113,4 +116,6 @@ public final class Constants {
     public static final double kRamseteB = 2;
     public static final double kRamseteZeta = 0.7;
   }
+
+public static int kLinearDistanceConversionFactor;
 }

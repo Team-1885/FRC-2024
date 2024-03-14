@@ -28,7 +28,7 @@ import frc.robot.commands.TalonShootSlow;
 import frc.robot.subsystems.CANLauncher;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Rotator;
-import frc.robot.subsystems.CANDrivetrain;
+import frc.robot.subsystems.DriveSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared.
@@ -38,7 +38,7 @@ import frc.robot.subsystems.CANDrivetrain;
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
-  public static final CANDrivetrain mDrive = CANDrivetrain.getInstance();
+  public static final DriveSubsystem mDrive = DriveSubsystem.getInstance();
   private final CANLauncher mLauncher = new CANLauncher();
   private final Rotator mRotator = new Rotator();
   private final Intake mIntake = new Intake();
@@ -68,16 +68,6 @@ public class RobotContainer {
 
     // Configure the trigger bindings
     configureBindings();
-  }
-
-  public Command loadTrajectory(String pFilename, boolean pResetOdometry) {
-    RamseteCommand ramseteCommand =  new RamseteCommand(Robot.trajectory, mDrive::getPose, new RamseteController(Constants.DrivetrainConstants.kRamseteB, Constants.DrivetrainConstants.kRamseteZeta), new SimpleMotorFeedforward(Constants.DrivetrainConstants.ksVolts, Constants.DrivetrainConstants.kvVoltSecondsPerMeter, Constants.DrivetrainConstants.kaVoltSecondsSquaredPerMeter), Constants.DrivetrainConstants.kDriveKinematics, mDrive::getWheelSpeeds, new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0), new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0), mDrive::tankDriveVolts, mDrive);
-    if(pResetOdometry) {
-        return new SequentialCommandGroup(new InstantCommand(()->mDrive.resetOdometry(Robot.trajectory.getInitialPose())), ramseteCommand);
-    }
-    else {
-        return ramseteCommand;
-    }
   }
 
   /**
@@ -145,9 +135,26 @@ public class RobotContainer {
             // Apply the voltage constraint
             .addConstraint(autoVoltageConstraint);
 
-    RamseteCommand ramseteCommand =
+    RamseteCommand toNoteRamsete =
         new RamseteCommand(
-            Robot.trajectory,
+            Robot.toNoteTraj,
+            mDrive::getPose,
+            new RamseteController(Constants.DrivetrainConstants.kRamseteB, Constants.DrivetrainConstants.kRamseteZeta),
+            new SimpleMotorFeedforward(
+                Constants.DrivetrainConstants.ksVolts,
+                Constants.DrivetrainConstants.kvVoltSecondsPerMeter,
+                Constants.DrivetrainConstants.kaVoltSecondsSquaredPerMeter),
+            Constants.DrivetrainConstants.kDriveKinematics,
+            mDrive::getWheelSpeeds,
+            new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0),
+            new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0),
+            // RamseteCommand passes volts to the callback
+            mDrive::tankDriveVolts,
+            mDrive);
+
+    RamseteCommand toSpeakerRamsete =
+        new RamseteCommand(
+            Robot.toSpeakerTraj,
             mDrive::getPose,
             new RamseteController(Constants.DrivetrainConstants.kRamseteB, Constants.DrivetrainConstants.kRamseteZeta),
             new SimpleMotorFeedforward(
@@ -163,11 +170,12 @@ public class RobotContainer {
             mDrive);
 
     // Reset odometry to the initial pose of the trajectory, run path following command, then stop at the end.
-    return Commands.runOnce(() -> mDrive.resetOdometry(Robot.trajectory.getInitialPose()))
+    return Commands.runOnce(() -> mDrive.resetOdometry(Robot.toNoteTraj.getInitialPose()))
         //.andThen(Commands.runOnce(() -> mDrive.tankDrive( kP * Robot.error, -kP * Robot.error)))
         .andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
         .andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))
-        .andThen(ramseteCommand)
+        .andThen(toNoteRamsete)
+        .andThen(toSpeakerRamsete)
         .andThen(Commands.runOnce(() -> mDrive.tankDriveVolts(0, 0)));
   }
 }
