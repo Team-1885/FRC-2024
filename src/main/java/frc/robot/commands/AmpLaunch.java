@@ -7,6 +7,7 @@ package frc.robot.commands;
 
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.CANLauncher;
 
 /*
@@ -29,8 +30,8 @@ public class AmpLaunch extends Command {
   public void initialize() {
     // TODO: Check for correct vals
     // Set the wheels to launching speed
-    mLauncher.setLaunchWheel(0.24);
-    mLauncher.setFeedWheel(0.24);
+    mLauncher.setLaunchWheel(Constants.LauncherConstants.kLauncherSpeed * 0.24);
+    mLauncher.setFeedWheel(Constants.LauncherConstants.kLauncherSpeed * 0.24);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

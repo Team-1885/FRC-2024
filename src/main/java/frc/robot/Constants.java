@@ -24,26 +24,25 @@ public final class Constants {
   }
 
   public static class DrivetrainConstants {
-    // PWM ports/CAN IDs for motor controllers
-    public static final int kLeftRearID = 3;
-    public static final int kLeftFrontID = 4;
-    public static final int kRightRearID = 1;
-    public static final int kRightFrontID = 2;
+    
+    
+    // CAN IDs for motor controllers
+    public static final int kLeftMasterID = 6;
+    public static final int kLeftFollowerID = 7;
+    public static final int kRightMasterID = 8;
+    public static final int kRightFollowerID = 9;
 
-    // Current limit for drivetrain motors
-    public static final int kCurrentLimit = 60;
+    
 
     // ========================================
     // DO NOT MODIFY THESE CONSTANTS
     // ========================================
-     
+    public static final int kCurrentLimit = 40;
     public static final double kWheelDiameterFeet = 0.5;
     public static final double kWheelCircumferenceFeet = Units.feetToMeters(kWheelDiameterFeet * Math.PI);
     public static final double kMaxVelocityRPM = 5676;
-    public static final double kPulsesPerRotation = 256.0;
     public static final double kTrackWidthMeters = Units.feetToMeters(20.875 / 12);
     public static final int kEncoderCPR = 1024;
-    public static final double kEncoderDistancePerPulse = (kTrackWidthMeters * Math.PI) / (double) kEncoderCPR;
 
     //EVERY CONSTANT AUTON USES
     public static final double kWheelDiameterInches = 6;
@@ -85,25 +84,30 @@ public final class Constants {
 
   public static class LauncherConstants {
     // PWM ports/CAN IDs for motor controllers
-    public static final int kFeederID = 5;
-    public static final int kLauncherID = 6;
+    public static final int kFeederID = 2;
+    public static final int kLauncherID = 1;
 
     // Current limit for launcher and feed wheels
     public static final int kLauncherCurrentLimit = 80;
     public static final int kFeedCurrentLimit = 80;
 
-    // Speeds for wheels when intaking and launching. Intake speeds are negative to run the wheels
-    // in reverse
-    public static final double kLauncherSpeed = 1;
-    public static final double kLaunchFeederSpeed = 1;
-    public static final double kIntakeLauncherSpeed = -1;
-    public static final double kIntakeFeederSpeed = -.2;
+    // Speeds for wheels when intaking and launching. Intake speeds are negative to run the wheels in reverse
+    public static final double kLauncherSpeed = 1d;
+    public static final double kLaunchFeederSpeed = 1d;
+    public static final double kIntakeLauncherSpeed = -1d;
+    public static final double kIntakeFeederSpeed = -1d;
+    public static final double kIntakeFeederSpeedSlower = -0.2d;
+    public static final double kFeedLaunchSpeed = -0.5d;
+    public static final double kStopSpeed = 0.0d;
 
-    public static final double kLauncherDelay = 1;
+    public static final double kLauncherDelay = 1d;
   }
 
   public static class IntakeConstants
   {
+    public static final int kFeederID = 3;
+    public static final int kRotatorMasterID = 1;
+    public static final int kRotatorFollowerID = 2;
     public static final double kTrueIntakeFeederSpeed = 1;
     public static final double kIntakeRotaterSpeed = 1;
   }

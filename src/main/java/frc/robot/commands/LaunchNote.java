@@ -7,6 +7,7 @@ package frc.robot.commands;
 
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.CANLauncher;
 
 /*
@@ -27,10 +28,9 @@ public class LaunchNote extends Command {
   // The initialize method is called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // TODO: Check for correct vals
     // Set the wheels to launching speed
-    mLauncher.setLaunchWheel(1);
-    mLauncher.setFeedWheel(1);
+    mLauncher.setLaunchWheel(Constants.LauncherConstants.kLauncherSpeed);
+    mLauncher.setFeedWheel(Constants.LauncherConstants.kLauncherSpeed);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

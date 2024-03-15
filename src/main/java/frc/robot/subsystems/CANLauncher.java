@@ -18,8 +18,8 @@ public class CANLauncher extends SubsystemBase {
 
   /** Creates a new Launcher. */
   public CANLauncher() {
-    mLaunchWheel = new CANSparkMax(18, MotorType.kBrushless);
-    mFeedWheel = new CANSparkMax(12, MotorType.kBrushless);
+    mLaunchWheel = new CANSparkMax(Constants.LauncherConstants.kLauncherID, MotorType.kBrushless);
+    mFeedWheel = new CANSparkMax(Constants.LauncherConstants.kFeederID, MotorType.kBrushless);
 
     mLaunchWheel.setSmartCurrentLimit(Constants.LauncherConstants.kLauncherCurrentLimit);
     mFeedWheel.setSmartCurrentLimit(Constants.LauncherConstants.kFeedCurrentLimit);
@@ -33,8 +33,8 @@ public class CANLauncher extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setFeedWheel(-0.2);
-          setLaunchWheel(-1);
+          setFeedWheel(Constants.LauncherConstants.kIntakeFeederSpeedSlower);
+          setLaunchWheel(Constants.LauncherConstants.kIntakeLauncherSpeed);
         },
         // When the command stops, stop the wheels
         () -> {});
@@ -45,7 +45,7 @@ public class CANLauncher extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setFeedWheel(-1);
+          setFeedWheel(Constants.LauncherConstants.kIntakeFeederSpeed);
         },
         // When the command stops, stop the wheels
         () -> {});
@@ -56,7 +56,7 @@ public class CANLauncher extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setLaunchWheel(-1);
+          setLaunchWheel(Constants.LauncherConstants.kLaunchFeederSpeed);
         },
         // When the command stops, stop the wheels
         () -> {
@@ -69,8 +69,8 @@ public class CANLauncher extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setLaunchWheel(-0.5);
-          setFeedWheel(-0.5);
+          setLaunchWheel(Constants.LauncherConstants.kFeedLaunchSpeed);
+          setFeedWheel(Constants.LauncherConstants.kFeedLaunchSpeed);
         },
         // When the command stops, stop the wheels
         () -> {
@@ -103,7 +103,7 @@ public class CANLauncher extends SubsystemBase {
   // A helper method to stop both wheels. You could skip having a method like this and call the
   // individual accessors with speed = 0 instead
   public void stop() {
-    mLaunchWheel.set(0);
-    mFeedWheel.set(0);
+    mLaunchWheel.set(Constants.LauncherConstants.kStopSpeed);
+    mFeedWheel.set(Constants.LauncherConstants.kStopSpeed);
   }
 }

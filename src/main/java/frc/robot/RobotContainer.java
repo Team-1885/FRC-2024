@@ -25,6 +25,7 @@ import frc.robot.commands.TalonFeed;
 import frc.robot.commands.TalonRotate;
 import frc.robot.commands.TalonShoot;
 import frc.robot.commands.TalonShootSlow;
+import frc.robot.commands.TurnToAngle;
 import frc.robot.subsystems.CANLauncher;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Rotator;
@@ -61,9 +62,6 @@ public class RobotContainer {
     mDrive.setDefaultCommand(
         mDrive.arcadeDriveCommand(
             () -> -mDriverController.getLeftY(), () -> -mDriverController.getRightX()));
-    // mDrive.setDefaultCommand(new RunCommand(() -> {
-    //     mDrive.arcadeDrive(-mDriverController.getLeftY(), -mDriverController.getRightX());
-    // }, mDrive));
     mRotator.setDefaultCommand(mRotate);
 
     // Configure the trigger bindings
@@ -171,11 +169,12 @@ public class RobotContainer {
 
     // Reset odometry to the initial pose of the trajectory, run path following command, then stop at the end.
     return Commands.runOnce(() -> mDrive.resetOdometry(Robot.toNoteTraj.getInitialPose()))
-        //.andThen(Commands.runOnce(() -> mDrive.tankDrive( kP * Robot.error, -kP * Robot.error)))
-        .andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
-        .andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))
-        .andThen(toNoteRamsete)
-        .andThen(toSpeakerRamsete)
+        .andThen(new TurnToAngle(90, mDrive))
+        .andThen(Commands.runOnce(() -> mRotator.setPosition(100))) // TODO: Test Functionality, Change TalonFX Config Vals
+        //.andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
+        //.andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))
+        //.andThen(toNoteRamsete)
+        //.andThen(toSpeakerRamsete)
         .andThen(Commands.runOnce(() -> mDrive.tankDriveVolts(0, 0)));
   }
 }

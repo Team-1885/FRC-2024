@@ -33,10 +33,10 @@ import java.util.function.DoubleSupplier;
 import org.opencv.features2d.FlannBasedMatcher;
 
 public class DriveSubsystem extends SubsystemBase {
-  private final CANSparkMax mLeftMaster = new CANSparkMax(6, REVLibCAN.MOTOR_TYPE);
-  private final CANSparkMax mLeftFollower = new CANSparkMax(7, REVLibCAN.MOTOR_TYPE);
-  private final CANSparkMax mRightMaster = new CANSparkMax(8, REVLibCAN.MOTOR_TYPE);
-  private final CANSparkMax mRightFollower = new CANSparkMax(9, REVLibCAN.MOTOR_TYPE);
+  private final CANSparkMax mLeftMaster = new CANSparkMax(Constants.DrivetrainConstants.kLeftMasterID, REVLibCAN.MOTOR_TYPE);
+  private final CANSparkMax mLeftFollower = new CANSparkMax(Constants.DrivetrainConstants.kLeftFollowerID, REVLibCAN.MOTOR_TYPE);
+  private final CANSparkMax mRightMaster = new CANSparkMax(Constants.DrivetrainConstants.kRightMasterID, REVLibCAN.MOTOR_TYPE);
+  private final CANSparkMax mRightFollower = new CANSparkMax(Constants.DrivetrainConstants.kRightFollowerID, REVLibCAN.MOTOR_TYPE);
   
   private final RelativeEncoder mLeftEncoder = mLeftMaster.getEncoder();
   private final RelativeEncoder mRightEncoder = mLeftMaster.getEncoder();
@@ -98,10 +98,11 @@ public class DriveSubsystem extends SubsystemBase {
           mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
     mOdometry.resetPosition(mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition(), getPose());
     
-    mLeftMaster.setSmartCurrentLimit(40);
-    mLeftFollower.setSmartCurrentLimit(40);
-    mRightMaster.setSmartCurrentLimit(40);
-    mRightFollower.setSmartCurrentLimit(40);
+    mLeftMaster.setSmartCurrentLimit(Constants.DrivetrainConstants.kCurrentLimit);
+    mLeftFollower.setSmartCurrentLimit(Constants.DrivetrainConstants.kCurrentLimit);
+    mRightMaster.setSmartCurrentLimit(Constants.DrivetrainConstants.kCurrentLimit);
+    mRightFollower.setSmartCurrentLimit(Constants.DrivetrainConstants.kCurrentLimit);
+
     mDrive.setSafetyEnabled(false);
 
     mLeftMaster.burnFlash();
