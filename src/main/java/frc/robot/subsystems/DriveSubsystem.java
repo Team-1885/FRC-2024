@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -59,6 +60,8 @@ public class DriveSubsystem extends SubsystemBase {
     return instance;
   }
 
+
+
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     SendableRegistry.addChild(mDrive, mLeftMaster);
@@ -75,10 +78,10 @@ public class DriveSubsystem extends SubsystemBase {
     mLeftEncoder.setPosition(0.0);
     mRightEncoder.setPosition(0.0);
 
-    mLeftEncoder.setPositionConversionFactor(Constants.kLinearDistanceConversionFactor);
-    mRightEncoder.setPositionConversionFactor(Constants.kLinearDistanceConversionFactor);
-    mLeftEncoder.setVelocityConversionFactor(Constants.kLinearDistanceConversionFactor / 60);
-    mRightEncoder.setVelocityConversionFactor(Constants.kLinearDistanceConversionFactor / 60);
+    mLeftEncoder.setPositionConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor);
+    mRightEncoder.setPositionConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor);
+    mLeftEncoder.setVelocityConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor / 60);
+    mRightEncoder.setVelocityConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor / 60);
     
     mLeftFollower.follow(mLeftMaster);
     mRightFollower.follow(mRightMaster);
@@ -110,6 +113,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     mOdometry.update(
       mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
+    SmartDashboard.putNumber("Gyro Angle", getAngle());
   }
 
   /**
@@ -130,6 +134,10 @@ public class DriveSubsystem extends SubsystemBase {
     return new DifferentialDriveWheelSpeeds(getLeftEncoderVelocity(), getRightEncoderVelocity());
   }
 
+  public DifferentialDrive getDifferentialDrive() {
+    return mDrive;
+  }
+
   /**
    * Resets the odometry to the specified pose.
    *
@@ -148,7 +156,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rot the commanded rotation
    */
   public void arcadeDrive(double pFwd, double pRot) {
-    mDrive.arcadeDrive(pFwd, pRot);
+    mDrive.arcadeDrive(pFwd, -pRot);
   }
 
   /**
@@ -246,8 +254,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    mGyro.calibrate();
     mGyro.reset();
+    mGyro.calibrate();
   }
 
   public static double getAngle() {
@@ -260,7 +268,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return mGyro.getRotation2d().getDegrees();
+    return Math.IEEEremainder(mGyro.getAngle(), 360) * 1.0;
   }
 
   /**
@@ -278,11 +286,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fwd the commanded forward movement
    * @param rot the commanded rotation
    */
-  public Command arcadeDriveCommand(DoubleSupplier pFwd, DoubleSupplier pRot) {
-    // A split-stick arcade command, with forward/backward controlled by the left
-    // hand, and turning controlled by the right.
-    return run(() -> mDrive.arcadeDrive(pFwd.getAsDouble(), pRot.getAsDouble()))
-        .withName("arcadeDrive");
-  }
+  
 
 }

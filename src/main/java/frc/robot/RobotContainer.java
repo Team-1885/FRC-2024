@@ -19,15 +19,16 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.Climb;
 import frc.robot.commands.LaunchNote;
+import frc.robot.commands.PositionControl;
 import frc.robot.commands.PrepareLaunch;
 import frc.robot.commands.TalonFeed;
 import frc.robot.commands.TalonRotate;
 import frc.robot.commands.TalonShoot;
-import frc.robot.commands.TalonShootSlow;
-import frc.robot.commands.TurnToAngle;
 import frc.robot.commands.TurnToAngleProfiled;
 import frc.robot.subsystems.CANLauncher;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Rotator;
 import frc.robot.subsystems.DriveSubsystem;
@@ -44,7 +45,8 @@ public class RobotContainer {
   private final CANLauncher mLauncher = new CANLauncher();
   private final Rotator mRotator = new Rotator();
   private final Intake mIntake = new Intake();
-
+  private final Climber mClimber = new Climber();
+  private final Climb mClimb;
 
   private final TalonRotate mRotate;
   private final double kP = 0.012;
@@ -59,13 +61,14 @@ public class RobotContainer {
 
     // Command Initialization
     mRotate = new TalonRotate(mRotator);
+    mClimb = new Climb(mClimber);
 
     mDrive.setDefaultCommand(
         // A split-stick arcade command, with forward/backward controlled by the left hand, and turning controlled by the right.
         new RunCommand(
             () ->
                 mDrive.arcadeDrive(
-                    -mDriverController.getLeftY(), -mDriverController.getRightX()),
+                    mDriverController.getRightX(), -mDriverController.getLeftY()),
             mDrive)
         );
     mRotator.setDefaultCommand(mRotate);
@@ -88,6 +91,11 @@ public class RobotContainer {
     
     new JoystickButton(mOperatorController, 3).whileTrue(mLauncher.feedlaunchWheel()).onFalse(new InstantCommand(mLauncher::stop));
 
+    new JoystickButton(mOperatorController, 4)
+        .whileTrue(
+           new PositionControl(mRotator)
+               .handleInterrupt(() -> mRotator.stop()));
+
     new JoystickButton(mOperatorController, 5)
         .whileTrue(
            new TalonFeed(mIntake)
@@ -97,18 +105,15 @@ public class RobotContainer {
         .whileTrue(
            new TalonShoot(mIntake)
                .handleInterrupt(() -> mIntake.stop()));
-
-    new JoystickButton(mOperatorController, 4)
-        .whileTrue(
-           new TalonShootSlow(mIntake)
-               .handleInterrupt(() -> mIntake.stop()));
     
-    new JoystickButton(mOperatorController, 9).onTrue(new TurnToAngle(90, mDrive).withTimeout(2));
-    new JoystickButton(mOperatorController, 10).onTrue(new TurnToAngleProfiled(-90, mDrive).withTimeout(2));
+    new JoystickButton(mOperatorController, 7).whileTrue(new Climb(mClimber).handleInterrupt(() -> mClimber.stop()));
+
+    new JoystickButton(mOperatorController, 9).onTrue(new TurnToAngleProfiled(90, mDrive).withTimeout(2).andThen(Commands.runOnce(() -> mDrive.zeroHeading())));
+    new JoystickButton(mOperatorController, 10).onTrue(new TurnToAngleProfiled(-90, mDrive).withTimeout(2).andThen(Commands.runOnce(() -> mDrive.zeroHeading())));
     
   }
 
-/**
+  /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
@@ -170,7 +175,8 @@ public class RobotContainer {
 
     // Reset odometry to the initial pose of the trajectory, run path following command, then stop at the end.
     return Commands.runOnce(() -> mDrive.resetOdometry(Robot.toNoteTraj.getInitialPose()))
-        .andThen(new TurnToAngle(90, mDrive))
+        // TODO: Tune PID vals via //https://docs.jpsrobotics2554.org/programming/advanced-concepts/motion-profiling/
+        .andThen(new TurnToAngleProfiled(90, mDrive))
         //.andThen(Commands.runOnce(() -> mRotator.TODO(100))) // TODO: Test Functionality, Change TalonFX Config Vals
         //.andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
         //.andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))

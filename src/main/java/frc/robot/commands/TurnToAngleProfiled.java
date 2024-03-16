@@ -32,7 +32,7 @@ public class TurnToAngleProfiled extends ProfiledPIDCommand {
         // Set reference to target
         targetAngleDegrees,
         // Pipe output to turn robot
-        (output, setpoint) -> drive.arcadeDrive(0, output),
+        (output, setpoint) -> drive.arcadeDrive(output, 0),
         // Require the drive
         drive);
 

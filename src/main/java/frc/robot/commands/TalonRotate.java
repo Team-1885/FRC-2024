@@ -17,7 +17,6 @@ public class TalonRotate extends Command {
 
   /** Creates a new LaunchNote. */
   public TalonRotate(Rotator pRotater) {
-    System.out.println("TalonRotate CONSTRUCTOR CALLED");
     // save the launcher system internally
     mRotater = pRotater;
 

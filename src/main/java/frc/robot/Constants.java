@@ -27,10 +27,10 @@ public final class Constants {
     
     
     // CAN IDs for motor controllers
-    public static final int kLeftMasterID = 6;
-    public static final int kLeftFollowerID = 7;
-    public static final int kRightMasterID = 8;
-    public static final int kRightFollowerID = 9;
+    public static final int kLeftMasterID = 4;
+    public static final int kLeftFollowerID = 3;
+    public static final int kRightMasterID = 2;
+    public static final int kRightFollowerID = 1;
 
     
 
@@ -58,7 +58,7 @@ public final class Constants {
     public static final double kStabilizationI = 0.5;
     public static final double kStabilizationD = 0;
     
-    public static final double kTurnP = 1;
+    public static final double kTurnP = 0.015;
     public static final double kTurnI = 0;
     public static final double kTurnD = 0;
 
@@ -92,8 +92,8 @@ public final class Constants {
 
   public static class LauncherConstants {
     // PWM ports/CAN IDs for motor controllers
-    public static final int kFeederID = 2;
-    public static final int kLauncherID = 1;
+    public static final int kFeederID = 20; // BEFORE 2
+    public static final int kLauncherID = 21; // BEFORE 1
 
     // Current limit for launcher and feed wheels
     public static final int kLauncherCurrentLimit = 80;
@@ -113,9 +113,9 @@ public final class Constants {
 
   public static class IntakeConstants
   {
-    public static final int kFeederID = 3;
-    public static final int kRotatorMasterID = 1;
-    public static final int kRotatorFollowerID = 2;
+    public static final int kFeederID = 22; // BEFORE 3
+    public static final int kRotatorMasterID = 23; // BEFORE 1
+    public static final int kRotatorFollowerID = 24; // BEFORE 2
     public static final double kTrueIntakeFeederSpeed = 1;
     public static final double kIntakeRotaterSpeed = 1;
   }
@@ -129,5 +129,10 @@ public final class Constants {
     public static final double kRamseteZeta = 0.7;
   }
 
-public static int kLinearDistanceConversionFactor;
-}
+public static final class ClimberConstants {
+    public static final int climber1ID = 24;
+    public static final int climber2ID = 22;
+  
+  }
+  
+  }
