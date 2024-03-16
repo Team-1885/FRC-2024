@@ -3,7 +3,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DriverStation;

@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
-import edu.wpi.first.math.controller.PIDController;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -17,14 +16,8 @@ public class Rotator extends SubsystemBase {
     //Servo exampleServo = new Servo(1);
 
 
-    private PIDController intakePID;
-
     public Rotator() {
         mRotateFollower.setControl(new Follower(mRotateMaster.getDeviceID(), false));
-        double kP = 0.01;
-        double kI = 0.0;
-        double kD = 0.0;
-        intakePID = new PIDController(kP, kI, kD);
     }
 
     public Command getRotatorCommand() {

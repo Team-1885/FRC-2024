@@ -8,7 +8,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.Rotator;
 
 /*
@@ -43,7 +42,7 @@ public class PositionControl extends Command {
     public void execute() {
         final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
 
-        mRotater.setControl(m_request.withPosition(10));
+        mRotater.setControl(m_request.withPosition(10)); //10 Rotations
     }
 
     // Returns true when the command should end.

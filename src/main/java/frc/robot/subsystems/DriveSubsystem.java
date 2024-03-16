@@ -3,36 +3,26 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
+
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.hardware.vendors.thirdparties.revlib.REVLibCAN;
-import static edu.wpi.first.units.MutableMeasure.mutable;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
-import java.util.function.DoubleSupplier;
 
 public class DriveSubsystem extends SubsystemBase {
-  private final CANSparkMax mLeftMaster = new CANSparkMax(Constants.DrivetrainConstants.kLeftMasterID, REVLibCAN.MOTOR_TYPE);
-  private final CANSparkMax mLeftFollower = new CANSparkMax(Constants.DrivetrainConstants.kLeftFollowerID, REVLibCAN.MOTOR_TYPE);
-  private final CANSparkMax mRightMaster = new CANSparkMax(Constants.DrivetrainConstants.kRightMasterID, REVLibCAN.MOTOR_TYPE);
-  private final CANSparkMax mRightFollower = new CANSparkMax(Constants.DrivetrainConstants.kRightFollowerID, REVLibCAN.MOTOR_TYPE);
+  private final CANSparkMax mLeftMaster = new CANSparkMax(Constants.DrivetrainConstants.kLeftMasterID, MotorType.kBrushless);
+  private final CANSparkMax mLeftFollower = new CANSparkMax(Constants.DrivetrainConstants.kLeftFollowerID, MotorType.kBrushless);
+  private final CANSparkMax mRightMaster = new CANSparkMax(Constants.DrivetrainConstants.kRightMasterID, MotorType.kBrushless);
+  private final CANSparkMax mRightFollower = new CANSparkMax(Constants.DrivetrainConstants.kRightFollowerID, MotorType.kBrushless);
   
   private final RelativeEncoder mLeftEncoder = mLeftMaster.getEncoder();
   private final RelativeEncoder mRightEncoder = mLeftMaster.getEncoder();
@@ -45,12 +35,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   ShuffleboardTab mTab = Shuffleboard.getTab("WC_Drive");
 
-  // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
-  private final MutableMeasure<Voltage> mAppliedVoltage = mutable(Volts.of(0));
-  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
-  private final MutableMeasure<Distance> mDistance = mutable(Meters.of(0));
-  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
-  private final MutableMeasure<Velocity<Distance>> mVelocity = mutable(MetersPerSecond.of(0));
 
 
 
@@ -72,9 +56,7 @@ public class DriveSubsystem extends SubsystemBase {
     mRightMaster.restoreFactoryDefaults();
     mRightFollower.restoreFactoryDefaults();
 
-    // Sets the distance per pulse for the encoders
-    // mLeftEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
-    // mRightEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
+  
     mLeftEncoder.setPosition(0.0);
     mRightEncoder.setPosition(0.0);
 
@@ -196,14 +178,6 @@ public class DriveSubsystem extends SubsystemBase {
     mRightEncoder.setPosition(0.0);
   }
 
-  /**
-   * Gets the average distance of the two encoders.
-   *
-   * @return the average of the two encoder readings
-   */
-  public double getAverageEncoderDistance() {
-    return ((getLeftEncoderPosition() + getRightEncoderPosition()) / 2.0);
-  }
 
   /**
    * Gets the left drive encoder.
@@ -279,13 +253,4 @@ public class DriveSubsystem extends SubsystemBase {
   public double getTurnRate() {
     return -mGyro.getRate();
   }
-
-    /**
-   * Returns a command that drives the robot with arcade controls.
-   *
-   * @param fwd the commanded forward movement
-   * @param rot the commanded rotation
-   */
-  
-
 }
