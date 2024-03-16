@@ -9,7 +9,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Constants.LauncherConstants.*;
+import frc.robot.Constants;
 
 
 public class CANLauncher extends SubsystemBase {
@@ -18,14 +18,11 @@ public class CANLauncher extends SubsystemBase {
 
   /** Creates a new Launcher. */
   public CANLauncher() {
-    System.out.println("CANLauncher is Constructed");
-    mLaunchWheel = new CANSparkMax(1, MotorType.kBrushed);
-    mFeedWheel = new CANSparkMax(3, MotorType.kBrushed);
-    System.out.println("mLaunchWheel is Constructed");
-    System.out.println("mFeedWheel is Constructed");
+    mLaunchWheel = new CANSparkMax(Constants.LauncherConstants.kLauncherID, MotorType.kBrushless);
+    mFeedWheel = new CANSparkMax(Constants.LauncherConstants.kFeederID, MotorType.kBrushless);
 
-    // mLaunchWheel.setSmartCurrentLimit(kLauncherCurrentLimit);
-    // mFeedWheel.setSmartCurrentLimit(kFeedCurrentLimit);
+    mLaunchWheel.setSmartCurrentLimit(Constants.LauncherConstants.kLauncherCurrentLimit);
+    mFeedWheel.setSmartCurrentLimit(Constants.LauncherConstants.kFeedCurrentLimit);
   }
 
   /**
@@ -36,8 +33,30 @@ public class CANLauncher extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setFeedWheel(kIntakeFeederSpeed);
-          setLaunchWheel(kIntakeLauncherSpeed);
+          setFeedWheel(Constants.LauncherConstants.kIntakeFeederSpeedSlower);
+          setLaunchWheel(Constants.LauncherConstants.kIntakeLauncherSpeed);
+        },
+        // When the command stops, stop the wheels
+        () -> {});
+  }
+
+    public Command feedWheel() {
+    // The startEnd helper method takes a method to call when the command is initialized and one to call when it ends
+    return this.startEnd(
+        // When the command is initialized, set the wheels to the intake speed values
+        () -> {
+          setFeedWheel(Constants.LauncherConstants.kIntakeFeederSpeed);
+        },
+        // When the command stops, stop the wheels
+        () -> {});
+  }
+
+  public Command launchWheel() {
+    // The startEnd helper method takes a method to call when the command is initialized and one to call when it ends
+    return this.startEnd(
+        // When the command is initialized, set the wheels to the intake speed values
+        () -> {
+          setLaunchWheel(Constants.LauncherConstants.kLaunchFeederSpeed);
         },
         // When the command stops, stop the wheels
         () -> {
@@ -45,26 +64,46 @@ public class CANLauncher extends SubsystemBase {
         });
   }
 
+  public Command feedlaunchWheel() {
+    // The startEnd helper method takes a method to call when the command is initialized and one to call when it ends
+    return this.startEnd(
+        // When the command is initialized, set the wheels to the intake speed values
+        () -> {
+          setLaunchWheel(Constants.LauncherConstants.kFeedLaunchSpeed);
+          setFeedWheel(Constants.LauncherConstants.kFeedLaunchSpeed);
+        },
+        // When the command stops, stop the wheels
+        () -> {
+        });
+  }
+
   // An accessor method to set the speed (technically the output percentage) of the launch wheel
   public void setLaunchWheel(double speed) {
-    System.out.println("setLaunchWheel() is Called");
     mLaunchWheel.set(speed);
-    System.out.println("mLaunchWheel set to speed " + speed);
   }
 
   // An accessor method to set the speed (technically the output percentage) of the feed wheel
   public void setFeedWheel(double speed) {
-    System.out.println("setFeedWheel() is Called");
     mFeedWheel.set(speed);
-    System.out.println("mFeedWheel set to speed " + speed);
+  }
+
+  public void shootVolts(double pLaunchVolts, double pFeedVolts) {
+    mLaunchWheel.setVoltage(pLaunchVolts);
+    mFeedWheel.setVoltage(pFeedVolts);
+  }
+
+  public void setLaunchVolts(double pLaunchVolts) {
+    mLaunchWheel.setVoltage(pLaunchVolts);
+  }
+
+  public void setFeedVolts(double pFeedVolts) {
+    mFeedWheel.setVoltage(pFeedVolts);
   }
 
   // A helper method to stop both wheels. You could skip having a method like this and call the
   // individual accessors with speed = 0 instead
   public void stop() {
-    System.out.println("stop() is Called");
-    mLaunchWheel.set(0);
-    mFeedWheel.set(0);
-    System.out.println("mLaunchWheel & mFeedWheel set to speed 0.0");
+    mLaunchWheel.set(Constants.LauncherConstants.kStopSpeed);
+    mFeedWheel.set(Constants.LauncherConstants.kStopSpeed);
   }
 }

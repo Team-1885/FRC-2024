@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.util.Units;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -21,32 +24,115 @@ public final class Constants {
   }
 
   public static class DrivetrainConstants {
-    // PWM ports/CAN IDs for motor controllers
-    public static final int kLeftRearID = 1;
-    public static final int kLeftFrontID = 2;
-    public static final int kRightRearID = 3;
-    public static final int kRightFrontID = 4;
+    
+    
+    // CAN IDs for motor controllers
+    public static final int kLeftMasterID = 4;
+    public static final int kLeftFollowerID = 3;
+    public static final int kRightMasterID = 2;
+    public static final int kRightFollowerID = 1;
 
-    // Current limit for drivetrain motors
-    public static final int kCurrentLimit = 60;
+    
+
+    // ========================================
+    // DO NOT MODIFY THESE CONSTANTS
+    // ========================================
+    public static final int kCurrentLimit = 40;
+    public static final double kWheelDiameterFeet = 0.5;
+    public static final double kWheelCircumferenceFeet = Units.feetToMeters(kWheelDiameterFeet * Math.PI);
+    public static final double kMaxVelocityRPM = 5676;
+    public static final double kTrackWidthMeters = Units.feetToMeters(20.875 / 12);
+    public static final int kEncoderCPR = 1024;
+
+    //EVERY CONSTANT AUTON USES
+    public static final double kWheelDiameterInches = 6;
+    public static final double kGearboxRatio = 1/8.46; // rotated 8.46 times, rotates gear that spins the wheel once
+    public static final double kWheelDiameterMeters = Units.inchesToMeters(kWheelDiameterInches);
+    public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
+    public static final double kLinearDistanceConversionFactor =  kWheelCircumferenceMeters * kGearboxRatio;
+    // ========================================
+    // DO NOT MODIFY THESE CONSTANTS
+    // ========================================
+
+    public static final double kStabilizationP = 1;
+    public static final double kStabilizationI = 0.5;
+    public static final double kStabilizationD = 0;
+    
+    public static final double kTurnP = 0.015;
+    public static final double kTurnI = 0;
+    public static final double kTurnD = 0;
+
+    public static final double kMaxTurnRateDegPerS = 100;
+    public static final double kMaxTurnAccelerationDegPerSSquared = 300;
+
+    public static final double kTurnToleranceDeg = 5;
+    public static final double kTurnRateToleranceDegPerS = 10; // degrees per second
+    
+    public static final double ksVolts = 0.25;
+    public static final double kvVoltSecondsPerMeter = 2.16;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.48;
+    public static final double kPDriveVel = 8.5; // Before was 8.5
+
+
+    // DifferentialDriveKinematics
+    public static final double kTrackwidthMeters = 0.69;
+    public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(
+            kTrackwidthMeters);
+
+    // Max Trajectory Velocity/Acceleration
+    public static final double kMaxSpeedMetersPerSecond = 3;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+
+    // Ramsete Parameters
+    public static final double kRamseteB = 2;
+    public static final double kRamseteZeta = 0.7;
+    
+
   }
 
   public static class LauncherConstants {
     // PWM ports/CAN IDs for motor controllers
-    public static final int kFeederID = 5;
-    public static final int kLauncherID = 6;
+    public static final int kFeederID = 18; // BEFORE 2
+    public static final int kLauncherID = 19; // BEFORE 1
 
     // Current limit for launcher and feed wheels
     public static final int kLauncherCurrentLimit = 80;
     public static final int kFeedCurrentLimit = 80;
 
-    // Speeds for wheels when intaking and launching. Intake speeds are negative to run the wheels
-    // in reverse
-    public static final double kLauncherSpeed = 1;
-    public static final double kLaunchFeederSpeed = 1;
-    public static final double kIntakeLauncherSpeed = -1;
-    public static final double kIntakeFeederSpeed = -.2;
+    // Speeds for wheels when intaking and launching. Intake speeds are negative to run the wheels in reverse
+    public static final double kLauncherSpeed = 1d;
+    public static final double kLaunchFeederSpeed = 1d;
+    public static final double kIntakeLauncherSpeed = -1d;
+    public static final double kIntakeFeederSpeed = -1d;
+    public static final double kIntakeFeederSpeedSlower = -0.2d;
+    public static final double kFeedLaunchSpeed = -0.5d;
+    public static final double kStopSpeed = 0.0d;
 
-    public static final double kLauncherDelay = 1;
+    public static final double kLauncherDelay = 1d;
   }
-}
+
+  public static class IntakeConstants
+  {
+    public static final int kFeederID = 20; // BEFORE 3
+    public static final int kRotatorMasterID = 21; // BEFORE 1
+    public static final int kRotatorFollowerID = 22; // BEFORE 2
+    public static final double kTrueIntakeFeederSpeed = 1;
+    public static final double kIntakeRotaterSpeed = 1;
+  }
+
+  public static final class AutoConstants {
+    public static final double kMaxSpeedMetersPerSecond = 1;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+
+    // Reasonable baseline values for a RAMSETE follower in units of meters and seconds
+    public static final double kRamseteB = 2;
+    public static final double kRamseteZeta = 0.7;
+  }
+
+public static final class ClimberConstants {
+    public static final int climber1ID = 23;
+    public static final int climber2ID = 24;
+  
+  }
+  
+  }
