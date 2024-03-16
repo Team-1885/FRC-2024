@@ -31,6 +31,14 @@ import frc.robot.subsystems.CANLauncher;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Rotator;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.limelight.LimelightNT;
+import frc.robot.LimelightHelpers;
+import edu.wpi.first.networktables.DoubleArraySubscriber;
+import edu.wpi.first.networktables.FloatArraySubscriber;
+import edu.wpi.first.networktables.FloatTopic;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 
 /**
  * This class is where the bulk of the robot should be declared.
@@ -127,100 +135,53 @@ public class RobotContainer {
             System.out.println("right trigger");
         }*/
 
-        new JoystickButton(mOperatorController,7)
+        new JoystickButton(mOperatorController,9)
         .whileTrue(
            new PrepareLaunch(mLauncher)
                .withTimeout(1)
                .andThen(new LaunchNote(mLauncher))
                .handleInterrupt(() -> mLauncher.stop()));
 
-        if (db.driverinput.isSet(InputMap.DRIVER.REFLECTIVE_TAPE_TRACKING)) {
-            // adjust limelight pipeline so the robot targets reflective tape
-            db.limelight.set(ELimelightData.TARGET_ID, Field2024.FieldElement.REFLECTIVE_TAPE);
-            // let target lock take over
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
-            // set LED
-            //db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, 20);
+    
+        float Kp = -0.1f;
+        float min_command = 0.05f;
+        
+        //std::shared_ptr<NetworkTable> table = NetworkTable::GetTable("limelight");
+        //float tx = table->GetNumber("tx");
 
-            // log
-            mTable.getEntry("Current Pipeline").setString("" + db.limelight.get(ELimelightData.PIPELINE));
-            mTable.getEntry("Tracking Object").setString("Tracking Reflective Tape");
+        
 
-            //db.addressableled.set(EAddressableLEDData.DESIREDCOLOR, Enums.EAddressableLEDState.RED);
-        }
+        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+        //FloatArraySubscriber tx;
 
-        // if the cone tracking button is pressed
-        else if (db.driverinput.isSet(InputMap.DRIVER.CONE_TRACKING)) {
-            // adjust limelight pipeline so the robot targets cones
-            db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.CONE);
-            // let target lock take over
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
+        //FloatTopic tx = table.getFloatTopic("tx");
+        //float tx = table->GetNumber("tx");
 
-            // log
-            mTable.getEntry("Current Pipeline").setString("" + db.limelight.get(ELimelightData.PIPELINE));
-            mTable.getEntry("Tracking Object").setString("Tracking Cones");
-            db.addressableled.set(EAddressableLEDData.DESIREDCOLOR, Enums.EAddressableLEDState.YELLOW);
-        }
+        FloatArraySubscriber val = table.getFloatArrayTopic("limelight").subscribe(new float[] {});
 
-        // if the cube tracking button is pressed
-        else if (db.driverinput.isSet(InputMap.DRIVER.CUBE_TRACKING)) {
-            // adjust limelight pipeline so the robot targets cubes
-            db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.CUBE);
-            // let target lock take over
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
+        float[] txArr = val.get();
 
-            // log
-            mTable.getEntry("Current Pipeline").setString("" + db.limelight.get(ELimelightData.PIPELINE));
-            mTable.getEntry("Tracking Object").setString("Tracking Cubes");
-        }
-        // track enemy robots' left corner
-        else if (db.driverinput.isSet(InputMap.DRIVER.OPPONENT_ROBOT_LEFT_TRACKING)) {
-            System.out.println("left tracking");
-            if (DriverStation.getAlliance() == DriverStation.Alliance.Blue)
+        float tx = txArr[txArr.length-1];
+
+        if (joystick->GetRawButton(9))
+        {
+            float heading_error = -tx;
+            float steering_adjust = 0.0f;
+            if (Math.abs(heading_error) > 1.0) 
             {
-                System.out.println("blue alliance");
-                db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.RED_ROBOT_LEFT/*red left corner field element*/);
-            }
-            else // if our team is red, target blue robots
-            {
-                db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.BLUE_ROBOT_LEFT/*blue left corner field element*/);
-            }
-            // let target lock take over
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
+                if (heading_error < 0) 
+                {
+                    steering_adjust = Kp*heading_error + min_command;
+                } 
+                else 
+                {
+                    steering_adjust = Kp*heading_error - min_command;
+                }
+            } 
+            left_command += steering_adjust;
+            right_command -= steering_adjust;
+        }      
 
-            // log
-            mTable.getEntry("Current Pipeline").setString("" + db.limelight.get(ELimelightData.PIPELINE));
-            mTable.getEntry("Tracking Object").setString("Tracking Cubes");
-        }
-        // track enemy robots' right
-        else if (db.driverinput.isSet(InputMap.DRIVER.OPPONENT_ROBOT_RIGHT_TRACKING)) {
-            // if our team is blue, target red robots
-            if (DriverStation.getAlliance() == DriverStation.Alliance.Blue)
-            {
-                db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.RED_ROBOT_RIGHT/*red right corner field element*/);
-            }
-            else // if our team is red, target blue robots
-            {
-                db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.BLUE_ROBOT_RIGHT/*blue right corner field element*/);
-            }
-            // let target lock take over
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
-
-            // log
-            mTable.getEntry("Current Pipeline").setString("" + db.limelight.get(ELimelightData.PIPELINE));
-            mTable.getEntry("Tracking Object").setString("Tracking Cubes");
-        }
-        else { // No targetting button is pressed
-            // set limelight pipeline back to base camera without crazy filters
-            db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.CAMERA.id());
-            // give turning control back to driver
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.VELOCITY);
-
-            // log
-            mTable.getEntry("Current Pipeline").setString("" + db.limelight.get(ELimelightData.PIPELINE));
-            mTable.getEntry("Tracking Object").setString("Not Tracking");
-            db.addressableled.set(EAddressableLEDData.DESIREDCOLOR, Enums.EAddressableLEDState.BATTLEFIElD_COLOR);
-        }
     }
   }
 
