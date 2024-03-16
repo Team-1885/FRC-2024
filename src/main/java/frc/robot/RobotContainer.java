@@ -26,6 +26,7 @@ import frc.robot.commands.TalonRotate;
 import frc.robot.commands.TalonShoot;
 import frc.robot.commands.TalonShootSlow;
 import frc.robot.commands.TurnToAngle;
+import frc.robot.commands.TurnToAngleProfiled;
 import frc.robot.subsystems.CANLauncher;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Rotator;
@@ -60,8 +61,13 @@ public class RobotContainer {
     mRotate = new TalonRotate(mRotator);
 
     mDrive.setDefaultCommand(
-        mDrive.arcadeDriveCommand(
-            () -> -mDriverController.getLeftY(), () -> -mDriverController.getRightX()));
+        // A split-stick arcade command, with forward/backward controlled by the left hand, and turning controlled by the right.
+        new RunCommand(
+            () ->
+                mDrive.arcadeDrive(
+                    -mDriverController.getLeftY(), -mDriverController.getRightX()),
+            mDrive)
+        );
     mRotator.setDefaultCommand(mRotate);
 
     // Configure the trigger bindings
@@ -97,13 +103,8 @@ public class RobotContainer {
            new TalonShootSlow(mIntake)
                .handleInterrupt(() -> mIntake.stop()));
     
-    /*new JoystickButton(mOperatorController, 7)
-        .whileTrue(
-           new PrepareLaunch(mLauncher)
-               .withTimeout(1)
-               .andThen(new AmpLaunch(mLauncher))
-               .handleInterrupt(() -> mLauncher.stop()));*/
-
+    new JoystickButton(mOperatorController, 9).onTrue(new TurnToAngle(90, mDrive).withTimeout(2));
+    new JoystickButton(mOperatorController, 10).onTrue(new TurnToAngleProfiled(-90, mDrive).withTimeout(2));
     
   }
 
@@ -170,7 +171,7 @@ public class RobotContainer {
     // Reset odometry to the initial pose of the trajectory, run path following command, then stop at the end.
     return Commands.runOnce(() -> mDrive.resetOdometry(Robot.toNoteTraj.getInitialPose()))
         .andThen(new TurnToAngle(90, mDrive))
-        .andThen(Commands.runOnce(() -> mRotator.TODO(100))) // TODO: Test Functionality, Change TalonFX Config Vals
+        //.andThen(Commands.runOnce(() -> mRotator.TODO(100))) // TODO: Test Functionality, Change TalonFX Config Vals
         //.andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
         //.andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))
         //.andThen(toNoteRamsete)

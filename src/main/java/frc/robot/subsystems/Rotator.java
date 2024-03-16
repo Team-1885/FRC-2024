@@ -83,7 +83,7 @@ public class Rotator extends SubsystemBase {
             new TrapezoidProfile.Constraints(80, 160)
         );
         // Final target of 200 rot, 0 rps
-        TrapezoidProfile.State m_goal = new TrapezoidProfile.State(200, 0);
+        TrapezoidProfile.State m_goal = new TrapezoidProfile.State(pRotations, 0);
         TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
         
         // create a position closed-loop request, voltage output, slot 0 configs
