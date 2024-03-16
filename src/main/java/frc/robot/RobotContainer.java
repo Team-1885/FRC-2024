@@ -170,7 +170,7 @@ public class RobotContainer {
     // Reset odometry to the initial pose of the trajectory, run path following command, then stop at the end.
     return Commands.runOnce(() -> mDrive.resetOdometry(Robot.toNoteTraj.getInitialPose()))
         .andThen(new TurnToAngle(90, mDrive))
-        .andThen(Commands.runOnce(() -> mRotator.setPosition(100))) // TODO: Test Functionality, Change TalonFX Config Vals
+        .andThen(Commands.runOnce(() -> mRotator.TODO(100))) // TODO: Test Functionality, Change TalonFX Config Vals
         //.andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
         //.andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))
         //.andThen(toNoteRamsete)

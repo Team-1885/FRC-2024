@@ -67,51 +67,34 @@ public class Rotator extends SubsystemBase {
         mRotateFollower.set(0);
     }
 
-    public void setPosition(int pRotations) {
-        // in init function
-        var talonFXConfigs = new TalonFXConfiguration();
-
-        // set slot 0 gains
-        var slot0Configs = talonFXConfigs.Slot0;
+    public void TODO(int pRotations) {
+        // in init function, set slot 0 gains
+        var slot0Configs = new Slot0Configs();
         slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
         slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
-        slot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
         slot0Configs.kP = 4.8; // A position error of 2.5 rotations results in 12 V output
         slot0Configs.kI = 0; // no output for integrated error
         slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
 
-        // set Motion Magic settings
-        var motionMagicConfigs = talonFXConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 80; // Target cruise velocity of 80 rps
-        motionMagicConfigs.MotionMagicAcceleration = 160; // Target acceleration of 160 rps/s (0.5 seconds)
-        motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
+        mRotateMaster.getConfigurator().apply(slot0Configs);
 
-        mRotateFollower.getConfigurator().apply(talonFXConfigs);
-
-        // create a Motion Magic request, voltage output
-        final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
-
-        // set target position to 100 rotations
-        mRotateMaster.setControl(m_request.withPosition(pRotations));
-        mRotateFollower.setControl(m_request.withPosition(pRotations));
-
-        // HERES THE DOC LINK
-        // https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/motion-magic.html
-
-        // } https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/basic-pid-control.html.
-        // For the basic PID for Talons, they do use Trapezoid Profile or whatever its called
-        // GOT IT. it was just .getPosition() iirc. but its a StatusSignal not a double
-        //Calcualte uses two doubles. Check this: https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/api-usage/status-signals.html
-        // it shows how to convert to an actual value. You gotta use a var something = .getValue or sumn like that
-
+        // Trapezoid profile with max velocity 80 rps, max accel 160 rps/s
+        final TrapezoidProfile m_profile = new TrapezoidProfile(
+            new TrapezoidProfile.Constraints(80, 160)
+        );
+        // Final target of 200 rot, 0 rps
+        TrapezoidProfile.State m_goal = new TrapezoidProfile.State(200, 0);
+        TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+        
+        // create a position closed-loop request, voltage output, slot 0 configs
+        final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
+        
+        // calculate the next profile setpoint
+        m_setpoint = m_profile.calculate(0.020, m_setpoint, m_goal);
+        
+        // send the request to the device
+        m_request.Position = m_setpoint.position;
+        m_request.Velocity = m_setpoint.velocity;
+        mRotateMaster.setControl(m_request);
     }
-        public void sigmaHello()
-        {
-            var sigmaPos = mRotateFollower.getPosition();
-            var pos = sigmaPos.getValueAsDouble();
-            double output = intakePID.calculate(pos);
-            //its latency not even angle or whatever, i think theres another method for it maybe
-            // bro this is not right. wym, we gotta convert it to a value using ur method
-            //im gon leave the liveshare and try something on the latest branch you pulled
-        }
-    }
+}
