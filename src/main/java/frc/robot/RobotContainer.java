@@ -4,27 +4,33 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.LauncherConstants.kLauncherDelay;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.util.PathPlannerLogging;
-
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.DriveCommand;
-import frc.robot.subsystems.CANLauncher;
-import frc.robot.subsystems.WestCoastDrive;
-import lombok.Getter;
-import frc.robot.commands.PrepareLaunch;
+import frc.robot.commands.Climb;
 import frc.robot.commands.LaunchNote;
+import frc.robot.commands.PositionControl;
+import frc.robot.commands.PrepareLaunch;
+import frc.robot.commands.TalonFeed;
+import frc.robot.commands.TalonRotate;
+import frc.robot.commands.TalonShoot;
+import frc.robot.commands.TurnToAngleProfiled;
+import frc.robot.subsystems.CANLauncher;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Rotator;
+import frc.robot.subsystems.DriveSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared.
@@ -34,50 +40,37 @@ import frc.robot.commands.LaunchNote;
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
-  private @Getter final WestCoastDrive mWestCoastDrive = WestCoastDrive.getInstance();
-  private @Getter final DriveCommand mDriveCommand;
+  public static final DriveSubsystem mDrive = DriveSubsystem.getInstance();
+  private final CANLauncher mLauncher = new CANLauncher();
+  private final Rotator mRotator = new Rotator();
+  private final Intake mIntake = new Intake();
+  private final Climber mClimber = new Climber();
+  private final Climb mClimb;
 
-  private @Getter final CANLauncher mLauncher = new CANLauncher();
-  public @Getter final static Joystick logitech = new Joystick(0);
-  private final SendableChooser<Command> autoChooser;
-  private final Field2d mField;
+  private final TalonRotate mRotate;
+  private final double kP = 0.012;
 
-  public @Getter final static Joystick mOperatorController = new Joystick(1);
+  public final static CommandXboxController mDriverController = new CommandXboxController(1); // 1 is the USB Port to be used as indicated on the Driver Station
+  public final static Joystick mOperatorController = new Joystick(2); // 2 is the USB Port to be used as indicated on the Driver Station
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    // Register Named Commands
-    NamedCommands.registerCommand("DriveCommand", new DriveCommand(mWestCoastDrive));
 
     // Command Initialization
-    mDriveCommand = new DriveCommand(mWestCoastDrive);
+    mRotate = new TalonRotate(mRotator);
+    mClimb = new Climb(mClimber);
 
-    // Build an auto chooser. This will use Commands.none() as the default option.
-    autoChooser = AutoBuilder.buildAutoChooser();
-
-    // Another option that allows you to specify the default auto by its name
-    SmartDashboard.putData("Auto Chooser", autoChooser);
-    mWestCoastDrive.setDefaultCommand(mDriveCommand);
-
-    mField = new Field2d();
-    SmartDashboard.putData("Field", mField);
-
-    // Logging callback for current robot pose
-    PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
-      mField.setRobotPose(pose);
-    });
-
-    // Logging callback for target robot pose
-    PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
-      mField.getObject("Target Pose").setPose(pose);
-    });
-
-    // Logging callback for the active path, this is sent as a list of poses
-    PathPlannerLogging.setLogActivePathCallback((poses) -> {
-      mField.getObject("Path").setPoses(poses);
-    });
+    mDrive.setDefaultCommand(
+        // A split-stick arcade command, with forward/backward controlled by the left hand, and turning controlled by the right.
+        new RunCommand(
+            () ->
+                mDrive.arcadeDrive(
+                    mDriverController.getRightX(), -mDriverController.getLeftY()),
+            mDrive)
+        );
+    mRotator.setDefaultCommand(mRotate);
 
     // Configure the trigger bindings
     configureBindings();
@@ -88,16 +81,35 @@ public class RobotContainer {
    * Triggers can be created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
-    new JoystickButton(mOperatorController, 1)
+    new JoystickButton(mOperatorController,2)
         .whileTrue(
-            new PrepareLaunch(mLauncher)
-                .withTimeout(kLauncherDelay)
-                .andThen(new LaunchNote(mLauncher))
-                .handleInterrupt(() -> mLauncher.stop()));
+           new PrepareLaunch(mLauncher)
+               .withTimeout(1)
+               .andThen(new LaunchNote(mLauncher))
+               .handleInterrupt(() -> mLauncher.stop()));
+    
+    new JoystickButton(mOperatorController, 3).whileTrue(mLauncher.feedlaunchWheel()).onFalse(new InstantCommand(mLauncher::stop));
 
-    new JoystickButton(mOperatorController, 2)
+    new JoystickButton(mOperatorController, 4)
         .whileTrue(
-            mLauncher.getIntakeCommand());
+           new PositionControl(mRotator)
+               .handleInterrupt(() -> mRotator.stop()));
+
+    new JoystickButton(mOperatorController, 5)
+        .whileTrue(
+           new TalonFeed(mIntake)
+               .handleInterrupt(() -> mIntake.stop()));
+
+    new JoystickButton(mOperatorController, 6)
+        .whileTrue(
+           new TalonShoot(mIntake)
+               .handleInterrupt(() -> mIntake.stop()));
+    
+    new JoystickButton(mOperatorController, 7).whileTrue(new Climb(mClimber).handleInterrupt(() -> mClimber.stop()));
+
+    new JoystickButton(mOperatorController, 9).onTrue(new TurnToAngleProfiled(90, mDrive).withTimeout(2).andThen(Commands.runOnce(() -> mDrive.zeroHeading())));
+    new JoystickButton(mOperatorController, 10).onTrue(new TurnToAngleProfiled(-90, mDrive).withTimeout(2).andThen(Commands.runOnce(() -> mDrive.zeroHeading())));
+    
   }
 
   /**
@@ -105,12 +117,61 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
-    // Load the path you want to follow using its name in the GUI
-    PathPlannerPath mPath = PathPlannerPath.fromPathFile("Drive Straight");
+  public Command getAutonomousCommand() { // the code needs to do stuff
+    // Create a voltage constraint to ensure we don't accelerate too fast
+    var autoVoltageConstraint =
+        new DifferentialDriveVoltageConstraint(
+            new SimpleMotorFeedforward(
+                Constants.DrivetrainConstants.ksVolts,
+                Constants.DrivetrainConstants.kvVoltSecondsPerMeter,
+                Constants.DrivetrainConstants.kaVoltSecondsSquaredPerMeter),
+            Constants.DrivetrainConstants.kDriveKinematics,
+            10);
 
-    // Create a path following command using AutoBuilder. This will also trigger event markers.
-    return AutoBuilder.followPath(mPath);
-    // return autoChooser.getSelected();
+
+    RamseteCommand toNoteRamsete =
+        new RamseteCommand(
+            Robot.toNoteTraj,
+            mDrive::getPose,
+            new RamseteController(Constants.DrivetrainConstants.kRamseteB, Constants.DrivetrainConstants.kRamseteZeta),
+            new SimpleMotorFeedforward(
+                Constants.DrivetrainConstants.ksVolts,
+                Constants.DrivetrainConstants.kvVoltSecondsPerMeter,
+                Constants.DrivetrainConstants.kaVoltSecondsSquaredPerMeter),
+            Constants.DrivetrainConstants.kDriveKinematics,
+            mDrive::getWheelSpeeds,
+            new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0),
+            new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0),
+            // RamseteCommand passes volts to the callback
+            mDrive::tankDriveVolts,
+            mDrive);
+
+    RamseteCommand toSpeakerRamsete =
+        new RamseteCommand(
+            Robot.toSpeakerTraj,
+            mDrive::getPose,
+            new RamseteController(Constants.DrivetrainConstants.kRamseteB, Constants.DrivetrainConstants.kRamseteZeta),
+            new SimpleMotorFeedforward(
+                Constants.DrivetrainConstants.ksVolts,
+                Constants.DrivetrainConstants.kvVoltSecondsPerMeter,
+                Constants.DrivetrainConstants.kaVoltSecondsSquaredPerMeter),
+            Constants.DrivetrainConstants.kDriveKinematics,
+            mDrive::getWheelSpeeds,
+            new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0),
+            new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0),
+            // RamseteCommand passes volts to the callback
+            mDrive::tankDriveVolts,
+            mDrive);
+
+    // Reset odometry to the initial pose of the trajectory, run path following command, then stop at the end.
+    return Commands.runOnce(() -> mDrive.resetOdometry(Robot.toNoteTraj.getInitialPose()))
+        // TODO: Tune PID vals via //https://docs.jpsrobotics2554.org/programming/advanced-concepts/motion-profiling/
+        .andThen(new TurnToAngleProfiled(90, mDrive))
+        //.andThen(Commands.runOnce(() -> mRotator.TODO(100))) // TODO: Test Functionality, Change TalonFX Config Vals
+        //.andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
+        //.andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))
+        //.andThen(toNoteRamsete)
+        //.andThen(toSpeakerRamsete)
+        .andThen(Commands.runOnce(() -> mDrive.tankDriveVolts(0, 0)));
   }
 }
