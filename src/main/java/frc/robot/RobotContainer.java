@@ -166,12 +166,12 @@ public class RobotContainer {
     // Reset odometry to the initial pose of the trajectory, run path following command, then stop at the end.
     return Commands.runOnce(() -> mDrive.resetOdometry(Robot.toNoteTraj.getInitialPose()))
         // TODO: Tune PID vals via //https://docs.jpsrobotics2554.org/programming/advanced-concepts/motion-profiling/
-        .andThen(new TurnToAngleProfiled(90, mDrive))
         //.andThen(Commands.runOnce(() -> mRotator.TODO(100))) // TODO: Test Functionality, Change TalonFX Config Vals
         //.andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
         //.andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))
         //.andThen(toNoteRamsete)
         //.andThen(toSpeakerRamsete)
+        .andThen(new TurnToAngleProfiled(-180, mDrive).withTimeout(5))
         .andThen(Commands.runOnce(() -> mDrive.tankDriveVolts(0, 0)));
   }
 }
