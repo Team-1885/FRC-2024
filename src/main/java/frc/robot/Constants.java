@@ -27,10 +27,10 @@ public final class Constants {
     
     
     // CAN IDs for motor controllers
-    public static final int kLeftMasterID = 4;
-    public static final int kLeftFollowerID = 3;
-    public static final int kRightMasterID = 2;
-    public static final int kRightFollowerID = 1;
+    public static final int kLeftMasterID = 6;
+    public static final int kLeftFollowerID = 7;
+    public static final int kRightMasterID = 8;
+    public static final int kRightFollowerID = 9;
 
     
 
@@ -92,8 +92,8 @@ public final class Constants {
 
   public static class LauncherConstants {
     // PWM ports/CAN IDs for motor controllers
-    public static final int kFeederID = 18; // BEFORE 2
-    public static final int kLauncherID = 19; // BEFORE 1
+    public static final int kFeederID = 4; // BEFORE 2
+    public static final int kLauncherID = 5; // BEFORE 1
 
     // Current limit for launcher and feed wheels
     public static final int kLauncherCurrentLimit = 80;
@@ -105,7 +105,7 @@ public final class Constants {
     public static final double kIntakeLauncherSpeed = -1d;
     public static final double kIntakeFeederSpeed = -1d;
     public static final double kIntakeFeederSpeedSlower = -0.2d;
-    public static final double kFeedLaunchSpeed = -0.5d;
+    public static final double kFeedLaunchSpeed = -0.1d;
     public static final double kStopSpeed = 0.0d;
 
     public static final double kLauncherDelay = 1d;
@@ -113,9 +113,9 @@ public final class Constants {
 
   public static class IntakeConstants
   {
-    public static final int kFeederID = 20; // BEFORE 3
-    public static final int kRotatorMasterID = 21; // BEFORE 1
-    public static final int kRotatorFollowerID = 22; // BEFORE 2
+    public static final int kFeederID = 1; // BEFORE 3
+    public static final int kRotatorMasterID = 1; // BEFORE 1
+    public static final int kRotatorFollowerID = 2; // BEFORE 2
     public static final double kTrueIntakeFeederSpeed = 1;
     public static final double kIntakeRotaterSpeed = 1;
   }

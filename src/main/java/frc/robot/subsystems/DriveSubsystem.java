@@ -70,8 +70,6 @@ public class DriveSubsystem extends SubsystemBase {
 
     mRightMaster.setInverted(false);
 
-    mGyro.reset();
-    mGyro.calibrate();
     resetEncoders();
 
     mOdometry = new DifferentialDriveOdometry(
@@ -252,5 +250,9 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getTurnRate() {
     return -mGyro.getRate();
+  }
+
+  public void resetGyro() {
+    mGyro.reset();
   }
 }
