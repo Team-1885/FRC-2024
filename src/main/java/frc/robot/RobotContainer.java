@@ -156,15 +156,35 @@ public class RobotContainer {
             mDrive::tankDriveVolts,
             mDrive);
 
+    RamseteCommand ramseteCommand2 =
+        new RamseteCommand(
+            Robot.toSpeakerTraj,
+            mDrive::getPose,
+            new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
+            new SimpleMotorFeedforward(
+                Constants.DrivetrainConstants.ksVolts,
+                Constants.DrivetrainConstants.kvVoltSecondsPerMeter,
+                Constants.DrivetrainConstants.kaVoltSecondsSquaredPerMeter),
+            Constants.DrivetrainConstants.kDriveKinematics,
+            mDrive::getWheelSpeeds,
+            new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0),
+            new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0),
+            // RamseteCommand passes volts to the callback
+            mDrive::tankDriveVolts,
+            mDrive);
+
     // Reset odometry to the initial pose of the trajectory, run path following command, then stop at the end.
     return Commands.runOnce(() -> mDrive.resetOdometry(Robot.toNoteTraj.getInitialPose()))
         // TODO: Tune PID vals via //https://docs.jpsrobotics2554.org/programming/advanced-concepts/motion-profiling/
         //.andThen(Commands.runOnce(() -> mRotator.TODO(100))) // TODO: Test Functionality, Change TalonFX Config Vals
         //.andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
         //.andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))
-        //.andThen(ramseteCommand)
+        .andThen(ramseteCommand)
+        .andThen(Commands.runOnce(() -> mDrive.resetGyro()))
         //.andThen(toSpeakerRamsete)
         .andThen(new TurnToAngleProfiled(-180, mDrive).withTimeout(5))
-        .andThen(Commands.runOnce(() -> mDrive.tankDriveVolts(0, 0)));
+        .andThen(Commands.runOnce(() -> mDrive.resetOdometry(Robot.toSpeakerTraj.getInitialPose())))
+        .andThen(ramseteCommand2);
+        //.andThen(Commands.runOnce(() -> mDrive.tankDriveVolts(0, 0)));
   }
 }

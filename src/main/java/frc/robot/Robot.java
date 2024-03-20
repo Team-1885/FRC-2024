@@ -32,7 +32,10 @@ public class Robot extends TimedRobot {
 
 	public static String trajJSON =
 		"Paths/output/MoveToNote.wpilib.json";
+	public static String traj2JSON =
+		"Paths/output/ReturnToSpeaker.wpilib.json";
 	public static Trajectory toNoteTraj = new Trajectory();
+	public static Trajectory toSpeakerTraj = new Trajectory();
 
 	/**
 	 * Default constructor for the Robot class. This constructor is automatically invoked when an instance of the Robot class is created.
@@ -57,6 +60,7 @@ public class Robot extends TimedRobot {
 		//mWestCoastDrive.resetGyro();
 
 		loadMoveToNote();
+		loadMoveToSpeaker();
 
 		// Make sure you only configure port forwarding once in your robot code.
         // Do not place these function calls in any periodic functions
@@ -74,6 +78,19 @@ public class Robot extends TimedRobot {
 		} catch (IOException ex) {
 			DriverStation.reportError(
 				"Unable to open trajectory: " + trajJSON,
+				ex.getStackTrace());
+		}
+	}
+
+	public void loadMoveToSpeaker() {
+		try {
+			Path trajectory2Path =
+				Filesystem.getDeployDirectory().toPath().resolve(
+					traj2JSON);
+			toSpeakerTraj = TrajectoryUtil.fromPathweaverJson(trajectory2Path);
+		} catch (IOException ex) {
+			DriverStation.reportError(
+				"Unable to open trajectory: " + traj2JSON,
 				ex.getStackTrace());
 		}
 	}
