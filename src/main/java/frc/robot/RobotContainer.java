@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.Climb;
 import frc.robot.commands.LaunchNote;
 import frc.robot.commands.PositionControl;
@@ -67,7 +69,7 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 mDrive.arcadeDrive(
-                    mDriverController.getRightX(), -mDriverController.getLeftY()),
+                    -mDriverController.getLeftY(), -mDriverController.getRightX()),
             mDrive)
     );
     mRotator.setDefaultCommand(mRotate);
@@ -105,7 +107,7 @@ public class RobotContainer {
            new TalonShoot(mIntake)
                .handleInterrupt(() -> mIntake.stop()));
     
-    new JoystickButton(mOperatorController, 7).whileTrue(new Climb(mClimber).handleInterrupt(() -> mClimber.stop()));
+    //new JoystickButton(mOperatorController, 7).whileTrue(new Climb(mClimber).handleInterrupt(() -> mClimber.stop()));
 
     new JoystickButton(mOperatorController, 9).onTrue(new TurnToAngleProfiled(90, mDrive).withTimeout(2).andThen(Commands.runOnce(() -> mDrive.resetOdometry(new Pose2d()))));
     new JoystickButton(mOperatorController, 10).onTrue(new TurnToAngleProfiled(-90, mDrive).withTimeout(2).andThen(Commands.runOnce(() -> mDrive.resetOdometry(new Pose2d()))));
@@ -127,29 +129,21 @@ public class RobotContainer {
             Constants.DrivetrainConstants.kDriveKinematics,
             10);
 
+    // Create config for trajectory
+    TrajectoryConfig config =
+        new TrajectoryConfig(
+                AutoConstants.kMaxSpeedMetersPerSecond,
+                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+            // Add kinematics to ensure max speed is actually obeyed
+            .setKinematics(Constants.DrivetrainConstants.kDriveKinematics)
+            // Apply the voltage constraint
+            .addConstraint(autoVoltageConstraint);
 
-    RamseteCommand toNoteRamsete =
+    RamseteCommand ramseteCommand =
         new RamseteCommand(
             Robot.toNoteTraj,
             mDrive::getPose,
-            new RamseteController(Constants.DrivetrainConstants.kRamseteB, Constants.DrivetrainConstants.kRamseteZeta),
-            new SimpleMotorFeedforward(
-                Constants.DrivetrainConstants.ksVolts,
-                Constants.DrivetrainConstants.kvVoltSecondsPerMeter,
-                Constants.DrivetrainConstants.kaVoltSecondsSquaredPerMeter),
-            Constants.DrivetrainConstants.kDriveKinematics,
-            mDrive::getWheelSpeeds,
-            new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0),
-            new PIDController(Constants.DrivetrainConstants.kPDriveVel, 0, 0),
-            // RamseteCommand passes volts to the callback
-            mDrive::tankDriveVolts,
-            mDrive);
-
-    RamseteCommand toSpeakerRamsete =
-        new RamseteCommand(
-            Robot.toSpeakerTraj,
-            mDrive::getPose,
-            new RamseteController(Constants.DrivetrainConstants.kRamseteB, Constants.DrivetrainConstants.kRamseteZeta),
+            new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
             new SimpleMotorFeedforward(
                 Constants.DrivetrainConstants.ksVolts,
                 Constants.DrivetrainConstants.kvVoltSecondsPerMeter,
@@ -168,9 +162,9 @@ public class RobotContainer {
         //.andThen(Commands.runOnce(() -> mRotator.TODO(100))) // TODO: Test Functionality, Change TalonFX Config Vals
         //.andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
         //.andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))
-        .andThen(toNoteRamsete)
+        //.andThen(ramseteCommand)
         //.andThen(toSpeakerRamsete)
-        //.andThen(new TurnToAngleProfiled(-180, mDrive).withTimeout(5))
+        .andThen(new TurnToAngleProfiled(-180, mDrive).withTimeout(5))
         .andThen(Commands.runOnce(() -> mDrive.tankDriveVolts(0, 0)));
   }
 }

@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -56,7 +57,7 @@ public class DriveSubsystem extends SubsystemBase {
     mLeftFollower.follow(mLeftMaster);
     mRightFollower.follow(mRightMaster);
 
-    mRightMaster.setInverted(false);
+    mRightMaster.setInverted(true);
 
     mOdometry = new DifferentialDriveOdometry(
           mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
@@ -79,7 +80,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     mOdometry.update(
       mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
-    // SmartDashboard.putNumber("Gyro Angle", getAngle());
+    SmartDashboard.putNumber("Gyro Angle", getAngle());
   }
 
   /**
@@ -223,7 +224,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double getIEEE() {
-    return Math.IEEEremainder(mGyro.getAngle(), 360) * 1.0;
+    return Math.IEEEremainder(mGyro.getAngle(), 360) * -1.0;
   }
 
   /**
@@ -232,7 +233,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return -mGyro.getRate();
+    return mGyro.getRate();
   }
 
   public void resetGyro() {

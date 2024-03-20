@@ -30,11 +30,9 @@ public class Robot extends TimedRobot {
 
 	private DriveSubsystem mWestCoastDrive = DriveSubsystem.getInstance();
 
-	public static String moveToNote =
+	public static String trajJSON =
 		"Paths/output/MoveToNote.wpilib.json";
-	public static String returnToSpeaker = "Paths/output/StraightCenter.wpilib.json";
 	public static Trajectory toNoteTraj = new Trajectory();
-	public static Trajectory toSpeakerTraj = new Trajectory();
 
 	/**
 	 * Default constructor for the Robot class. This constructor is automatically invoked when an instance of the Robot class is created.
@@ -56,7 +54,7 @@ public class Robot extends TimedRobot {
 
 		mWestCoastDrive.zeroHeading();
 		mWestCoastDrive.resetEncoders();
-		mWestCoastDrive.resetGyro();
+		//mWestCoastDrive.resetGyro();
 
 		loadMoveToNote();
 
@@ -71,24 +69,11 @@ public class Robot extends TimedRobot {
 		try {
 			Path trajectoryPath =
 				Filesystem.getDeployDirectory().toPath().resolve(
-					moveToNote);
+					trajJSON);
 			toNoteTraj = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
 		} catch (IOException ex) {
 			DriverStation.reportError(
-				"Unable to open trajectory: " + moveToNote,
-				ex.getStackTrace());
-		}
-	}
-
-	public void loadReturnToSpeaker() {
-		try {
-			Path trajectoryPath =
-				Filesystem.getDeployDirectory().toPath().resolve(
-					returnToSpeaker);
-			toSpeakerTraj = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-		} catch (IOException ex) {
-			DriverStation.reportError(
-				"Unable to open trajectory: " + returnToSpeaker,
+				"Unable to open trajectory: " + trajJSON,
 				ex.getStackTrace());
 		}
 	}
