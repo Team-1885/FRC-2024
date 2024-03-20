@@ -12,9 +12,6 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -33,18 +30,11 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final DifferentialDriveOdometry mOdometry;
 
-  ShuffleboardTab mTab = Shuffleboard.getTab("WC_Drive");
-
-
-
-
   private static final DriveSubsystem instance = new DriveSubsystem();
 
   public static DriveSubsystem getInstance() {
     return instance;
   }
-
-
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -56,9 +46,7 @@ public class DriveSubsystem extends SubsystemBase {
     mRightMaster.restoreFactoryDefaults();
     mRightFollower.restoreFactoryDefaults();
 
-  
-    mLeftEncoder.setPosition(0.0);
-    mRightEncoder.setPosition(0.0);
+    resetEncoders();
 
     mLeftEncoder.setPositionConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor);
     mRightEncoder.setPositionConversionFactor(Constants.DrivetrainConstants.kLinearDistanceConversionFactor);
@@ -69,8 +57,6 @@ public class DriveSubsystem extends SubsystemBase {
     mRightFollower.follow(mRightMaster);
 
     mRightMaster.setInverted(false);
-
-    resetEncoders();
 
     mOdometry = new DifferentialDriveOdometry(
           mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
@@ -93,7 +79,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     mOdometry.update(
       mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition());
-    SmartDashboard.putNumber("Gyro Angle", getAngle());
+    // SmartDashboard.putNumber("Gyro Angle", getAngle());
   }
 
   /**
@@ -124,7 +110,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pPose) {
-    resetEncoders();
     mOdometry.resetPosition(
         mGyro.getRotation2d(), mLeftEncoder.getPosition(), mRightEncoder.getPosition(), pPose);
   }
@@ -136,7 +121,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rot the commanded rotation
    */
   public void arcadeDrive(double pFwd, double pRot) {
-    mDrive.arcadeDrive(pFwd, -pRot);
+    mDrive.arcadeDrive(pFwd, pRot);
   }
 
   /**
@@ -148,12 +133,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void tankDriveVolts(double pLeftVolts, double pRightVolts) {
     mLeftMaster.setVoltage(pLeftVolts);
     mRightMaster.setVoltage(pRightVolts);
-    //mDrive.feed();
-
-    // if (Math.abs(pLeftVolts / 12) < 1 && Math.abs(pRightVolts / 12) < 1) {
-    //   mLeftMaster.set(pLeftVolts / 12);
-    //   mRightMaster.set(pRightVolts / 12);
-    // }
+    mDrive.feed();
   }
 
   public void setCoastMode() {
@@ -227,7 +207,6 @@ public class DriveSubsystem extends SubsystemBase {
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     mGyro.reset();
-    mGyro.calibrate();
   }
 
   public static double getAngle() {
@@ -240,6 +219,10 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
+    return mGyro.getRotation2d().getDegrees();
+  }
+
+  public double getIEEE() {
     return Math.IEEEremainder(mGyro.getAngle(), 360) * 1.0;
   }
 

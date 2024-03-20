@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -69,7 +69,7 @@ public class RobotContainer {
                 mDrive.arcadeDrive(
                     mDriverController.getRightX(), -mDriverController.getLeftY()),
             mDrive)
-        );
+    );
     mRotator.setDefaultCommand(mRotate);
 
     // Configure the trigger bindings
@@ -107,9 +107,8 @@ public class RobotContainer {
     
     new JoystickButton(mOperatorController, 7).whileTrue(new Climb(mClimber).handleInterrupt(() -> mClimber.stop()));
 
-    new JoystickButton(mOperatorController, 9).onTrue(new TurnToAngleProfiled(90, mDrive).withTimeout(2).andThen(Commands.runOnce(() -> mDrive.zeroHeading())));
-    new JoystickButton(mOperatorController, 10).onTrue(new TurnToAngleProfiled(-90, mDrive).withTimeout(2).andThen(Commands.runOnce(() -> mDrive.zeroHeading())));
-    
+    new JoystickButton(mOperatorController, 9).onTrue(new TurnToAngleProfiled(90, mDrive).withTimeout(2).andThen(Commands.runOnce(() -> mDrive.resetOdometry(new Pose2d()))));
+    new JoystickButton(mOperatorController, 10).onTrue(new TurnToAngleProfiled(-90, mDrive).withTimeout(2).andThen(Commands.runOnce(() -> mDrive.resetOdometry(new Pose2d()))));
   }
 
   /**
@@ -169,9 +168,9 @@ public class RobotContainer {
         //.andThen(Commands.runOnce(() -> mRotator.TODO(100))) // TODO: Test Functionality, Change TalonFX Config Vals
         //.andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
         //.andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))
-        //.andThen(toNoteRamsete)
+        .andThen(toNoteRamsete)
         //.andThen(toSpeakerRamsete)
-        .andThen(new TurnToAngleProfiled(-180, mDrive).withTimeout(5))
+        //.andThen(new TurnToAngleProfiled(-180, mDrive).withTimeout(5))
         .andThen(Commands.runOnce(() -> mDrive.tankDriveVolts(0, 0)));
   }
 }

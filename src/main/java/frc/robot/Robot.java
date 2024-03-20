@@ -27,7 +27,6 @@ public class Robot extends TimedRobot {
 	private Command mAutonomousCommand;
 
 	RobotContainer mRobotContainer;
-	public static double error;
 
 	private DriveSubsystem mWestCoastDrive = DriveSubsystem.getInstance();
 
@@ -131,7 +130,6 @@ public class Robot extends TimedRobot {
 	/** This function is called periodically during autonomous. */
 	@Override
 	public void autonomousPeriodic() {
-		error = 90 - DriveSubsystem.getAngle();
 
 	}
 
