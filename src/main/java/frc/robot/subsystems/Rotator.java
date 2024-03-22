@@ -13,7 +13,6 @@ public class Rotator extends SubsystemBase {
     TalonFX mRotateMaster = new TalonFX(Constants.IntakeConstants.kRotatorMasterID);
     TalonFX mRotateFollower = new TalonFX(Constants.IntakeConstants.kRotatorFollowerID);
     Slot0Configs slot0Configs = new Slot0Configs();
-    //Servo exampleServo = new Servo(1);
 
 
     public Rotator() {

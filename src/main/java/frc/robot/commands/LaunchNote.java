@@ -30,7 +30,7 @@ public class LaunchNote extends Command {
   public void initialize() {
     // Set the wheels to launching speed
     mLauncher.setLaunchWheel(Constants.LauncherConstants.kLauncherSpeed);
-    mLauncher.setFeedWheel(Constants.LauncherConstants.kLauncherSpeed);
+    mLauncher.setFeedWheel(-Constants.LauncherConstants.kLauncherSpeed);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

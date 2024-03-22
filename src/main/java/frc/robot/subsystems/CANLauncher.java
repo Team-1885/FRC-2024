@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -15,6 +16,9 @@ import frc.robot.Constants;
 public class CANLauncher extends SubsystemBase {
   CANSparkMax mLaunchWheel;
   CANSparkMax mFeedWheel;
+  Servo mServoL = new Servo(1);
+  Servo mServoR = new Servo(2);
+
 
   /** Creates a new Launcher. */
   public CANLauncher() {
@@ -69,7 +73,7 @@ public class CANLauncher extends SubsystemBase {
     return this.startEnd(
         // When the command is initialized, set the wheels to the intake speed values
         () -> {
-          setLaunchWheel(Constants.LauncherConstants.kFeedLaunchSpeed);
+          setLaunchWheel(-Constants.LauncherConstants.kFeedLaunchSpeed);
           setFeedWheel(Constants.LauncherConstants.kFeedLaunchSpeed);
         },
         // When the command stops, stop the wheels
@@ -105,5 +109,10 @@ public class CANLauncher extends SubsystemBase {
   public void stop() {
     mLaunchWheel.set(Constants.LauncherConstants.kStopSpeed);
     mFeedWheel.set(Constants.LauncherConstants.kStopSpeed);
+  }
+
+  public void setServoPosition(double pos) {
+    mServoL.set(pos);
+    mServoR.set(pos);
   }
 }

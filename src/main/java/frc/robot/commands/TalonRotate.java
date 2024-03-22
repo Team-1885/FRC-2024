@@ -26,10 +26,7 @@ public class TalonRotate extends Command {
 
   // The initialize method is called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    // Set the wheels to launching speed
-    mRotater.setIntakeRotater(-RobotContainer.mOperatorController.getRawAxis(1) * 0.125);
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

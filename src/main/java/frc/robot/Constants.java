@@ -27,10 +27,10 @@ public final class Constants {
     
     
     // CAN IDs for motor controllers
-    public static final int kLeftMasterID = 4;
-    public static final int kLeftFollowerID = 3;
-    public static final int kRightMasterID = 2;
-    public static final int kRightFollowerID = 1;
+    public static final int kLeftMasterID = 6;
+    public static final int kLeftFollowerID = 7;
+    public static final int kRightMasterID = 8;
+    public static final int kRightFollowerID = 9;
 
     
 
@@ -90,8 +90,8 @@ public final class Constants {
 
   public static class LauncherConstants {
     // PWM ports/CAN IDs for motor controllers
-    public static final int kFeederID = 19; // BEFORE 2
-    public static final int kLauncherID = 20; // BEFORE 3
+    public static final int kFeederID = 3; // BEFORE 2
+    public static final int kLauncherID = 2; // BEFORE 3
 
     // Current limit for launcher and feed wheels
     public static final int kLauncherCurrentLimit = 80;
@@ -99,11 +99,11 @@ public final class Constants {
 
     // Speeds for wheels when intaking and launching. Intake speeds are negative to run the wheels in reverse
     public static final double kLauncherSpeed = 1d;
-    public static final double kLaunchFeederSpeed = 1d;
+    public static final double kLaunchFeederSpeed = -1d;
     public static final double kIntakeLauncherSpeed = -1d;
     public static final double kIntakeFeederSpeed = -1d;
     public static final double kIntakeFeederSpeedSlower = -0.2d;
-    public static final double kFeedLaunchSpeed = -0.5d;
+    public static final double kFeedLaunchSpeed = 0.5d;
     public static final double kStopSpeed = 0.0d;
 
     public static final double kLauncherDelay = 1d;
@@ -111,9 +111,9 @@ public final class Constants {
 
   public static class IntakeConstants
   {
-    public static final int kFeederID = 21; // BEFORE 1
-    public static final int kRotatorMasterID = 22; // BEFORE 1
-    public static final int kRotatorFollowerID = 23; // BEFORE 2
+    public static final int kFeederID = 4; // BEFORE 1
+    public static final int kRotatorMasterID = 1; // BEFORE 1
+    public static final int kRotatorFollowerID = 2; // BEFORE 2
     public static final double kTrueIntakeFeederSpeed = 1;
     public static final double kIntakeRotaterSpeed = 1;
   }
@@ -130,6 +130,11 @@ public final class Constants {
   public static final class ClimberConstants {
     public static final int climber1ID = 24;
     public static final int climber2ID = 25;
+
+    public static final double speedRight = 0.25;
+    public static final double speedLeft = speedRight; //0.395;
+    
+    
   
   }
 }

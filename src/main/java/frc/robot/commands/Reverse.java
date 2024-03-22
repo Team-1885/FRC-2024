@@ -5,13 +5,14 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ClimberConstants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Climber;
 
-public class Climb extends Command {
+public class Reverse extends Command {
   Climber mClimber;
   /** Creates a new Climb. */
-  public Climb(Climber mClimber) {
+  public Reverse(Climber mClimber) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.mClimber = mClimber;
     addRequirements(mClimber);
@@ -21,13 +22,13 @@ public class Climb extends Command {
   @Override
   public void initialize() {
     // Set the wheels to launching speed
-    mClimber.setClimberSpeed(-RobotContainer.mOperatorController.getRawAxis(2) * 0.125);
-  }
+   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    mClimber.setClimberSpeed(-RobotContainer.mOperatorController.getRawAxis(2) * 0.125);
+    mClimber.setClimberSpeed(RobotContainer.mOperatorController.getRawAxis(2), RobotContainer.mOperatorController.getRawAxis(3));
+
   }
 
   // Called once the command ends or is interrupted.
