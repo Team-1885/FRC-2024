@@ -111,7 +111,7 @@ public final class Constants {
 
   public static class IntakeConstants
   {
-    public static final int kFeederID = 4; // BEFORE 1
+    public static final int kFeederID = 1; // BEFORE 1
     public static final int kRotatorMasterID = 1; // BEFORE 1
     public static final int kRotatorFollowerID = 2; // BEFORE 2
     public static final double kTrueIntakeFeederSpeed = 1;
@@ -131,7 +131,7 @@ public final class Constants {
     public static final int climber1ID = 24;
     public static final int climber2ID = 25;
 
-    public static final double speedRight = 0.25;
+    public static final double speedRight = 0.5;
     public static final double speedLeft = speedRight; //0.395;
     
     

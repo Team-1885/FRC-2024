@@ -88,7 +88,7 @@ public class RobotContainer {
                                 -mDriverController.getLeftY(), -mDriverController.getRightX()),
                         mDrive));
         mRotator.setDefaultCommand(mRotate);
-        mLauncher.setDefaultCommand(mAngleShooter);
+        //mLauncher.setDefaultCommand(mAngleShooter);
         mClimber.setDefaultCommand(mReverse);
 
         // Configure the trigger bindings
@@ -136,6 +136,8 @@ public class RobotContainer {
                 .whileTrue(new ClimbRight(mClimber).handleInterrupt(() -> mClimber.stop()));
         new JoystickButton(mOperatorController, 8)
                 .whileTrue(new ClimbLeft(mClimber).handleInterrupt(() -> mClimber.stop()));
+
+        new JoystickButton(mOperatorController, 1).whileTrue(new AngleShooter(mLauncher).handleInterrupt(() -> mLauncher.stop()));
 
         //new JoystickButton(mOperatorController, 9).onTrue(new TurnToAngleProfiled(90, mDrive).withTimeout(2)
                 //.andThen(Commands.runOnce(() -> mDrive.resetOdometry(new Pose2d()))));
