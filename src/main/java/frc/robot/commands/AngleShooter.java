@@ -7,6 +7,7 @@ package frc.robot.commands;
 import javax.swing.plaf.basic.BasicBorders.RolloverButtonBorder;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.CANLauncher;
 
@@ -22,13 +23,13 @@ public class AngleShooter extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // Set the wheels to launching speed
+    launcher.setServoPosition(90);
    }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    launcher.setServoPosition(Math.abs(RobotContainer.mOperatorController.getRawAxis(5)));
+    launcher.setServoPosition(90);
   }
 
   // Called once the command ends or is interrupted.

@@ -115,8 +115,8 @@ public class CANLauncher extends SubsystemBase {
   }
 
   public void setServoPosition(double pos) {
-    mServoL.set(pos);
-    mServoR.set(pos);
+    mServoL.setAngle(pos);
+    mServoR.setAngle(pos);
   }
 
   public void stopServos() {

@@ -137,7 +137,9 @@ public class RobotContainer {
         new JoystickButton(mOperatorController, 8)
                 .whileTrue(new ClimbLeft(mClimber).handleInterrupt(() -> mClimber.stop()));
 
-        new JoystickButton(mOperatorController, 1).whileTrue(new AngleShooter(mLauncher).handleInterrupt(() -> mLauncher.stop()));
+        new JoystickButton(mOperatorController, 1).whileTrue(new AngleShooter(mLauncher).handleInterrupt(() -> mLauncher.stopServos()));
+        //new JoystickButton(mOperatorController, 1).toggleOnTrue(Commands.startEnd(() -> mLauncher.setServoPosition(180), () -> mLauncher.setServoPosition(0), mLauncher));
+        
 
         //new JoystickButton(mOperatorController, 9).onTrue(new TurnToAngleProfiled(90, mDrive).withTimeout(2)
                 //.andThen(Commands.runOnce(() -> mDrive.resetOdometry(new Pose2d()))));
