@@ -107,14 +107,14 @@ public class RobotContainer {
      * Flight joysticks}.
      */
     private void configureBindings() {
-        new JoystickButton(mOperatorController, 2)
+        new JoystickButton(mOperatorController, 1)
                 .whileTrue(
                         new PrepareLaunch(mLauncher)
                                 .withTimeout(1)
                                 .andThen(new LaunchNote(mLauncher))
                                 .handleInterrupt(() -> mLauncher.stop()));
 
-        new JoystickButton(mOperatorController, 3).whileTrue(mLauncher.feedlaunchWheel())
+        new JoystickButton(mOperatorController, 2).whileTrue(mLauncher.feedlaunchWheel())
                 .onFalse(new InstantCommand(mLauncher::stop));
 
         new JoystickButton(mOperatorController, 4)
@@ -132,19 +132,16 @@ public class RobotContainer {
                         new TalonShoot(mIntake)
                                 .handleInterrupt(() -> mIntake.stop()));
 
-        new JoystickButton(mOperatorController, 7)
-                .whileTrue(new ClimbRight(mClimber).handleInterrupt(() -> mClimber.stop()));
         new JoystickButton(mOperatorController, 8)
+                .whileTrue(new ClimbRight(mClimber).handleInterrupt(() -> mClimber.stop()));
+        new JoystickButton(mOperatorController, 7)
                 .whileTrue(new ClimbLeft(mClimber).handleInterrupt(() -> mClimber.stop()));
 
-        new JoystickButton(mOperatorController, 1).whileTrue(new AngleShooter(mLauncher).handleInterrupt(() -> mLauncher.stopServos()));
-        //new JoystickButton(mOperatorController, 1).toggleOnTrue(Commands.startEnd(() -> mLauncher.setServoPosition(180), () -> mLauncher.setServoPosition(0), mLauncher));
-        
+        //new JoystickButton(mOperatorController, 9)
+        //        .whileTrue(new Reverse(mClimber).handleInterrupt(() -> mClimber.stop()));
 
-        //new JoystickButton(mOperatorController, 9).onTrue(new TurnToAngleProfiled(90, mDrive).withTimeout(2)
-                //.andThen(Commands.runOnce(() -> mDrive.resetOdometry(new Pose2d()))));
-        //new JoystickButton(mOperatorController, 10).onTrue(new TurnToAngleProfiled(-90, mDrive).withTimeout(2)
-                //.andThen(Commands.runOnce(() -> mDrive.resetOdometry(new Pose2d()))));
+        new JoystickButton(mOperatorController, 3).whileTrue(new AngleShooter(mLauncher).handleInterrupt(() -> mLauncher.stopServos()));
+        // DONT WORK //new JoystickButton(mOperatorController, 1).toggleOnTrue(Commands.startEnd(() -> mLauncher.setServoPosition(180), () -> mLauncher.setServoPosition(0), mLauncher));
     }
 
     /**
