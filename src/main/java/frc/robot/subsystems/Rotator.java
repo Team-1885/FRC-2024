@@ -5,6 +5,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -63,5 +64,12 @@ public class Rotator extends SubsystemBase {
     public void applyConfigs(Slot0Configs pConfigs) {
         mRotateMaster.getConfigurator().apply(pConfigs);
         mRotateFollower.getConfigurator().apply(pConfigs);
+    }
+
+    @Override
+    public void periodic() {
+        var masterPos = mRotateMaster.getPosition();
+        double masterPosDouble = masterPos.getValue();
+        SmartDashboard.putNumber("Master Pos", masterPosDouble);
     }
 }

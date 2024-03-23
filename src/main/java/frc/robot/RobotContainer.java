@@ -121,10 +121,10 @@ public class RobotContainer {
         new JoystickButton(mOperatorController, 2).whileTrue(mLauncher.feedlaunchWheel())
                 .onFalse(new InstantCommand(mLauncher::stop));
 
-        //new JoystickButton(mOperatorController, 4)
-        //        .whileTrue(
-        //                new PositionControl(mRotator)
-        //                        .handleInterrupt(() -> mRotator.stop()));
+        new JoystickButton(mOperatorController, 4)
+                .whileTrue(
+                        new PositionControl(mRotator)
+                                .handleInterrupt(() -> mRotator.stop()));
 
         new JoystickButton(mOperatorController, 5)
                 .whileTrue(
@@ -220,7 +220,7 @@ public class RobotContainer {
                 .andThen(new WaitCommand(2))
                 .andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(0)))
                 .andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(0)))
-                .andThen(new WaitCommand(9))
+                .andThen(new WaitCommand(2))
                 .andThen(ramseteCommand);
                 //.andThen(Commands.runOnce(() -> mDrive.resetGyro()));
                 // .andThen(toSpeakerRamsete)

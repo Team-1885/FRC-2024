@@ -30,7 +30,7 @@ public class PositionControl extends Command {
     @Override
     public void initialize() {
         var slot0Configs = new Slot0Configs();
-        slot0Configs.kP = 24;
+        slot0Configs.kP = 0.1;
         slot0Configs.kI = 0;
         slot0Configs.kD = 0.1;
 
@@ -42,7 +42,7 @@ public class PositionControl extends Command {
     public void execute() {
         final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
 
-        mRotater.setControl(m_request.withPosition(10)); //10 Rotations
+        mRotater.setControl(m_request.withPosition(30)); //10 Rotations
     }
 
     // Returns true when the command should end.
