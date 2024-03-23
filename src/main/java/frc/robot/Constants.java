@@ -132,7 +132,7 @@ public final class Constants {
     public static final int climber2ID = 25;
 
     public static final double speedRight = 0.5;
-    public static final double speedLeft = 0.5;
+    public static final double speedLeft = 1;
     
     
   

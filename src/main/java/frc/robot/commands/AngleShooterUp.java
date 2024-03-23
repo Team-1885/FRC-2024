@@ -23,13 +23,13 @@ public class AngleShooterUp extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    launcher.setServoPosition(180);
+    launcher.setServoPosition(80);
    }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    launcher.setServoPosition(180);
+    launcher.setServoPosition(80);
   }
 
   // Called once the command ends or is interrupted.

@@ -16,11 +16,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.AngleShooter;
+import frc.robot.commands.AngleShooterUp;
 import frc.robot.commands.ClimbLeft;
 import frc.robot.commands.ClimbRight;
 import frc.robot.commands.LaunchNote;
@@ -49,7 +51,7 @@ public class RobotContainer {
 
     // The robot's subsystems and commands are defined here...
     public static final DriveSubsystem mDrive = DriveSubsystem.getInstance();
-    private final CANLauncher mLauncher = new CANLauncher();
+    public final CANLauncher mLauncher = new CANLauncher();
     private final Rotator mRotator = new Rotator();
     private final Intake mIntake = new Intake();
     private final Climber mClimber = new Climber();
@@ -59,6 +61,7 @@ public class RobotContainer {
 
     private final TalonRotate mRotate;
     private final AngleShooter mAngleShooter;
+    private final AngleShooterUp mAngleShooterUp;
 
     private final double kP = 0.012;
 
@@ -76,6 +79,7 @@ public class RobotContainer {
         // Command Initialization
         mRotate = new TalonRotate(mRotator);
         mAngleShooter = new AngleShooter(mLauncher);
+        mAngleShooterUp = new AngleShooterUp(mLauncher);
         mClimbRight = new ClimbRight(mClimber);
         mClimbLeft = new ClimbLeft(mClimber);
         mReverse = new Reverse(mClimber);
@@ -110,17 +114,17 @@ public class RobotContainer {
         new JoystickButton(mOperatorController, 1)
                 .whileTrue(
                         new PrepareLaunch(mLauncher)
-                                .withTimeout(1)
+                                .withTimeout(0.75)
                                 .andThen(new LaunchNote(mLauncher))
                                 .handleInterrupt(() -> mLauncher.stop()));
 
         new JoystickButton(mOperatorController, 2).whileTrue(mLauncher.feedlaunchWheel())
                 .onFalse(new InstantCommand(mLauncher::stop));
 
-        new JoystickButton(mOperatorController, 4)
-                .whileTrue(
-                        new PositionControl(mRotator)
-                                .handleInterrupt(() -> mRotator.stop()));
+        //new JoystickButton(mOperatorController, 4)
+        //        .whileTrue(
+        //                new PositionControl(mRotator)
+        //                        .handleInterrupt(() -> mRotator.stop()));
 
         new JoystickButton(mOperatorController, 5)
                 .whileTrue(
@@ -141,6 +145,8 @@ public class RobotContainer {
         //        .whileTrue(new Reverse(mClimber).handleInterrupt(() -> mClimber.stop()));
 
         new JoystickButton(mOperatorController, 3).whileTrue(new AngleShooter(mLauncher).handleInterrupt(() -> mLauncher.stopServos()));
+        new JoystickButton(mOperatorController, 9).whileTrue(new AngleShooterUp(mLauncher).handleInterrupt(() -> mLauncher.stopServos()));
+        new JoystickButton(mOperatorController, 10).whileTrue(Commands.runOnce(() -> mLauncher.setServoPosition(60)));
         // DONT WORK //new JoystickButton(mOperatorController, 1).toggleOnTrue(Commands.startEnd(() -> mLauncher.setServoPosition(180), () -> mLauncher.setServoPosition(0), mLauncher));
     }
 
@@ -207,14 +213,20 @@ public class RobotContainer {
                 // //https://docs.jpsrobotics2554.org/programming/advanced-concepts/motion-profiling/
                 // .andThen(Commands.runOnce(() -> mRotator.TODO(100))) // TODO: Test
                 // Functionality, Change TalonFX Config Vals
-                // .andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
-                // .andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(12)))
-                .andThen(ramseteCommand)
-                .andThen(Commands.runOnce(() -> mDrive.resetGyro()))
+                .andThen(Commands.runOnce(() -> mLauncher.setServoPosition(80)))
+                .andThen(new WaitCommand(2))
+                .andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(12)))
+                .andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(-12)))
+                .andThen(new WaitCommand(2))
+                .andThen(Commands.runOnce(() -> mLauncher.setLaunchVolts(0)))
+                .andThen(Commands.runOnce(() -> mLauncher.setFeedVolts(0)))
+                .andThen(new WaitCommand(9))
+                .andThen(ramseteCommand);
+                //.andThen(Commands.runOnce(() -> mDrive.resetGyro()));
                 // .andThen(toSpeakerRamsete)
-                .andThen(new TurnToAngleProfiled(-180, mDrive).withTimeout(5))
-                .andThen(Commands.runOnce(() -> mDrive.resetOdometry(Robot.toSpeakerTraj.getInitialPose())))
-                .andThen(ramseteCommand2);
+                //.andThen(new TurnToAngleProfiled(-180, mDrive).withTimeout(5))
+                //.andThen(Commands.runOnce(() -> mDrive.resetOdometry(Robot.toSpeakerTraj.getInitialPose())));
+                //.andThen(ramseteCommand2);
         // .andThen(Commands.runOnce(() -> mDrive.tankDriveVolts(0, 0)));
     }
 }
