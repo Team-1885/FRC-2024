@@ -22,13 +22,13 @@ public class TalonFeed extends Command {
   @Override
   public void initialize() {
     // Set the wheels to launching speed
-    mFeeder.setIntakeFeeder(0.3);
+    mFeeder.setIntakeFeeder(0.2);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    mFeeder.setIntakeFeeder(0.3);
+    mFeeder.setIntakeFeeder(0.2);
   }
 
   // Returns true when the command should end.

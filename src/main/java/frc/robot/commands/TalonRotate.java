@@ -31,7 +31,7 @@ public class TalonRotate extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    mRotater.setIntakeRotater(-RobotContainer.mOperatorController.getRawAxis(1) * 0.125);
+    mRotater.setIntakeRotater(-RobotContainer.mOperatorController.getRawAxis(1) * 0.2);
   }
 
   // Returns true when the command should end.
