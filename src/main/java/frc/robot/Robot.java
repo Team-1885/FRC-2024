@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-aimport frc.robot.subsystems.CANLauncher;
+import frc.robot.subsystems.CANLauncher;
 import frc.robot.subsystems.DriveSubsystem;
 
 import java.io.IOException;
