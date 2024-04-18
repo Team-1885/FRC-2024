@@ -11,9 +11,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.*;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.button.*;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.*;
 import frc.robot.commands.Climb;
@@ -22,8 +20,10 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Rotator;
 import frc.robot.subsystems.DriveSubsystem;
+import lombok.Getter;
 
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 /**
  * This class is where the bulk of the robot should be declared.
@@ -38,12 +38,12 @@ public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     public static final DriveSubsystem mDrive = DriveSubsystem.getInstance();
     private final CANLauncher mLauncher = new CANLauncher();
-    private final Rotator mRotator = new Rotator();
+    public final static Rotator mRotator = new Rotator();
     private final Intake mIntake = new Intake();
     private final Climber mClimber = new Climber();
     private final Climb mClimb;
 
-    private final TalonRotate mRotate;
+    public final TalonRotate mRotate;
     private final AngleShooter mAngleShooter;
 
     private final double kP = 0.012;
@@ -61,7 +61,6 @@ public class RobotContainer {
     public RobotContainer() {
 
         // Command Initialization
-        mRotate = new TalonRotate(mRotator);
         mAngleShooter = new AngleShooter(mLauncher);
 
         mDrive.setDefaultCommand(
@@ -71,8 +70,9 @@ public class RobotContainer {
                         () -> mDrive.arcadeDrive(
                                 -mDriverController.getLeftY(), -mDriverController.getRightX()),
                         mDrive));
+
+        mRotate = new TalonRotate(mRotator);
         mRotator.setDefaultCommand(mRotate);
-        //mLauncher.setDefaultCommand(mAngleShooter);
 
         mClimb = new Climb(mClimber);
         mClimber.setDefaultCommand(mClimb);
@@ -84,12 +84,12 @@ public class RobotContainer {
     /**
      * Use this method to define your trigger->command mappings.
      * Triggers can be created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+     * {@link Trigger#Trigger(BooleanSupplier)} constructor with
      * an arbitrary predicate, or via the named factories in
-     * {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses
+     * {@link CommandGenericHID}'s subclasses
      * for {@link CommandXboxController
-     * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4}
-     * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick
+     * Xbox}/{@link CommandPS4Controller PS4}
+     * controllers or {@link CommandJoystick
      * Flight joysticks}.
      */
     private void configureBindings() {

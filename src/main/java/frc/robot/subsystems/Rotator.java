@@ -66,6 +66,11 @@ public class Rotator extends SubsystemBase {
         mRotateFollower.getConfigurator().apply(pConfigs);
     }
 
+    public double getPos() {
+        var masterPos = mRotateMaster.getPosition();
+        return masterPos.getValue();
+    }
+
     @Override
     public void periodic() {
         var masterPos = mRotateMaster.getPosition();
