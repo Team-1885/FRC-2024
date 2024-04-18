@@ -22,13 +22,13 @@ public class TalonShoot extends Command {
   @Override
   public void initialize() {
     // Set the wheels to launching speed
-    mFeeder.setIntakeFeeder(-1);
+    mFeeder.setIntakeFeeder(-0.5);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // There is nothing we need this command to do on each iteration. You could remove this method and the default blank method of the base class will run.
+    mFeeder.setIntakeFeeder(-0.5);
   }
 
   // Returns true when the command should end.

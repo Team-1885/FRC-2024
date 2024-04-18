@@ -5,6 +5,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -16,7 +17,7 @@ public class Rotator extends SubsystemBase {
 
 
     public Rotator() {
-        mRotateFollower.setControl(new Follower(mRotateMaster.getDeviceID(), false));
+        mRotateFollower.setControl(new Follower(mRotateMaster.getDeviceID(), true));
     }
 
     public Command getRotatorCommand() {
@@ -37,7 +38,7 @@ public class Rotator extends SubsystemBase {
     // An accessor method to set the speed (technically the output percentage) of the feed wheel
     public void setIntakeRotater(double speed) {
         mRotateMaster.set(speed);
-        mRotateFollower.set(-speed);
+        //mRotateFollower.set(-speed);
     }
 
     public double getMasterSpeed() {
@@ -52,16 +53,27 @@ public class Rotator extends SubsystemBase {
     // and call the individual accessors with speed = 0 instead
     public void stop() {
         mRotateMaster.set(0);
-        mRotateFollower.set(0);
+        //mRotateFollower.set(0);
     }
 
     public void setControl(PositionVoltage pRequest) {
         mRotateMaster.setControl(pRequest);
-        mRotateFollower.setControl(pRequest);
+        //mRotateFollower.setControl(pRequest);
     }
 
     public void applyConfigs(Slot0Configs pConfigs) {
         mRotateMaster.getConfigurator().apply(pConfigs);
         mRotateFollower.getConfigurator().apply(pConfigs);
+    }
+
+    @Override
+    public void periodic() {
+        var masterPos = mRotateMaster.getPosition();
+        double masterPosDouble = masterPos.getValue();
+        SmartDashboard.putNumber("Master Pos", masterPosDouble);
+
+        var followerPos = mRotateFollower.getPosition();
+        double followerPosDouble = followerPos.getValue();
+        SmartDashboard.putNumber("Follower Pos", followerPosDouble);
     }
 }
