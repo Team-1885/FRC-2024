@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Climber extends SubsystemBase {
   TalonSRX climberR = new TalonSRX(11);
@@ -19,25 +20,7 @@ public class Climber extends SubsystemBase {
   public Climber() {
     climberR.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     climberL.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-
-    
   }
-
-  public Command getClimberCommand() {
-        // The startEnd helper method takes a method to call when the command is
-        // initialized and one to
-        // call when it ends
-        return this.startEnd(
-                // When the command is initialized, set the wheels to the intake speed values
-                () -> {
-                    climberR.set(ControlMode.PercentOutput, 1);
-                    climberL.set(ControlMode.PercentOutput, 1);
-                },
-                // When the command stops, stop the wheels
-                () -> {
-                    stop();
-                });
-    }
 
   public void stop() {
     climberR.set(ControlMode.PercentOutput, 0.0);
@@ -45,22 +28,10 @@ public class Climber extends SubsystemBase {
 
   }
 
-  public void setRightClimberSpeed(double speedR) {
-    climberR.set(ControlMode.PercentOutput, speedR);
-  }
-
   public void setClimberSpeed(double speedL, double speedR) {
-    climberR.set(ControlMode.PercentOutput, speedR);
-    climberL.set(ControlMode.PercentOutput, speedL);
+    climberR.set(ControlMode.PercentOutput, Constants.ClimberConstants.speedRight * speedR);
+    climberL.set(ControlMode.PercentOutput, -1 * Constants.ClimberConstants.speedLeft * speedL);
   }
-
-  public void setLeftClimberSpeed(double speedL) {
-    climberL.set(ControlMode.PercentOutput, speedL);
-  }
-
-
-
-
 
   @Override
   public void periodic() {
@@ -75,4 +46,5 @@ public class Climber extends SubsystemBase {
     SmartDashboard.putNumber("L: ", velL);
     SmartDashboard.putNumber("R: ", velR);
   }
+
 }

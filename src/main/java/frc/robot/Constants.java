@@ -131,8 +131,11 @@ public final class Constants {
     public static final int climber1ID = 24;
     public static final int climber2ID = 25;
 
-    public static final double speedRight = 0.5;
-    public static final double speedLeft = speedRight; //0.395;
+    public static final int climberLButtonID = 7;
+    public static final int climberRButtonID = 8;
+
+    public static final double speedRight = 1;
+    public static final double speedLeft = 1; //0.395;
     
     
   

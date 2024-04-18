@@ -9,26 +9,31 @@ import frc.robot.Constants.ClimberConstants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Climber;
 
-public class Reverse extends Command {
-  Climber mClimber;
+public class Climb extends Command {
+  Climber climber;
+
   /** Creates a new Climb. */
-  public Reverse(Climber mClimber) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    this.mClimber = mClimber;
-    addRequirements(mClimber);
+  public Climb(Climber climber) {
+    this.climber = climber;
+    addRequirements(climber);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // Set the wheels to launching speed
-   }
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    mClimber.setClimberSpeed(RobotContainer.mOperatorController.getRawAxis(2), RobotContainer.mOperatorController.getRawAxis(3));
 
+    boolean lPressed = RobotContainer.mOperatorController.getRawButton(ClimberConstants.climberLButtonID);
+    boolean rPressed = RobotContainer.mOperatorController.getRawButton(ClimberConstants.climberRButtonID);
+
+    double l = lPressed ? 1 : 0;
+    double r = rPressed ? 1 : 0;
+
+    climber.setClimberSpeed(RobotContainer.mOperatorController.getRawAxis(2) - l, RobotContainer.mOperatorController.getRawAxis(3) - r);
   }
 
   // Called once the command ends or is interrupted.
@@ -41,3 +46,4 @@ public class Reverse extends Command {
     return false;
   }
 }
+

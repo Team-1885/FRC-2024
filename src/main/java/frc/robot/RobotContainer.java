@@ -7,35 +7,23 @@ package frc.robot;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RamseteCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.commands.AngleShooter;
-import frc.robot.commands.ClimbLeft;
-import frc.robot.commands.ClimbRight;
-import frc.robot.commands.LaunchNote;
-import frc.robot.commands.PositionControl;
-import frc.robot.commands.PrepareLaunch;
-import frc.robot.commands.Reverse;
-import frc.robot.commands.TalonFeed;
-import frc.robot.commands.TalonRotate;
-import frc.robot.commands.TalonShoot;
-import frc.robot.commands.TurnToAngleProfiled;
+import frc.robot.commands.*;
+import frc.robot.commands.Climb;
 import frc.robot.subsystems.CANLauncher;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Rotator;
 import frc.robot.subsystems.DriveSubsystem;
+
+import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared.
@@ -53,9 +41,7 @@ public class RobotContainer {
     private final Rotator mRotator = new Rotator();
     private final Intake mIntake = new Intake();
     private final Climber mClimber = new Climber();
-    private final ClimbRight mClimbRight;
-    private final ClimbLeft mClimbLeft;
-    private final Reverse mReverse;
+    private final Climb mClimb;
 
     private final TalonRotate mRotate;
     private final AngleShooter mAngleShooter;
@@ -64,7 +50,8 @@ public class RobotContainer {
 
     public final static CommandXboxController mDriverController = new CommandXboxController(1); // 1 is the USB Port to
                                                                                                 // be used as indicated
-                                                                                                // on the Driver Station
+
+    // on the Driver Station
     public final static Joystick mOperatorController = new Joystick(2); // 2 is the USB Port to be used as indicated on
                                                                         // the Driver Station
 
@@ -76,9 +63,6 @@ public class RobotContainer {
         // Command Initialization
         mRotate = new TalonRotate(mRotator);
         mAngleShooter = new AngleShooter(mLauncher);
-        mClimbRight = new ClimbRight(mClimber);
-        mClimbLeft = new ClimbLeft(mClimber);
-        mReverse = new Reverse(mClimber);
 
         mDrive.setDefaultCommand(
                 // A split-stick arcade command, with forward/backward controlled by the left
@@ -89,7 +73,9 @@ public class RobotContainer {
                         mDrive));
         mRotator.setDefaultCommand(mRotate);
         //mLauncher.setDefaultCommand(mAngleShooter);
-        mClimber.setDefaultCommand(mReverse);
+
+        mClimb = new Climb(mClimber);
+        mClimber.setDefaultCommand(mClimb);
 
         // Configure the trigger bindings
         configureBindings();
@@ -132,11 +118,6 @@ public class RobotContainer {
                         new TalonShoot(mIntake)
                                 .handleInterrupt(() -> mIntake.stop()));
 
-        new JoystickButton(mOperatorController, 7)
-                .whileTrue(new ClimbRight(mClimber).handleInterrupt(() -> mClimber.stop()));
-        new JoystickButton(mOperatorController, 8)
-                .whileTrue(new ClimbLeft(mClimber).handleInterrupt(() -> mClimber.stop()));
-
         new JoystickButton(mOperatorController, 1).whileTrue(new AngleShooter(mLauncher).handleInterrupt(() -> mLauncher.stop()));
 
         //new JoystickButton(mOperatorController, 9).onTrue(new TurnToAngleProfiled(90, mDrive).withTimeout(2)
@@ -144,6 +125,8 @@ public class RobotContainer {
         //new JoystickButton(mOperatorController, 10).onTrue(new TurnToAngleProfiled(-90, mDrive).withTimeout(2)
                 //.andThen(Commands.runOnce(() -> mDrive.resetOdometry(new Pose2d()))));
     }
+
+
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
